@@ -1,0 +1,2 @@
+Field,Description,Example
+actor.alternateId,Username of the actor that triggered the log,example@okta.com
