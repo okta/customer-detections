@@ -8,9 +8,10 @@ modified_date: '2024-11-07'
 threat:
   - T1078
 prevention:
-  - Zero Standing Privileges via Okta Govern Admin Roles
+  - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
 detection:
   okta_systemlog:
     - eventType eq "policy.evaluate_sign_on" and target.displayName eq "Okta Admin Console" and ((debugContext.debugData.behaviors co "New Device=POSITIVE" and debugContext.debugData.behaviors co "New IP=POSITIVE") OR (debugContext.debugData.logOnlySecurityData co "\"New Device\":\"POSITIVE\"" or debugContext.debugData.logOnlySecurityData co "\"New IP\":\"POSITIVE\""))
 false_positives:
-  - Okta Admins leveraging a new legitimate corporate devices
+  - Okta Admins leveraging a new legitimate corporate device
+  - Okta Admins logging into the admin console from a new legitimate IP
