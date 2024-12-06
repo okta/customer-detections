@@ -1,16 +1,28 @@
-title: 
-id: 
-description: Detects...
-references:
-  - 
-created_date: '2024-11-07'
-modified_date: '2024-11-07'
+title: Creation of an Identity Provider by a Super Administrator or Org Administrator
+id: 9d2dfd1cdd991ca70b747f1db89be5af
+description: Detects a potentially compromised admin account creating a new IDP for cross tenant impersonation
+  - https://sec.okta.com/articles/2023/08/cross-tenant-impersonation-prevention-and-detection
+author: okta-dco
+created_date: '2023-08-31'
+modified_date: '2023-08-31'
 threat:
-  - 
+  Tactic:
+    - Persistence
+    - Lateral Movement
+  Technique:
+    - T1078 Valid Accounts
+    - T1550 Use Alternate Authentication Material
 prevention:
-  - 
+  - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
+  - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
+  - Enable Protected Actions (under Settings > Features) to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+  - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+  - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
+  - Apply ASN and IP Session Binding (from Settings > Features) to all administrative apps to prevent the replay of stolen administrative sessions.
 detection:
   okta_systemlog:
-    - 
+    OIE:
+      - eventType sw "system.idp.lifecycle"
 false_positives:
-  - 
+  - Legitimate new IDPs being created, should be very rare
+  - To focus on just IDP created events use this query - eventType eq "system.idp.lifecycle.create"
