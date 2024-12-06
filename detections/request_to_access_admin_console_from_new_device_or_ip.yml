@@ -3,7 +3,7 @@ id: 6b9260b1e02041a665d4e4a5117cfe16
 description: Detects an adversary attempting to access the Okta Admin Console from anomalous devices or IPs.
 references:
   - https://sec.okta.com/leastprivilege
-author: okta-ido
+author: okta-dco
 created_date: '2024-11-07'
 modified_date: '2024-11-07'
 threat:
@@ -14,9 +14,15 @@ threat:
     - T1078 Valid Accounts
 prevention:
   - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
+  - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
+  - Enable Protected Actions (under Settings > Features) to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+  - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+  - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
+  - Apply ASN and IP Session Binding (from Settings > Features) to all administrative apps to prevent the replay of stolen administrative sessions.
 detection:
   okta_systemlog:
-    - eventType eq "policy.evaluate_sign_on" and target.displayName eq "Okta Admin Console" and ((debugContext.debugData.behaviors co "New Device=POSITIVE" and debugContext.debugData.behaviors co "New IP=POSITIVE") OR (debugContext.debugData.logOnlySecurityData co "\"New Device\":\"POSITIVE\"" or debugContext.debugData.logOnlySecurityData co "\"New IP\":\"POSITIVE\""))
+    OIE:
+      - eventType eq "policy.evaluate_sign_on" and target.displayName eq "Okta Admin Console" and ((debugContext.debugData.behaviors co "New Device=POSITIVE" and debugContext.debugData.behaviors co "New IP=POSITIVE") OR (debugContext.debugData.logOnlySecurityData co "\"New Device\":\"POSITIVE\"" or debugContext.debugData.logOnlySecurityData co "\"New IP\":\"POSITIVE\""))
 false_positives:
   - Okta Admins leveraging a new legitimate corporate device
   - Okta Admins logging into the admin console from a new legitimate IP

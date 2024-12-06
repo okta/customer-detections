@@ -1,2 +1,86 @@
 Field,Description,Example
-actor.alternateId,Username of the actor that triggered the log,example@okta.com
+Actor,Information about the identity performing the action identified in Event.EventType,
+actor.alternateId,Username of the identity performing the activity,example@domain.com
+actor.DetailEntry,,
+actor.DisplayName,Full Name of the identity performing the activity,Jane Doe
+actor.ID,20 character Unique ID of the identity performing the activity ,00uxxxxxxxxxxxxxxxxx
+actor.type,Type of account associated with the identity ,"User, <list some others>"
+,,
+Client,Information about the client performing the action identified in the Event.EventType,
+client.device,Type of device performing the action,"Computer, Mobile"
+client.GeographicalContext,Geolocation of the client IP provided by our 3rd party provider,
+client.GeographicalContext.City,City the client IP is registered to ,Los Angeles
+client.GeographicalContext.Country/region,Country or region the client IP is registered to,United States
+client.GeographicalContext.Geolocation.Lat,Latitude the client IP is registered to,
+client.GeographicalContext.Geolocation.Lon,Longitude the client IP is registered to ,
+client.GeographicalContext.PostalCode,Postal or Zip code the client IP is registered to,
+client.GeographicalContext.State,State or Province the client IP is registered to ,California
+client.ID,,
+client.IPAdress,IP address of the client,x.x.x.x
+client.UserAgent.Browser,Client Browser of the client derived from the User Agent,Chrome
+client.UserAgent.OS,OS of the client derived from the User Agent,Mac OS X
+client.UserAgent.RawUserAgent,Raw User Agent String of the client,"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+client.Zone,Any applicable network zones evaluated as defined in Security > Network Zones,
+,,
+Event.AuthenticationContext,Metadata pertaining to the authentication,
+Event.AuthenticationContext.AuthenticationProvider,,
+Event.AuthenticationContext.AuthenticationStep,,
+Event.AuthenticationContext.CredentialProvider,,
+Event.AuthenticationContext.CredentialType,,
+Event.AuthenticationContext.ExternalSessionId,,
+Event.AuthenticationContext.Interface,,
+Event.AuthenticationContext.Issuer,,
+Event.AuthenticationContext.RootSessionId,,
+Event.DisplayMessage,Short description of the Event.EventType,User accessing Okta admin app
+Event.EventType,Event identifier of the action being performed see (https://developer.okta.com/docs/reference/api/event-types/),user.session.access_admin_app
+Event.Outcome,,
+Event.Outcome.Reason,,
+Event.Outcome.Result,The outcome of the action being performed defined in Event.EventType,"SUCCESS, FAILURE, CHALLENGE"
+Event.Published,Timestamp the log event was published in UTC,2024-12-05T17:23:52.807Z
+Event.SecurityContext,,
+Event.SecurityContext.ASNumber,ASN the client IP is authenticating from,394089
+Event.SecurityContext.ASOrg,Organization the client IP is registered to ,palo alto networks inc
+Event.SecurityContext.Domain,,
+Event.SecurityContext.IsProxy,"Boolean result if the IP is registered to a proxy or anonymizer service, derived from 3rd party service provider","false, <true> {dfsafdsa}"
+Event.SecurityContext.ISP,ISP the client IP is registered to ,google
+Event.Severity,<find definitions>,"INFO, "
+,,
+Event.System,,
+Event.System.DebugContext.DebugData.AuthnRequestId,,
+Event.System.DebugContext.DebugData.DeviceFingerprint,client generated unique identifier that is based off of various aspects of the end user’s browser. The device fingerprint is similar to the Device token but it is not stored as a cookie,3bb5786bd65261de7b1b0173156d8000
+Event.System.DebugContext.DebugData.DtHash,hash of the device token. The device token is a backend generated unique string that is returned as a browser cookie.,203fb28ad85ffbc2b789dddfcae566a4a3c707a3ef85509730702493bb778e62
+Event.System.DebugContext.DebugData.LogOnlySecurityData,,
+Event.System.DebugContext.DebugData.OktaUserAgentExtended,,
+Event.System.DebugContext.DebugData.Origin,,
+Event.System.DebugContext.DebugData.InitiationType,,
+Event.System.DebugContext.DebugData.RequestId,,
+Event.System.DebugContext.DebugData.RedirectUri,,
+Event.System.DebugContext.DebugData.RequestUrl,,
+Event.System.DebugContext.DebugData.SignOnMode,,
+Event.System.DebugContext.DebugData.ThreatSuspected,,
+Event.System.DebugContext.DebugData.TraceId,,
+Event.System.DebugContext.DebugData.ThreatSuspected,,
+Event.System.DebugContext.DebugData.Url,,
+Event.System.LegacyEventType,,
+Event.System.Transaction.Detail,,
+Event.System.Transaction.ID,,
+Event.System.Transaction.Type,,
+Event.System.UUID,,
+Event.System.Version,,
+,,
+Request,,
+Request.IPChain,,
+Request.IPChain.GeographicalContext.City,,
+Request.IPChain.GeographicalContext.Country/region,,
+Request.IPChain.GeographicalContext.Geolocation.Lat,,
+Request.IPChain.GeographicalContext.Geolocation.Lon,,
+Request.IPChain.IP,,
+Request.IPChain.Source,,
+Request.IPChain.Version,,
+,,
+Target,,
+Target.AlternateId,,
+Target.DetailEntry.SignOnModeType,,
+Target.DisplayName,,
+Target.ID,,
+Target.Type,,
