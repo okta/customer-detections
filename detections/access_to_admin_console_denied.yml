@@ -1,20 +1,26 @@
-title: 
-id: 
-description: 
+title: Access to Admin Console Denied
+id: e6e88bfdbc27a65cddf1225c9ff0fb12
+description: Detects a potential malicious actor trying to login to an administrative account
+author: Okta
 references:
-  - 
-created_date: '2024-11-07'
-modified_date: '2024-11-07'
+  - https://sec.okta.com/leastprivilege
+created_date: '2022-10-22'
+modified_date: '2022-10-22'
 threat:
   Tactic:
-    - 
+    - Initial Access
   Technique:
-    - 
+    - T1078 Valid Accounts
 prevention:
-  - 
+  - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
+  - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
+  - Enable Protected Actions (under Settings > Features) to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+  - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+  - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
+  - Apply ASN and IP Session Binding (from Settings > Features) to all administrative apps to prevent the replay of stolen administrative sessions.
 detection:
   okta_systemlog:
     OIE:
-      - 
+      - eventType eq "user.session.access_admin_app" AND outcome.result eq "FAILURE"
 false_positives:
-  - 
+  - Legitimate administrative users causing a failure due to user-error. Enhance this detection looking for multiple instances of this occurring from the same source

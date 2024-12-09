@@ -1,0 +1,24 @@
+title: Hunt on Factor Resets
+id: c743cf73c0c508da3bf286367e548111
+description: Detects an adversary resetting MFA factors after compromising an account, hunt for indication of malicious factor resets
+references:
+  - https://sec.okta.com/articles/2023/08/cross-tenant-impersonation-prevention-and-detection
+  - https://help.okta.com/oie/en-us/content/topics/identity-engine/authenticators/require-phishing-resistant-authenticator.htm?cshid=csh-require-phish-resistant
+author: Okta
+created_date: '2023-08-31'
+modified_date: '2023-08-31'
+threat:
+  Tactic:
+    - Credential Access
+    - Defense Evasion
+    - Persistence
+  Technique:
+    - T1556.006 Modify Authentication Process.Multi-Factor Authentication
+prevention:
+  - Configure strict authenticator enrollment policies requiring users to leverage high security methods of enrollment (see references link)
+detection:
+  okta_systemlog:
+    OIE:
+      - eventType eq "user.mfa.factor.reset_all"
+false_positives:
+  - Legitimate factor resets when a user receives a new device. Exclude any commonalities relating to your environment and hunt for suspicious mfa resets.
