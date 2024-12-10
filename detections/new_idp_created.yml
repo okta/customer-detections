@@ -1,6 +1,7 @@
 title: Creation of an Identity Provider by a Super Administrator or Org Administrator
 id: 9d2dfd1cdd991ca70b747f1db89be5af
 description: Detects a potentially compromised admin account creating a new IDP for cross tenant impersonation
+references:
   - https://sec.okta.com/articles/2023/08/cross-tenant-impersonation-prevention-and-detection
 author: okta-dco
 created_date: '2023-08-31'
