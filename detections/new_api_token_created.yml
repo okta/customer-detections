@@ -1,9 +1,11 @@
 title: New Okta API Token Created
 id: f0d9c641e55c89527c263090ed2ea0c8
-description: Detects a new Okta API token being created by an Okta Administrator
+description: |
+  Detects a new Okta API token being created by an Okta Administrator.
+  An adversary with access to an Okta Adminsitrative account may create an API token to maintain persistence in the environment.
 references:
   - https://developer.okta.com/docs/guides/tokens/
-author: okta-dco
+author: Okta
 created_date: '2024-11-07'
 modified_date: '2024-11-07'
 threat:
@@ -20,7 +22,7 @@ prevention:
   - Apply ASN and IP Session Binding (from Settings > Features) to all administrative apps to prevent the replay of stolen administrative sessions.
 detection:
   okta_systemlog:
-    OIE:
-      - eventType eq "system.api_token.create"
+    OIE: |
+      eventType eq "system.api_token.create"
 false_positives:
   - Legitimate new Okta API tokens being created for approved integrations
