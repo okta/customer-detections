@@ -1,89 +1,89 @@
-Field,Description,Example
-Actor,Information about the identity performing the action identified in Event.EventType,
-actor.alternateId,Username of the identity performing the activity,example@domain.com
+Field,Example,Description
+Actor,,Information about the identity performing the action identified in Event.EventType
+actor.alternateId,example@domain.com,Username of the identity performing the activity
 actor.DetailEntry,,
-actor.DisplayName,Full Name of the identity performing the activity,Jane Doe
-actor.ID,20 character Unique ID of the identity performing the activity ,00uxxxxxxxxxxxxxxxxx
-actor.type,Type of account associated with the identity ,"User, <list some others>"
+actor.DisplayName,Jane Doe,Full Name of the identity performing the activity
+actor.ID,00uxxxxxxxxxxxxxxxxx,20 character Unique ID of the identity performing the activity 
+actor.type,"User, <list some others>",Type of account associated with the identity 
 ,,
-Client,Information about the client performing the action identified in the Event.EventType,
-client.device,Type of device performing the action,"Computer, Mobile"
-client.GeographicalContext,Geolocation of the client IP provided by our 3rd party provider,
-client.GeographicalContext.City,City the client IP is registered to ,Los Angeles
-client.GeographicalContext.Country/region,Country or region the client IP is registered to,United States
-client.GeographicalContext.Geolocation.Lat,Latitude the client IP is registered to,
-client.GeographicalContext.Geolocation.Lon,Longitude the client IP is registered to ,
-client.GeographicalContext.PostalCode,Postal or Zip code the client IP is registered to,
-client.GeographicalContext.State,State or Province the client IP is registered to ,California
+Client,,Information about the client performing the action identified in the Event.EventType
+client.device,"Computer, Mobile",Type of device performing the action
+client.GeographicalContext,,Geolocation of the client IP provided by our 3rd party provider
+client.GeographicalContext.City,Los Angeles,City the client IP is registered to 
+client.GeographicalContext.Country/region,United States,Country or region the client IP is registered to
+client.GeographicalContext.Geolocation.Lat,,Latitude the client IP is registered to
+client.GeographicalContext.Geolocation.Lon,,Longitude the client IP is registered to 
+client.GeographicalContext.PostalCode,,Postal or Zip code the client IP is registered to
+client.GeographicalContext.State,California,State or Province the client IP is registered to 
 client.ID,,
-client.IPAdress,IP address of the client,x.x.x.x
-client.UserAgent.Browser,Client Browser of the client derived from the User Agent,Chrome
-client.UserAgent.OS,OS of the client derived from the User Agent,Mac OS X
-client.UserAgent.RawUserAgent,Raw User Agent String of the client,"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-client.Zone,Any applicable network zones evaluated as defined in Security > Network Zones,
+client.IPAdress,x.x.x.x,IP address of the client
+client.UserAgent.Browser,Chrome,Client Browser of the client derived from the User Agent
+client.UserAgent.OS,Mac OS X,OS of the client derived from the User Agent
+client.UserAgent.RawUserAgent,"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",Raw User Agent String of the client
+client.Zone,,Any applicable network zones evaluated as defined in Security > Network Zones
 ,,
-Event.AuthenticationContext,Metadata pertaining to the authentication,
+Event.AuthenticationContext,,Metadata pertaining to the authentication
 Event.AuthenticationContext.AuthenticationProvider,,
 Event.AuthenticationContext.AuthenticationStep,,
 Event.AuthenticationContext.CredentialProvider,,
 Event.AuthenticationContext.CredentialType,,
-Event.AuthenticationContext.ExternalSessionId,"Represents an external session created outside Okta, typically by third-party 
-applications or identity providers that are integrated with Okta.  The externalsessionid is often used in the context of SSO integrations with third-party applications (like Salesforce, Google Apps, etc.) or federated identity systems. It links an external session to the user's Okta session when the user is accessing applications that are integrated with Okta.",trsdAwYA0kkTO2Z49aV8rZhRQ
+Event.AuthenticationContext.ExternalSessionId,trsdAwYA0kkTO2Z49aV8rZhRQ,"Represents an external session created outside Okta, typically by third-party 
+applications or identity providers that are integrated with Okta.  The externalsessionid is often used in the context of SSO integrations with third-party applications (like Salesforce, Google Apps, etc.) or federated identity systems. It links an external session to the user's Okta session when the user is accessing applications that are integrated with Okta."
 Event.AuthenticationContext.Interface,,
 Event.AuthenticationContext.Issuer,,
-Event.AuthenticationContext.RootSessionId,"Represents the primary session that a user is associated with when they log into 
+Event.AuthenticationContext.RootSessionId,trsXbqhVX7nQ2anDUyN90cdMw,"Represents the primary session that a user is associated with when they log into 
 Okta. This ID is generated when a user successfully authenticates and creates 
-a session within Okta.  A user can have a single rootsessionid per login, but this ID may persist across multiple applications if the user is authenticated via Single Sign-On (SSO) or other integrated Okta features.",trsXbqhVX7nQ2anDUyN90cdMw
+a session within Okta.  A user can have a single rootsessionid per login, but this ID may persist across multiple applications if the user is authenticated via Single Sign-On (SSO) or other integrated Okta features."
 Event.DisplayMessage,,
-Event.EventType,Event identifier of the action being performed see (https://developer.okta.com/docs/reference/api/event-types/),user.session.access_admin_app
+Event.EventType,user.session.access_admin_app,Event identifier of the action being performed see (https://developer.okta.com/docs/reference/api/event-types/)
 Event.Outcome,,
 Event.Outcome.Reason,,
-Event.Outcome.Result,The outcome of the action being performed defined in Event.EventType,"SUCCESS, FAILURE, CHALLENGE"
-Event.Published,Timestamp the log event was published in UTC,2024-12-05T17:23:52.807Z
+Event.Outcome.Result,"SUCCESS, FAILURE, CHALLENGE",The outcome of the action being performed defined in Event.EventType
+Event.Published,2024-12-05T17:23:52.807Z,Timestamp the log event was published in UTC
 Event.SecurityContext,,
-Event.SecurityContext.ASNumber,ASN the client IP is authenticating from,394089
-Event.SecurityContext.ASOrg,Organization the client IP is registered to ,palo alto networks inc
+Event.SecurityContext.ASNumber,394089,ASN the client IP is authenticating from
+Event.SecurityContext.ASOrg,palo alto networks inc,Organization the client IP is registered to 
 Event.SecurityContext.Domain,,
-Event.SecurityContext.IsProxy,"Boolean result if the IP is registered to a proxy or anonymizer service, derived from 3rd party service provider","false, <true> {dfsafdsa}"
-Event.SecurityContext.ISP,ISP the client IP is registered to ,google
-Event.Severity,<find definitions>,"INFO, "
+Event.SecurityContext.IsProxy,"false, <true> {dfsafdsa}","Boolean result if the IP is registered to a proxy or anonymizer service, derived from 3rd party service provider"
+Event.SecurityContext.ISP,google,ISP the client IP is registered to 
+Event.Severity,"INFO, ",<find definitions>
 ,,
 Event.System,,
 Event.System.DebugContext.DebugData.AuthnRequestId,,
-Event.System.DebugContext.DebugData.Behaviors,"The result of behavior detection evaluation which is present if behaviors are 
-evaluated in the request.","{New Geo-Location=NEGATIVE, New Device=NEGATIVE, New IP=NEGATIVE, New State=NEGATIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}"
-Event.System.DebugContext.DebugData.DeviceFingerprint,client generated unique identifier that is based off of various aspects of the end user’s browser. The device fingerprint is similar to the Device token but it is not stored as a cookie,3bb5786bd65261de7b1b0173156d8000
-Event.System.DebugContext.DebugData.DtHash,hash of the device token. The device token is a backend generated unique string that is returned as a browser cookie.,203fb28ad85ffbc2b789dddfcae566a4a3c707a3ef85509730702493bb778e62
+Event.System.DebugContext.DebugData.Behaviors,"{New Geo-Location=NEGATIVE, New Device=NEGATIVE, New IP=NEGATIVE, New State=NEGATIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}","The result of behavior detection evaluation which is present if behaviors are 
+evaluated in the request."
+Event.System.DebugContext.DebugData.DeviceFingerprint,3bb5786bd65261de7b1b0173156d8000,client generated unique identifier that is based off of various aspects of the end user’s browser. The device fingerprint is similar to the Device token but it is not stored as a cookie
+Event.System.DebugContext.DebugData.DtHash,203fb28ad85ffbc2b789dddfcae566a4a3c707a3ef85509730702493bb778e62,hash of the device token. The device token is a backend generated unique string that is returned as a browser cookie.
 Event.System.DebugContext.DebugData.LogOnlySecurityData,,
 Event.System.DebugContext.DebugData.OktaUserAgentExtended,,
 Event.System.DebugContext.DebugData.Origin,,
 Event.System.DebugContext.DebugData.InitiationType,,
 Event.System.DebugContext.DebugData.RequestId,,
-Event.System.DebugContext.DebugData.RedirectUri,"If the action corresponding to this event was involved in an authentication flow, this is the redirect URI specified.",https://<customer>.okta.com/enduser/callback
+Event.System.DebugContext.DebugData.RedirectUri,https://<customer>.okta.com/enduser/callback,"If the action corresponding to this event was involved in an authentication flow, this is the redirect URI specified."
 Event.System.DebugContext.DebugData.RequestUrl,,
-Event.System.DebugContext.DebugData.Risk,"Contains the level of risk for a particular request (LOW, MEDIUM, or HIGH) and the reasons that contributed to the risk level.",Risk{level=LOW}
-Event.System.DebugContext.DebugData.SignOnMode,,"OpenID Connect, SAML_1_1"
+Event.System.DebugContext.DebugData.Risk,Risk{level=LOW},"Contains the level of risk for a particular request (LOW, MEDIUM, or HIGH) and the reasons that contributed to the risk level."
+Event.System.DebugContext.DebugData.SignOnMode,"OpenID Connect, SAML_1_1",
 Event.System.DebugContext.DebugData.TraceId,,
-Event.System.DebugContext.DebugData.ThreatSuspected,"the event has met enough criteria to be considered a threat and the IP address 
-either is already on the Okta database denylist, or it will be added within 24 hours",TRUE
-Event.System.DebugContext.DebugData.Tunnels,"This will contain details on all relevant proxy or VPN information Spur has associated with this IP address. You can check the ""type"" (String), ""operator"" (String), and ""anonymous"" (boolean) fields under the top level ""tunnels"" field to get more information. Tunnels appears in SysLog as a list.","[{""anonymous"":true,""operator"":null,""type"":""VPN""}]"
+Event.System.DebugContext.DebugData.ThreatSuspected,TRUE,"the event has met enough criteria to be considered a threat and the IP address 
+either is already on the Okta database denylist, or it will be added within 24 hours"
+Event.System.DebugContext.DebugData.Tunnels,"[{""anonymous"":true,""operator"":null,""type"":""VPN""}]","This will contain details on all relevant proxy or VPN information Spur has associated with this IP address. You can check the ""type"" (String), ""operator"" (String), and ""anonymous"" (boolean) fields under the top level ""tunnels"" field to get more information. Tunnels appears in SysLog as a list."
 Event.System.DebugContext.DebugData.Url,,
 Event.System.LegacyEventType,,
 Event.System.Transaction.Detail,,
-Event.System.Transaction.ID,"Identifies events that have occurred together as part of an operation (for example, a request to the Okta servers). Similar to rootSessionID and externalSessionID, this field can be used for event correlation, see https://developer.okta.com/docs/reference/system-log-query/",unknown
-Event.System.Transaction.Type,,WEB
-Event.System.UUID,,UUID8044c4e5-b664-11ef-8a11-33ea08b0dcb1
-Event.System.Version,,0
+Event.System.Transaction.ID,unknown,"Identifies events that have occurred together as part of an operation (for example, a request to the Okta servers). Similar to rootSessionID and externalSessionID, this field can be used for event correlation, see https://developer.okta.com/docs/reference/system-log-query/"
+Event.System.Transaction.Type,WEB,
+Event.System.UUID,UUID8044c4e5-b664-11ef-8a11-33ea08b0dcb1,
+Event.System.Version,0,
 ,,
 Request,,
-Request.IPChain,"represents a sequence of network-related information tied to a specific authentication event. It helps Okta track the source of the login request and any intermediary systems, firewalls, or security layers involved in the request.",
-Request.IPChain.GeographicalContext.City,,Pittsburgh
-Request.IPChain.GeographicalContext.Country/region,,Pennsylvania 
-Request.IPChain.GeographicalContext.Geolocation.Lat,,40.5457
-Request.IPChain.GeographicalContext.Geolocation.Lon,,-80.0508
-Request.IPChain.IP,,165.85.197.1
+Request.IPChain,,"represents a sequence of network-related informatio including intermediary systems, firewalls, or security layers involved in the request."
+Request.IPChain.GeographicalContext.City,Pittsburgh,
+Request.IPChain.GeographicalContext.Country/region,Pennsylvania ,
+Request.IPChain.GeographicalContext.Geolocation.Lat,40.5457,
+Request.IPChain.GeographicalContext.Geolocation.Lon,-80.0508,
+Request.IPChain.IP,165.85.197.1,
 Request.IPChain.Source,,
-Request.IPChain.Version,,V4
+Request.IPChain.Version,V4,
 ,,
 Target,,
 Target.AlternateId,,

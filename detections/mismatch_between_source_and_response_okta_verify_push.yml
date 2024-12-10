@@ -6,6 +6,7 @@ description: |
   The detection is enhanved if the org is evaluating behavior conditions in the authentication policies using Okta Behavior Detection.
 references:
   - https://sec.okta.com/shareddetections
+  - https://research.splunk.com/application/8085b79b-9b85-4e67-ad63-351c9e9a5e9a/
 author: Okta
 created_date: '2023-04-06'
 modified_date: '2023-04-06'

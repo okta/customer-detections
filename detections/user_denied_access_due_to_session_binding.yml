@@ -1,20 +1,25 @@
-title: 
-id: 
-description: 
+title: User Denied Access due to Session Binding
+id: 1fae6f177a9b8ab64d8d31781ae5926f
+description: |
+  Detects violations of Okta's built-in ASN binding feature for administrative sessions.
+  This feature is enabled by default and fires an event when it detects an ASN change mid-session for administrators. 
 references:
-  - 
-created_date: '2024-11-07'
-modified_date: '2024-11-07'
+  - https://sec.okta.com/protectingadminsessions
+author: Okta
+created_date: '2024-03-21'
+modified_date: '2024-03-21'
 threat:
   Tactic:
-    - 
+    - Credential Access
   Technique:
-    - 
+    - T1539 Steal Web Session Cookie
 prevention:
-  - 
+  - Enable Protected Actions in the Okta Admin Console. This forces step-up authentication before an administrative user can modify critical settings, such as enabling a third-party Identity Provider or resetting all factors of an administrative user, greatly reducing what actions an adversary can perform with a stolen session token.
+  - Configure a Re-authentication Frequency of “Every Sign-In Attempt” to all administrative applications. This greatly diminishes access to applications using a stolen user session.
+  - Configure strict authentication policies for administrative applications. Require the device to originate from a company-owned network zone, be a managed device, and require re-authentication if device context has changed.
 detection:
   okta_systemlog:
-    OIE:
-      - 
+    OIE: | 
+      eventType eq "security.session.detect_client_roaming"
 false_positives:
-  - 
+  -  If connected to a VPN and have a Proxy agent installed on the machine (Netspoke, Zscaler), initially ASN assigned by VPN provider, and the proxy agent also tries to assign an ASN. 
