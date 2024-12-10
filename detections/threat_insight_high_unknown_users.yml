@@ -1,20 +1,24 @@
-title: 
-id: 
-description: 
+title: Threat Insight Alert - Login Failure with High Unknown Users
+id: c404d050ea87cfa3f950d43d866c043a
+description: |
+  Detects multiple login failures with high unknown user counts from the same IP accross one or more Okta orgs.
 references:
-  - 
-created_date: '2024-11-07'
-modified_date: '2024-11-07'
+  - https://sec.okta.com/shareddetections
+  - https://help.okta.com/en-us/content/topics/security/threat-insight/configure-threatinsight-system-log.htm
+author: Okta
+created_date: '2023-04-06'
+modified_date: '2023-04-06'
 threat:
   Tactic:
-    - 
+    - Credential Access
   Technique:
-    - 
+    - T1110.004 Credential Stuffing
 prevention:
-  - 
+  - Configure ThreatInsight to block mode to automatically block these attacks. 
+  - Implement passwordless authentication within your Okta tenant (https://help.okta.com/oie/en-us/content/topics/identity-engine/password-optional/password-optional-disabled.htm)
 detection:
   okta_systemlog:
-    OIE:
-      - 
+    OIE: |
+      eventType eq "security.threat.detected" AND outcome.reason co "Login failures with high unknown users count"
 false_positives:
-  - 
+  - Should be rare, certain automation setups might trigger this detection. 

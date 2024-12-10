@@ -21,7 +21,7 @@ prevention:
   - Perform proactive domain monitoring to detect new phishing domains impersonating your Okta tenant
 detection:
   okta_systemlog:
-    OIE:
-      - eventType eq "user.authentication.auth_via_mfa" AND result eq "FAILURE" AND outcome.reason eq "FastPass declined phishing attempt"
+    OIE: |
+      eventType eq "user.authentication.auth_via_mfa" AND result eq "FAILURE" AND outcome.reason eq "FastPass declined phishing attempt"
 false_positives:
   - Planned internal red teaming or pentesting engagements

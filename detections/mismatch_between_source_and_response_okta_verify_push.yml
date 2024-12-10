@@ -26,7 +26,7 @@ detection:
     Counts the total number of push events, successful authentication events, and any push sources where the client is a new device.
     Creates a ratio of successful sign-ins to pushes. 
     If the ratio (currently tuned aggressively) indicates push spam, or if a user has rejected a push, the detection proceeds to evaluate whether there is more than one IP address used during the session (session roaming) and the presence of both a new IP and new device during the session.
-  okta_splunk: |
+  splunk: |
    index=main sourcetype=OktaIM2:log eventType IN (system.push.send_factor_verify_push) OR (eventType IN (user.authentication.auth_via_mfa) debugContext.debugData.factor="OKTA_VERIFY_PUSH")
    | eval groupby='authenticationContext.externalSessionId'
     ``` Each push is sent to each registered push device, so we should group pushes around the same time as a single event for the purpose of this use-case ``` 
