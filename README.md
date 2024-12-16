@@ -1,7 +1,4 @@
-<a href="https://www.okta.com/">
-    <img src="https://www.okta.com/sites/default/files/Dev_Logo-03_Large.png" alt="OKTA logo" title="OKTA" height="100" />
-</a>
-
+[<img src="https://www.okta.com/sites/default/files/Dev_Logo-01_Large-thumbnail.png" align="right" width="256px"/>]
 # Okta Security Detection Catalog
 Welcome to the Okta Security Detection Catalog. This repository contains a collection of detection rules for security monitoring and detailed descriptions of log fields used for threat analysis within Okta environments. 
 
