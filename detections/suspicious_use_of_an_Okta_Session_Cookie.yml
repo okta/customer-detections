@@ -28,4 +28,4 @@ detection:
     ``` If we see different Operating Systems or Browsers from a UserAccount using with the same DTHash ```
     | where dc_src_ip>1 AND (dc_userAgentOS>1 OR dc_userAgentBrowser>1)
 false_positives:
-  - 
+  - Environment specific use cases or automations where cookies are re-used
