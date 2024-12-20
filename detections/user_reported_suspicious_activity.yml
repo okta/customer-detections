@@ -20,6 +20,6 @@ prevention:
 detection:
   okta_systemlog:
     OIE: |
-      eventType =  "user.account.report_suspicious_activity_by_enduser"
+      eventType eq  "user.account.report_suspicious_activity_by_enduser"
 false_positives:
   - End users reporting suspicious activity that is actually legitimate. 
