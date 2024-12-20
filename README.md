@@ -1,5 +1,7 @@
-[<img src="https://cdn.brandfolder.io/2VK5Y09C/at/bb3mqsj5ssrgxtc5fbvtx/Logo-H_Developer-blue.svg" align="right" width="384px"/>](https://developer.okta.com/)
-[![Support](https://img.shields.io/badge/docs-okta_security_blog-blue)][secblog]
+[<img src=""https://www.okta.com/sites/default/files/Dev_Logo-01_Large-thumbnail.png"" align="right" width="256px"/>](https://sec.okta.com/articles)
+[![Blog](https://img.shields.io/badge/docs-okta_security_blog-blue)][secblog]
+[![Advisories](https://img.shields.io/badge/docs-okta_security_advisories-blue)][advisories]
+[![EventTypes](https://img.shields.io/badge/docs-okta_event_types-blue)][eventtypes]
 
 # Okta Security Detection Catalog
 Welcome to the Okta Security Detection Catalog. This repository contains a collection of detection rules for security monitoring and detailed descriptions of log fields used for threat analysis within Okta environments. 
@@ -35,3 +37,5 @@ https://trust.okta.com/security-advisories/
 https://developer.okta.com/docs/reference/api/event-types/
 
 [secblog]: https://sec.okta.com/articles
+[advisories]: https://trust.okta.com/security-advisories/
+[eventtypes]: https://developer.okta.com/docs/reference/api/event-types/
