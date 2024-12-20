@@ -1,4 +1,4 @@
-[<img src=""https://www.okta.com/sites/default/files/Dev_Logo-01_Large-thumbnail.png"" align="right" width="256px"/>](https://sec.okta.com/articles)
+[<img src="https://www.okta.com/sites/default/files/Dev_Logo-01_Large-thumbnail.png" align="right" width="256px"/>](https://sec.okta.com/articles)
 [![Blog](https://img.shields.io/badge/docs-okta_security_blog-blue)][secblog]
 [![Advisories](https://img.shields.io/badge/docs-okta_security_advisories-blue)][advisories]
 [![EventTypes](https://img.shields.io/badge/docs-okta_event_types-blue)][eventtypes]
