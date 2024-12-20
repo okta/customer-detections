@@ -1,5 +1,5 @@
 [<img src="https://cdn.brandfolder.io/2VK5Y09C/at/bb3mqsj5ssrgxtc5fbvtx/Logo-H_Developer-blue.svg" align="right" width="384px"/>](https://developer.okta.com/)
-[![Support](https://img.shields.io/badge/support-Developer%20Forum-blue.svg)][devforum]
+[![Support](https://img.shields.io/badge/docs-okta_security_blog-blue)][secblog]
 
 # Okta Security Detection Catalog
 Welcome to the Okta Security Detection Catalog. This repository contains a collection of detection rules for security monitoring and detailed descriptions of log fields used for threat analysis within Okta environments. 
@@ -33,3 +33,5 @@ Note: The Okta system log query language is mostly leveraged in these detections
 https://sec.okta.com/articles
 https://trust.okta.com/security-advisories/
 https://developer.okta.com/docs/reference/api/event-types/
+
+[secblog]: https://sec.okta.com/articles
