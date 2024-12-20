@@ -1,6 +1,5 @@
-[<img src="https://www.okta.com/sites/default/files/Dev_Logo-01_Large-thumbnail.png" align="right" width="256px"/>](https://sec.okta.com/articles)
-[![Blog](https://img.shields.io/badge/docs-okta_security_blog-blue)][secblog]
-[![Advisories](https://img.shields.io/badge/docs-okta_security_advisories-blue)][advisories]
+[![Blog](https://img.shields.io/badge/blog-okta_security-blue)][secblog]
+[![Advisories](https://img.shields.io/badge/advisories-okta_security_advisories-blue)][advisories]
 [![EventTypes](https://img.shields.io/badge/docs-okta_event_types-blue)][eventtypes]
 
 # Okta Security Detection Catalog
@@ -16,25 +15,27 @@ Welcome to the Okta Security Detection Catalog. This repository contains a colle
 ## Getting Started
 The System Log provides a detailed log of user, admin and support events relevant to use of the Okta Workforce Identity Cloud.
 
-These events can be [browsed, searched or filtered in the admin console](https://help.okta.com/en-us/content/topics/reports/syslog-filters.htm). They can also be queried and filtered programmatically via the System Log API, and can be exported or streamed to third-party security monitoring tools. 
+These events can be [browsed, searched or filtered in the admin console](https://help.okta.com/en-us/content/topics/reports/syslog-filters.htm). They can also be queried and [filtered](https://developer.okta.com/docs/reference/api/system-log/#filtering-results) programmatically via the [System Log API](https://developer.okta.com/docs/reference/api/system-log/), and can be [exported](https://support.okta.com/help/s/article/Exporting-Okta-Log-Data?language=en_US) or [streamed](https://help.okta.com/en/prod/Content/Topics/Reports/log-streaming/about-log-streams.htm) to third-party security monitoring tools. 
 
-Okta Security recommends the use of Log Streaming to capture events in third-party security tools in close to real-time, and/or the use of Event Hooks and Workflows for security orchestration opportunities.
+Okta Security recommends the use of [Log Streaming](https://help.okta.com/en-us/Content/Topics/Reports/log-streaming/about-log-streams.htm) to capture events in third-party security tools in close to real-time, and/or the use of [Event Hooks](https://developer.okta.com/docs/concepts/event-hooks/) and [Workflows](https://www.okta.com/platform/workflows/) for security orchestration opportunities.
 
 Most events in System Log follow a similar pattern:
-user.account.password_reset
-`<domain>.<resource>. <action>`
+*user.account.password_reset*
+`<domain>.<resource>.<action>`
 
 
 Some of the queries listed below use the following operators to group multiple events together:
 
-Review recommended detections and run searches on ones you want to implement to determine how they fit in your environment. Perform any necessary tuning or baselining to ensure they are high fidelity prior to creating an alert. 
+| Operator |  |
+| `eq` | Equals |
+| `ne` | Not Equal to | 
+| `sw` | Starts With |
+| `ew` | Ends With | 
+| `co` | Contains |
 
-Note: The Okta system log query language is mostly leveraged in these detections, however some are documented in splunk query language. A plain english description of the detection logic is provided for splunk to allow detection engineers to implement in their respective SIEMs. 
+Okta recommends customers review these detections and run searches using those that appear to be applicable to your environment. Perform any necessary tuning or baselining to ensure they deliver high fidelity results prior to creating an alert. 
 
-## References
-https://sec.okta.com/articles
-https://trust.okta.com/security-advisories/
-https://developer.okta.com/docs/reference/api/event-types/
+Note: Most of these detections leverage Okta system log query languages, however a subset is provided in splunk query language. A plain english description of the detection logic is provided for splunk queries to allow detection engineers to implement in their SIEM of choice.
 
 [secblog]: https://sec.okta.com/articles
 [advisories]: https://trust.okta.com/security-advisories/
