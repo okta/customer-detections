@@ -27,6 +27,7 @@ Most events in System Log follow a similar pattern:
 Some of the queries listed below use the following operators to group multiple events together:
 
 | Operator | Description |
+| ------------- | ------------- |
 | `eq` | Equals |
 | `ne` | Not Equal to | 
 | `sw` | Starts With |
