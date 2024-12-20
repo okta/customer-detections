@@ -19,8 +19,8 @@ These events can be [browsed, searched or filtered in the admin console](https:/
 
 Okta Security recommends the use of [Log Streaming](https://help.okta.com/en-us/Content/Topics/Reports/log-streaming/about-log-streams.htm) to capture events in third-party security tools in close to real-time, and/or the use of [Event Hooks](https://developer.okta.com/docs/concepts/event-hooks/) and [Workflows](https://www.okta.com/platform/workflows/) for security orchestration opportunities.
 
-Most events in System Log follow a similar pattern:
-*user.account.password_reset*
+Most events in System Log follow a similar pattern:\
+*user.account.password_reset*\
 `<domain>.<resource>.<action>`
 
 
