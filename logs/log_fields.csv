@@ -8,13 +8,13 @@ actor.type,"User, <list some others>",Type of account associated with the identi
 ,,
 Client,,Information about the client performing the action identified in the Event.EventType
 client.device,"Computer, Mobile",Type of device performing the action
-client.GeographicalContext,,Geolocation of the client IP provided by our 3rd party provider
+client.GeographicalContext,,Geolocation of the client IP
 client.GeographicalContext.City,Los Angeles,City the client IP is registered to 
 client.GeographicalContext.Country/region,United States,Country or region the client IP is registered to
-client.GeographicalContext.Geolocation.Lat,,Latitude the client IP is registered to
-client.GeographicalContext.Geolocation.Lon,,Longitude the client IP is registered to 
-client.GeographicalContext.PostalCode,,Postal or Zip code the client IP is registered to
-client.GeographicalContext.State,California,State or Province the client IP is registered to 
+client.GeographicalContext.Geolocation.Lat,45.5075,Latitude the client IP is registered to
+client.GeographicalContext.Geolocation.Lon,-73.5887,Longitude the client IP is registered to 
+client.GeographicalContext.PostalCode,22042,Postal or Zip code the client IP is registered to
+client.GeographicalContext.State,Virginia,State or Province the client IP is registered to 
 client.ID,,
 client.IPAdress,x.x.x.x,IP address of the client
 client.UserAgent.Browser,Chrome,Client Browser of the client derived from the User Agent
@@ -22,9 +22,21 @@ client.UserAgent.OS,Mac OS X,OS of the client derived from the User Agent
 client.UserAgent.RawUserAgent,"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",Raw User Agent String of the client
 client.Zone,,Any applicable network zones evaluated as defined in Security > Network Zones
 ,,
+Device,,Device telemetry of the authenticating device
+Device.Device Integrator,"{""CROWDSTRIKE"":{""....""}}",Metadata from the device if device integration is setup
+Device.Disk Encryption Type,ALL_INTERNAL_VOLUMES,Type of disk encryption setup on the authenticating device
+Device.ID,guo1kds4evoGP3BcZ1u7,Unique ID of the authenticating Device
+Device.Managed,TRUE,Boolean value if the device is managed in Okta or not
+Device.Name,"Mac15,6",???
+Device.OS Platform,OSX,Operating system platform
+Device.OS Version,15.2.0,Operating system version
+Device.Registered,TRUE,Boolean value if the device is registered in Okta or not
+Device.Screen Lock Type,BIOMETRIC,What type of lock is configured on the device locally
+Device.Secure Hardware Present,TRUE,Boolean value if the device has secure hardware implemented
+,,
 Event.AuthenticationContext,,Metadata pertaining to the authentication
-Event.AuthenticationContext.AuthenticationProvider,,
-Event.AuthenticationContext.AuthenticationStep,,
+Event.AuthenticationContext.AuthenticationProvider,FACTOR_PROVIDER,
+Event.AuthenticationContext.AuthenticationStep,0,
 Event.AuthenticationContext.CredentialProvider,,
 Event.AuthenticationContext.CredentialType,,
 Event.AuthenticationContext.ExternalSessionId,trsdAwYA0kkTO2Z49aV8rZhRQ,"Represents an external session created outside Okta, typically by third-party 
@@ -34,6 +46,17 @@ Event.AuthenticationContext.Issuer,,
 Event.AuthenticationContext.RootSessionId,trsXbqhVX7nQ2anDUyN90cdMw,"Represents the primary session that a user is associated with when they log into 
 Okta. This ID is generated when a user successfully authenticates and creates 
 a session within Okta.  A user can have a single rootsessionid per login, but this ID may persist across multiple applications if the user is authenticated via Single Sign-On (SSO) or other integrated Okta features."
+Event.AuthenticationContext.AuthenticatorContext,,Context about the authenticator used
+Event.AuthenticationContext.AuthenticatorContext.ApplicationVersion,131.0.6778.205,Version of the application facilitating the authentication
+Event.AuthenticationContext.AuthenticatorContext.BinaryIdentifier,VHZYH3X3KS.com.google.Chrome.helper,Process identifier of the application facilitating the authentication
+Event.AuthenticationContext.AuthenticatorContext.BinaryPath,/Applications/Google Chrome.app/Google Chrome Helper,File path of the application facilitating the authentication
+Event.AuthenticationContext.AuthenticatorContext.BindingMethod,LOOPBACK,Binding method used during the authentication; see fastpass whitepaper for list
+Event.AuthenticationContext.AuthenticatorContext.RequestOrigin,https://{company}.okta.com,Origin header value of the authentication 
+Event.AuthenticationContext.AuthenticatorContext.SignerDistinguishedName,Developer ID Application: Google LLC,Signer of the application facilitating the authentication
+Event.AuthenticationContext.AuthenticatorContext.SignerKeyIdentifier,f2638ed05f1faa6e73e1cc61939afc98c1004fb1a70d04ddc0e63fe9084b5558,Hash of the signer's key
+Event.AuthenticationContext.AuthenticatorContext.UserConsent,APPROVED_USER_VERIFICATION,Outcome of user verification
+Event.AuthenticationContext.AuthenticatorContext.ValidationStatus,SUCCESS,Outcome of the authenticator validation
+,,
 Event.DisplayMessage,,
 Event.EventType,user.session.access_admin_app,Event identifier of the action being performed see (https://developer.okta.com/docs/reference/api/event-types/)
 Event.Outcome,,
@@ -49,18 +72,31 @@ Event.SecurityContext.ISP,google,ISP the client IP is registered to
 Event.Severity,"INFO, ",<find definitions>
 ,,
 Event.System,,
+Event.System.DebugContext.DebugData.AuthenticatorMethodChallengeTime,2025-01-10T15:17:49.778Z,Timestamp the user was challenged for MFA
 Event.System.DebugContext.DebugData.AuthnRequestId,,
+Event.System.DebugContext.DebugData.AuthorizationServer,aus1mabkazcLoQg5c1d8,Unique ID of configured authorization server
+Event.System.DebugContext.DebugData.AuthorizationServerName,app-prod,Configured name of authorization server
 Event.System.DebugContext.DebugData.Behaviors,"{New Geo-Location=NEGATIVE, New Device=NEGATIVE, New IP=NEGATIVE, New State=NEGATIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}","The result of behavior detection evaluation which is present if behaviors are 
 evaluated in the request."
+Event.System.DebugContext.DebugData.ClientAuthType,none,
+Event.System.DebugContext.DebugData.DefaultAuthorizationServer,FALSE,Boolean if default authorization server was used
 Event.System.DebugContext.DebugData.DeviceFingerprint,3bb5786bd65261de7b1b0173156d8000,client generated unique identifier that is based off of various aspects of the end user’s browser. The device fingerprint is similar to the Device token but it is not stored as a cookie
 Event.System.DebugContext.DebugData.DtHash,203fb28ad85ffbc2b789dddfcae566a4a3c707a3ef85509730702493bb778e62,hash of the device token. The device token is a backend generated unique string that is returned as a browser cookie.
+Event.System.DebugContext.DebugData.Factor,SIGNED_NONCE,MFA Factor used - SIGNED_NONCE is Okta Fastpass
+Event.System.DebugContext.DebugData.FactorIntent,AUTHENTICATION,??
+Event.System.DebugContext.DebugData.GrantType,refresh_token,type of grant being issued 
+Event.System.DebugContext.DebugData.GrantedScopes,"offline_access, profile, openid",Scopes granted through the oauth token
+Event.System.DebugContext.DebugData.KeyTypeUsedForAuthentication,USER_VERIFYING_BIO_OR_PIN,
 Event.System.DebugContext.DebugData.LogOnlySecurityData,,
 Event.System.DebugContext.DebugData.OktaUserAgentExtended,,
 Event.System.DebugContext.DebugData.Origin,,
+Event.System.DebugContext.DebugData.Policy,00p1mabob67xzg6KK1d8,Authorization Server policy hit for this event 
 Event.System.DebugContext.DebugData.InitiationType,,
-Event.System.DebugContext.DebugData.RequestId,,
+Event.System.DebugContext.DebugData.RequestId,a2f7c1f4d84c3deaa3f990db7a6cba8a,
 Event.System.DebugContext.DebugData.RedirectUri,https://<customer>.okta.com/enduser/callback,"If the action corresponding to this event was involved in an authentication flow, this is the redirect URI specified."
 Event.System.DebugContext.DebugData.RequestUrl,,
+Event.System.DebugContext.DebugData.RequestedScopes,openid,Scopes requested through the oauth token
+Event.System.DebugContext.DebugData.ResponseTime,120,Response time in ms
 Event.System.DebugContext.DebugData.Risk,Risk{level=LOW},"Contains the level of risk for a particular request (LOW, MEDIUM, or HIGH) and the reasons that contributed to the risk level."
 Event.System.DebugContext.DebugData.SignOnMode,"OpenID Connect, SAML_1_1",
 Event.System.DebugContext.DebugData.TraceId,,
@@ -68,7 +104,7 @@ Event.System.DebugContext.DebugData.ThreatSuspected,TRUE,"the event has met enou
 either is already on the Okta database denylist, or it will be added within 24 hours"
 Event.System.DebugContext.DebugData.Tunnels,"[{""anonymous"":true,""operator"":null,""type"":""VPN""}]","This will contain details on all relevant proxy or VPN information Spur has associated with this IP address. You can check the ""type"" (String), ""operator"" (String), and ""anonymous"" (boolean) fields under the top level ""tunnels"" field to get more information. Tunnels appears in SysLog as a list."
 Event.System.DebugContext.DebugData.Url,,
-Event.System.LegacyEventType,,
+Event.System.LegacyEventType,app.oauth2.token.grant_failure,Event Type as it's displayed in Okta Classic Engine
 Event.System.Transaction.Detail,,
 Event.System.Transaction.ID,unknown,"Identifies events that have occurred together as part of an operation (for example, a request to the Okta servers). Similar to rootSessionID and externalSessionID, this field can be used for event correlation, see https://developer.okta.com/docs/reference/system-log-query/"
 Event.System.Transaction.Type,WEB,
@@ -88,6 +124,11 @@ Request.IPChain.Version,V4,
 Target,,
 Target.AlternateId,,
 Target.DetailEntry.SignOnModeType,,
-Target.DisplayName,,
-Target.ID,,
-Target.Type,,
+Target.DetailEntry.Expires,2025-01-10T16:17:51.000Z,Time the oauth token will expire
+Target.DetailEntry.Hash,8cDrUnQC9aSi_nRynxlEkg,
+Target.DetailEntry.MethodTypeUsed,Use Okta FastPass,MFA events - what MFA factors were used during an authentication
+Target.DetailEntryMethodUsedVerifiedProperties,"[DEVICE_BOUND, PHISHING_RESISTANT, USER_VERIFYING, USER_PRESENCE, HARDWARE_PROTECTED]",MFA events - what properties were enforced for the mfa factor used. 
+Target.DetailEntry.Subject,00u1ds4ilkz3cSvMt1d8,"Subject of the oauth token, usually the user that is issuing it"
+Target.DisplayName,Jane Doe,"Configured name of the target. Depending on the event type it could be a full name, policy name, token name, etc. "
+Target.ID,0ua1iq1ydvzhltfT41d8,"Unique ID of the target, depending on the event type it could be a user id, policy id, token id, etc. "
+Target.Type,AppUser,
