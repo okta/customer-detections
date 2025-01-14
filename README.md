@@ -36,7 +36,7 @@ Some of the queries listed below use the following operators to group multiple e
 
 Okta recommends customers review these detections and run searches using those that appear to be applicable to your environment. Perform any necessary tuning or baselining to ensure they deliver high fidelity results prior to creating an alert. 
 
-Note: Most of these detections leverage Okta system log query languages, however a subset is provided in splunk query language. A plain english description of the detection logic is provided for splunk queries to allow detection engineers to implement in their SIEM of choice.
+Note: Most of these detections leverage Okta system log query languages, however a subset is provided in splunk query language. A plain english description of the detection logic is provided for splunk queries to allow detection engineers to implement in their SIEM of choice..
 
 [secblog]: https://sec.okta.com/articles
 [advisories]: https://trust.okta.com/security-advisories/
