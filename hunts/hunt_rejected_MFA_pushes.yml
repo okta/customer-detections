@@ -1,0 +1,23 @@
+title: Hunt on rejected MFA pushes
+id: 052d6fd99943e35c76b75411bd2ecc0e
+description: |
+  Detects possible account takeover attempts where the end user rejected a suspicious MFA push
+references:
+  - https://support.okta.com/help/s/article/System-Log-queries-for-attempted-account-takeover?language=en_US
+author: Okta
+created_date: '2024-07-08'
+modified_date: '2024-07-08'
+threat:
+  Tactic:
+    - Credential Access
+  Technique:
+    - T1621 Multi-Factor Authentication Request Generation
+prevention:
+  - Require Okta Number Challenges on all MFA pushes
+  - Leverage Okta FastPass over traditional MFA push notifications
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "user.mfa.okta_verify.deny_push"	
+false_positives:
+  - End users accidentally pressing the wrong button during a push notification

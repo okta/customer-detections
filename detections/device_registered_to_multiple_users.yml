@@ -1,0 +1,32 @@
+title: Device Registered to Multiple Users
+id: f2ae616490db4cc6515b5f8ff7785262
+description: |
+  Detects an adversary registering the same device as MFA to multiple compromised accounts. 
+  To maintain persistence threat actors are observed registering their own MFA devices, often leveraging the same device for multiple compromised accounts.  
+references:
+  - Internal Threat Research
+author: Okta
+created_date: '2025-01-15'
+modified_date: '2025-01-15'
+threat:
+  Tactic:
+    - Credential Access
+    - Defense Evasion
+    - Persistence
+  Technique:
+    - T1556.006 Modify Authentication Process.Multi-Factor Authentication
+prevention:
+  - Configure strong Okta account management policies to lock down or place strict restrictions on MFA enrollment
+detection:
+  explanation: | 
+    The query below: 
+    Retrieves events where a user added a device as an MFA factor.
+    Groups the results by the device ID and counts the distinct number of userIDs that have added that same device ID over the supplied period of time
+    Alerts when 2 or more unique user IDs were observed registering the same device ID
+  splunk: |
+    index=main sourcetype=oktaim2:log AND eventType="device.user.add"
+    | stats dc(actor.id) as distinct_user_count values(client.ipAddress) as source_ip values(actor.alternateId) as username by target.DetailEntry.OktaDeviceId
+    | where distinct_user_count >= 2
+false_positives:
+  - Customer identity accounts that leverage a shared phone
+  - Service accounts leveraging a shared device

@@ -1,12 +1,12 @@
 Field,Example,Description
-Actor,,Information about the identity performing the action identified in Event.EventType
+Actor,null,Information about the identity performing the action identified in Event.EventType
 actor.alternateId,example@domain.com,Username of the identity performing the activity
 actor.DetailEntry,,
 actor.DisplayName,Jane Doe,Full Name of the identity performing the activity
 actor.ID,00uxxxxxxxxxxxxxxxxx,20 character Unique ID of the identity performing the activity 
 actor.type,"User, <list some others>",Type of account associated with the identity 
 ,,
-Client,,Information about the client performing the action identified in the Event.EventType
+Client,null,Information about the client performing the action identified in the Event.EventType
 client.device,"Computer, Mobile",Type of device performing the action
 client.GeographicalContext,,Geolocation of the client IP
 client.GeographicalContext.City,Los Angeles,City the client IP is registered to 
@@ -22,7 +22,7 @@ client.UserAgent.OS,Mac OS X,OS of the client derived from the User Agent
 client.UserAgent.RawUserAgent,"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",Raw User Agent String of the client
 client.Zone,,Any applicable network zones evaluated as defined in Security > Network Zones
 ,,
-Device,,Device telemetry of the authenticating device
+Device,null,Device telemetry of the authenticating device
 Device.Device Integrator,"{""CROWDSTRIKE"":{""....""}}",Metadata from the device if device integration is setup
 Device.Disk Encryption Type,ALL_INTERNAL_VOLUMES,Type of disk encryption setup on the authenticating device
 Device.ID,guo1kds4evoGP3BcZ1u7,Unique ID of the authenticating Device
@@ -34,7 +34,7 @@ Device.Registered,TRUE,Boolean value if the device is registered in Okta or not
 Device.Screen Lock Type,BIOMETRIC,What type of lock is configured on the device locally
 Device.Secure Hardware Present,TRUE,Boolean value if the device has secure hardware implemented
 ,,
-Event.AuthenticationContext,,Metadata pertaining to the authentication
+Event.AuthenticationContext,null,Metadata pertaining to the authentication
 Event.AuthenticationContext.AuthenticationProvider,FACTOR_PROVIDER,
 Event.AuthenticationContext.AuthenticationStep,0,
 Event.AuthenticationContext.CredentialProvider,,
@@ -46,7 +46,7 @@ Event.AuthenticationContext.Issuer,,
 Event.AuthenticationContext.RootSessionId,trsXbqhVX7nQ2anDUyN90cdMw,"Represents the primary session that a user is associated with when they log into 
 Okta. This ID is generated when a user successfully authenticates and creates 
 a session within Okta.  A user can have a single rootsessionid per login, but this ID may persist across multiple applications if the user is authenticated via Single Sign-On (SSO) or other integrated Okta features."
-Event.AuthenticationContext.AuthenticatorContext,,Context about the authenticator used
+Event.AuthenticationContext.AuthenticatorContext,null,Context about the authenticator used
 Event.AuthenticationContext.AuthenticatorContext.ApplicationVersion,131.0.6778.205,Version of the application facilitating the authentication
 Event.AuthenticationContext.AuthenticatorContext.BinaryIdentifier,VHZYH3X3KS.com.google.Chrome.helper,Process identifier of the application facilitating the authentication
 Event.AuthenticationContext.AuthenticatorContext.BinaryPath,/Applications/Google Chrome.app/Google Chrome Helper,File path of the application facilitating the authentication
@@ -57,7 +57,7 @@ Event.AuthenticationContext.AuthenticatorContext.SignerKeyIdentifier,f2638ed05f1
 Event.AuthenticationContext.AuthenticatorContext.UserConsent,APPROVED_USER_VERIFICATION,Outcome of user verification
 Event.AuthenticationContext.AuthenticatorContext.ValidationStatus,SUCCESS,Outcome of the authenticator validation
 ,,
-Event.DisplayMessage,,
+Event.DisplayMessage,null,
 Event.EventType,user.session.access_admin_app,Event identifier of the action being performed see (https://developer.okta.com/docs/reference/api/event-types/)
 Event.Outcome,,
 Event.Outcome.Reason,,
@@ -71,7 +71,7 @@ Event.SecurityContext.IsProxy,"false, <true> {dfsafdsa}","Boolean result if the 
 Event.SecurityContext.ISP,google,ISP the client IP is registered to 
 Event.Severity,"INFO, ",<find definitions>
 ,,
-Event.System,,
+Event.System,null,
 Event.System.DebugContext.DebugData.AuthenticatorMethodChallengeTime,2025-01-10T15:17:49.778Z,Timestamp the user was challenged for MFA
 Event.System.DebugContext.DebugData.AuthnRequestId,,
 Event.System.DebugContext.DebugData.AuthorizationServer,aus1mabkazcLoQg5c1d8,Unique ID of configured authorization server
@@ -89,16 +89,16 @@ Event.System.DebugContext.DebugData.GrantedScopes,"offline_access, profile, open
 Event.System.DebugContext.DebugData.KeyTypeUsedForAuthentication,USER_VERIFYING_BIO_OR_PIN,
 Event.System.DebugContext.DebugData.LogOnlySecurityData,,
 Event.System.DebugContext.DebugData.OktaUserAgentExtended,,
-Event.System.DebugContext.DebugData.Origin,,
+Event.System.DebugContext.DebugData.Origin,https://{company}.okta.com,Origin header value of the request
 Event.System.DebugContext.DebugData.Policy,00p1mabob67xzg6KK1d8,Authorization Server policy hit for this event 
-Event.System.DebugContext.DebugData.InitiationType,,
+Event.System.DebugContext.DebugData.InitiationType,"SP_INITIATIED, IDP_INITIATED",Determines whether the authentication was initiated through a service provider's login page or through the IDP
 Event.System.DebugContext.DebugData.RequestId,a2f7c1f4d84c3deaa3f990db7a6cba8a,
 Event.System.DebugContext.DebugData.RedirectUri,https://<customer>.okta.com/enduser/callback,"If the action corresponding to this event was involved in an authentication flow, this is the redirect URI specified."
-Event.System.DebugContext.DebugData.RequestUrl,,
+Event.System.DebugContext.DebugData.RequestUrl,/app/google/{appid}/sso/saml/mail,URI of the request thats being logged
 Event.System.DebugContext.DebugData.RequestedScopes,openid,Scopes requested through the oauth token
 Event.System.DebugContext.DebugData.ResponseTime,120,Response time in ms
 Event.System.DebugContext.DebugData.Risk,Risk{level=LOW},"Contains the level of risk for a particular request (LOW, MEDIUM, or HIGH) and the reasons that contributed to the risk level."
-Event.System.DebugContext.DebugData.SignOnMode,"OpenID Connect, SAML_1_1",
+Event.System.DebugContext.DebugData.SignOnMode,"OpenID Connect, SAML 2.0",Protocol used to facilitate the authentication
 Event.System.DebugContext.DebugData.TraceId,,
 Event.System.DebugContext.DebugData.ThreatSuspected,TRUE,"the event has met enough criteria to be considered a threat and the IP address 
 either is already on the Okta database denylist, or it will be added within 24 hours"
@@ -111,7 +111,7 @@ Event.System.Transaction.Type,WEB,
 Event.System.UUID,UUID8044c4e5-b664-11ef-8a11-33ea08b0dcb1,
 Event.System.Version,0,
 ,,
-Request,,
+Request,null,
 Request.IPChain,,"represents a sequence of network-related informatio including intermediary systems, firewalls, or security layers involved in the request."
 Request.IPChain.GeographicalContext.City,Pittsburgh,
 Request.IPChain.GeographicalContext.Country/region,Pennsylvania ,
@@ -121,7 +121,7 @@ Request.IPChain.IP,165.85.197.1,
 Request.IPChain.Source,,
 Request.IPChain.Version,V4,
 ,,
-Target,,
+Target,null,
 Target.AlternateId,,
 Target.DetailEntry.SignOnModeType,,
 Target.DetailEntry.Expires,2025-01-10T16:17:51.000Z,Time the oauth token will expire
