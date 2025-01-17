@@ -1,0 +1,37 @@
+title: Phone Number Registered to Multiple Users
+id: d1e09d985740ae32f8267b0800e3b012
+description: |
+  Detects an adversary registering the same SMS phone number as MFA to multiple compromised accounts. 
+  This detections requires the Okta org to allow SMS as an MFA factor.
+  To maintain persistence threat actors are observed registering their own MFA devices, often leveraging the same device for multiple compromised accounts.  
+references:
+  - Internal Threat Research
+author: Okta
+created_date: '2025-01-15'
+modified_date: '2025-01-15'
+threat:
+  Tactic:
+    - Credential Access
+    - Defense Evasion
+    - Persistence
+  Technique:
+    - T1556.006 Modify Authentication Process.Multi-Factor Authentication
+prevention:
+  - Require strong MFA factors and do not allow factors such as email or SMS.
+  - Configure strong Okta account management policies to lock down or place strict restrictions on MFA enrollment
+detection:
+  explanation: | 
+    The query below: 
+    Retrieves events where an SMS phone verification message is sent, this event includes the Mobile ID and phone number
+    Extracts the mobile phone ID from the target fields, this ID is the same when the phone number is the same
+    Groups the results by the "MobilePhone" that was used, and counts the distinct number of userIDs that leveraged that respective "MobilePhone"
+    Alerts when 2 or more unique user IDs were observed using the same mobile phone number for SMS verification
+  splunk: |
+    index=main sourcetype=oktaim2:log AND eventType="system.sms.send_phone_verification_message"
+    | eval targets=mvzip('target{}.type', 'target{}.id', ": ")
+    | eval targets=mvfilter(targets LIKE "MobilePhone%")
+    | stats dc(actor.id) as distinct_user_count values(client.ipAddress) as source_ip values(actor.alternateId) as username by targets
+    | where distinct_user_count >= 2
+false_positives:
+  - Customer identity accounts that leverage a shared phone
+  - Service accounts leveraging a shared device
