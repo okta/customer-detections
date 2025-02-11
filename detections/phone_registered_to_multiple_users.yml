@@ -1,9 +1,9 @@
 title: Phone Number Registered to Multiple Users
 id: d1e09d985740ae32f8267b0800e3b012
 description: |
-  Detects an adversary registering the same SMS phone number as MFA to multiple compromised accounts. 
+  Detects when a specific phone number is registered to multiple users.
+  An adversary may register the same SMS phone number as MFA to multiple accounts they have compromised in order to maintain persistence. 
   This detections requires the Okta org to allow SMS as an MFA factor.
-  To maintain persistence threat actors are observed registering their own MFA devices, often leveraging the same device for multiple compromised accounts.  
 references:
   - Internal Threat Research
 author: Okta
@@ -15,7 +15,7 @@ threat:
     - Defense Evasion
     - Persistence
   Technique:
-    - T1556.006 Modify Authentication Process.Multi-Factor Authentication
+    - T1556.006: Modify Authentication Process.Multi-Factor Authentication
 prevention:
   - Require strong MFA factors and do not allow factors such as email or SMS.
   - Configure strong Okta account management policies to lock down or place strict restrictions on MFA enrollment

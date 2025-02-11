@@ -14,7 +14,7 @@ threat:
     - Defense Evasion
     - Persistence
   Technique:
-    - T1556.006 Modify Authentication Process.Multi-Factor Authentication
+    - T1556.006: Modify Authentication Process.Multi-Factor Authentication
 prevention:
   - Configure strong Okta account management policies to lock down or place strict restrictions on MFA enrollment
 detection:
@@ -24,8 +24,9 @@ detection:
     Groups the results by the device ID and counts the distinct number of userIDs that have added that same device ID over the supplied period of time
     Alerts when 2 or more unique user IDs were observed registering the same device ID
   splunk: |
-    index=main sourcetype=oktaim2:log AND eventType="device.user.add"
-    | stats dc(actor.id) as distinct_user_count values(client.ipAddress) as source_ip values(actor.alternateId) as username by target.DetailEntry.OktaDeviceId
+    index=main sourcetype=OktaIM2:log AND eventType="device.user.add"
+    | spath "target{}.detailEntry.oktaDeviceId" output="device_id"
+    | stats dc(actor.id) as distinct_user_count values(client.ipAddress) as source_ip values(actor.alternateId) as username by device_id
     | where distinct_user_count >= 2
 false_positives:
   - Customer identity accounts that leverage a shared phone

@@ -12,8 +12,8 @@ threat:
   Tactic:
     - Initial Access
   Technique:
-    - T1566 Phishing
-    - T1078 Valid Accounts
+    - T1566: Phishing
+    - T1078: Valid Accounts
 prevention:
   - Configure a dynamic network zone blocklist to pro-actively block these proxies
   - Configure authentication policies to only allow authentications from certain approved network ranges

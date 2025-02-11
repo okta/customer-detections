@@ -12,7 +12,7 @@ threat:
   Tactic:
     - Credential Access
   Technique:
-    - T1110.004 Credential Stuffing
+    - T1110.004: Credential Stuffing
 prevention:
   - Configure ThreatInsight to block mode to automatically block these attacks. 
   - Implement passwordless authentication within your Okta tenant (https://help.okta.com/oie/en-us/content/topics/identity-engine/password-optional/password-optional-disabled.htm)

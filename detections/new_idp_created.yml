@@ -2,7 +2,7 @@ title: Creation of an Identity Provider by a Super Administrator or Org Administ
 id: 9d2dfd1cdd991ca70b747f1db89be5af
 description: |
   Detects creation of an external identity provider.
-  Threat actors were observed configuring a second Identity Provider to act as an "impersonation app" to access applications within the compromised Org on behalf of other users.
+  Threat actors may configure a second Identity Provider to act as an "impersonation app" to access applications within the compromised Org on behalf of other users.
   This second Identity Provider, also controlled by the attacker, would act as a “source” IdP in an inbound federation relationship (sometimes called “Org2Org”) with the target.
 references:
   - https://sec.okta.com/articles/2023/08/cross-tenant-impersonation-prevention-and-detection
@@ -14,15 +14,14 @@ threat:
     - Persistence
     - Lateral Movement
   Technique:
-    - T1078 Valid Accounts
-    - T1550 Use Alternate Authentication Material
+    - T1078: Valid Accounts
+    - T1550: Use Alternate Authentication Material
 prevention:
   - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
   - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
   - Enable Protected Actions (under Settings > Features) to force re-authentication whenever an administrative user attempts to perform sensitive actions.
   - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
   - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
-  - Apply ASN and IP Session Binding (from Settings > Features) to all administrative apps to prevent the replay of stolen administrative sessions.
 detection:
   okta_systemlog:
     OIE: |

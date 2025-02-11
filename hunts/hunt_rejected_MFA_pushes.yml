@@ -11,7 +11,7 @@ threat:
   Tactic:
     - Credential Access
   Technique:
-    - T1621 Multi-Factor Authentication Request Generation
+    - T1621: Multi-Factor Authentication Request Generation
 prevention:
   - Require Okta Number Challenges on all MFA pushes
   - Leverage Okta FastPass over traditional MFA push notifications
