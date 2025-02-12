@@ -2,7 +2,7 @@ title: Okta Phishing Detection with FastPass Origin Check
 id: e3a21d2c43100be37cd865d4d1f72ff7
 description: |
   Detects when a user enrolled in FastPass fails to authenticate via a real-time AiTM phishing proxy.
-  Fastpass logs when it detects a change in the origin during the authentication flow. 
+  An adversary may attempt to compromise a user via AiTM phishing infrastructure, Okta Fastpass logs an event when we block an authentication when this is suspected. 
 references:
   - https://sec.okta.com/shareddetections
   - https://sec.okta.com/fastpassphishingdetection
@@ -15,12 +15,12 @@ threat:
     - Credential Access
     - Collection
   Technique:
-    - T1557 Adversary-in-the-Middle
-    - T1566 Phishing
-    - T1539 Steal Web Session Cookie
+    - T1557: Adversary-in-the-Middle
+    - T1566: Phishing
+    - T1539: Steal Web Session Cookie
 prevention:
   - Configure authentication policies to ensure Okta Fastpass is used in all authentication flows.
-  - Perform proactive domain monitoring to detect new phishing domains impersonating your Okta tenant.
+  - Perform proactive domain monitoring to detect new phishing domains impersonating your brand.
 detection:
   okta_systemlog:
     OIE: |

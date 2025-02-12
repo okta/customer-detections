@@ -14,12 +14,13 @@ threat:
     - Initial Access
     - Persistence
   Technique:
-    - T1078 Valid Accounts
+    - T1078: Valid Accounts
 prevention:
   - Configure strict authentication policies that take a risk-based approach. 
+  - <add more here>
 detection:
   okta_systemlog:
     OIE: |
-      eventType eq  "user.account.report_suspicious_activity_by_enduser"
+      eventType eq "user.account.report_suspicious_activity_by_enduser"
 false_positives:
   - End users reporting suspicious activity that is actually legitimate. 

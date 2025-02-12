@@ -14,7 +14,7 @@ threat:
     - Defense Evasion
     - Persistence
   Technique:
-    - T1556.006 Modify Authentication Process.Multi-Factor Authentication
+    - T1556.006: Modify Authentication Process.Multi-Factor Authentication
 prevention:
   - Configure strict authenticator enrollment policies requiring users to leverage high security methods of enrollment (see references link)
   - Design a secure employee verification process when end users call into help desk requesting mfa factor resets

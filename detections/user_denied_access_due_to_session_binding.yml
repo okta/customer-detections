@@ -12,10 +12,10 @@ threat:
   Tactic:
     - Credential Access
   Technique:
-    - T1539 Steal Web Session Cookie
+    - T1539: Steal Web Session Cookie
 prevention:
   - Enable Protected Actions in the Okta Admin Console. This forces step-up authentication before an administrative user can modify critical settings, such as enabling a third-party Identity Provider or resetting all factors of an administrative user, greatly reducing what actions an adversary can perform with a stolen session token.
-  - Configure a Re-authentication Frequency of “Every Sign-In Attempt” to all administrative applications. This greatly diminishes access to applications using a stolen user session.
+  - Configure a Re-authentication Frequency of “Every Sign-In Attempt” to all administrative applications. This greatly diminishes access to applications using a stolen user session without persistent access to MFA.
   - Configure strict authentication policies for administrative applications. Require the device to originate from a company-owned network zone, be a managed device, and require re-authentication if device context has changed.
 detection:
   okta_systemlog:

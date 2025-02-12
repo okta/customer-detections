@@ -12,14 +12,13 @@ threat:
   Tactic:
     - Persistence
   Technique:
-    - T1078 Valid Accounts
+    - T1078: Valid Accounts
 prevention:
   - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
   - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
   - Enable Protected Actions (under Settings > Features) to force re-authentication whenever an administrative user attempts to perform sensitive actions.
   - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
   - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
-  - Apply ASN and IP Session Binding (from Settings > Features) to all administrative apps to prevent the replay of stolen administrative sessions.
 detection:
   okta_systemlog:
     OIE: |
