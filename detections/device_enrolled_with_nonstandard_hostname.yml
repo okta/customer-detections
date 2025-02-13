@@ -1,8 +1,8 @@
 title: Device Enrolled with Non-Standard Hostname
 id: 4f6161a02dbd790f1b1c2c9f5287ab45
 description: |
-  Detects when a new device is enrolled by a user that doesn't follow standard hostname nomenclature used by a specific company
-  An adversary with access to a compromised account may enroll their own device to leverage as MFA. This device does not often follow standard hostname nomenclature used in the company. 
+  Detects when a new device is enrolled by a user that doesn't follow standard hostname nomenclature used in the organization.
+  An adversary with access to a compromised account may enroll their own device to leverage as MFA. This device does not often follow standard hostname nomenclature used in the organization. 
 references:
   - null
 author: Okta
@@ -33,7 +33,7 @@ detection:
     | spath "target{}.detailEntry.managed" output="managed"
     | spath "target{}.detailEntry.osPlatform" output="OS"
     | spath "target{}.detailEntry.osVersion" output="OS_Version"
-    ```Filter when the hostname of the device being enrolled doesn't follow standard hostname nomenclature regex```
+    ```Filter when the name of the device being enrolled doesn't follow standard hostname nomenclature regex```
     | where NOT match(hostname, "<insert your standard hostname nomenclature regex here>")
     ```Display the information```
     | stats values(published) as timestamp values(displayMessage) as message values(actor.id) as actor_id values(actor.alternateId) as username values(client.ipAddress) as source_ip values(OS) as OS values(OS_Version) as OS_Version values(managed) as managed_device by hostname

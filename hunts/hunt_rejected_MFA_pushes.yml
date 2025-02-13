@@ -1,7 +1,8 @@
 title: Hunt on rejected MFA pushes
 id: 052d6fd99943e35c76b75411bd2ecc0e
 description: |
-  Detects possible account takeover attempts where the end user rejected a suspicious MFA push
+  Detects when an Okta Verify push notification is rejected.
+  An adversary with compromised credentials may try to push bomb the victim until they accept the MFA push.
 references:
   - https://support.okta.com/help/s/article/System-Log-queries-for-attempted-account-takeover?language=en_US
 author: Okta

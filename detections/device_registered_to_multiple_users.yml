@@ -1,7 +1,7 @@
 title: Device Registered to Multiple Users
 id: f2ae616490db4cc6515b5f8ff7785262
 description: |
-  Detects when a device is registered for MFA to multiple users. 
+  Detects when the same device is registered for MFA to multiple users. 
   An adversary may register their own MFA devices, often leveraging the same device for multiple compromised accounts.  
 references:
   - Threat Research
@@ -28,7 +28,8 @@ detection:
   splunk: |
     index=main sourcetype=OktaIM2:log AND eventType="device.user.add"
     | spath "target{}.detailEntry.oktaDeviceId" output="device_id"
-    | stats dc(actor.id) as distinct_user_count values(client.ipAddress) as source_ip values(actor.alternateId) as username by device_id
+    | spath "target{}.displayName" output="device_name"
+    | stats values(device_name) as device_name dc(actor.id) as distinct_user_count values(client.ipAddress) as source_ip values(actor.alternateId) as username by device_id
     | where distinct_user_count >= 2
 false_positives:
   - Customer identity accounts that leverage a shared phone.

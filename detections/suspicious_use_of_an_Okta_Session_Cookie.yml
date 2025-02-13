@@ -1,7 +1,7 @@
 title: Suspicious Use of an Okta Session Cookie
 id: 5532601c33db3f51f8db046fe5f9c4c2
 description: |
-  Detects when an IP changes mid-session without re-authentication. 
+  Detects when an IP and browser or OS changes mid-session. 
   An adversary that has stolen an Okta cookie may attempt to import it into their own device & browser in order to access the account. 
   This detection looks for one or more policy evaluation events in which multiple client values (IP, UA, etc.) change associated to the same Device Token for a specific user. 
 references:

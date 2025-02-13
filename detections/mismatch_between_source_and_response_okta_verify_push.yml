@@ -18,7 +18,7 @@ threat:
 prevention:
   - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
   - Leverage Okta Number Challenge MFA over standard push verification.
-  - Block traffic from anonymizers and proxies via network zones that are often used by threat actors in account takeover.
+  - Block traffic from anonymizers and proxies via network zones that are often used in account takeover.
   - Educate users on how to identify and report suspicious MFA push notifications.
 detection:
   explanation: | 

@@ -1,7 +1,8 @@
 title: Sign-in Attempts from Anonymizer Proxies
 id: fce89e7ad37c483094a637bbb3881e5d
 description: |
-  Hunt for login attempts from IPs that Okta identifies as anonymizers. 
+  Detects login attempts from IPs that Okta identifies as anonymizers.
+  An adversary may attempt to login with compromised credentials from a known anonymizer. 
 references:
   - https://sec.okta.com/articles/2023/08/cross-tenant-impersonation-prevention-and-detection
   - https://help.okta.com/oie/en-us/content/topics/identity-engine/network/create-dynamic-zone.htm

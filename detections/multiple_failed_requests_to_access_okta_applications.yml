@@ -1,7 +1,7 @@
 title: Multiple Failed Requests to Access Okta Applications
 id: 17dbb021f4a1bb58274136c6441a38ba
 description: |
-  Detects an adversary attempting to reuse a stolen web session cookie in an org with well-configured authentication policies triggering failure policy evaluation events.
+  Detects an adversary attempting to reuse a stolen web session cookie in an org with well-configured authentication policies triggering failed policy evaluation events.
   Looks for multiple attempts to open app chiclets with no successful response to an authentication challenge.
   This detection assumes authentication policies are setup to require re-authentication on every access, especially for high impact applications. 
 references:

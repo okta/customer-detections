@@ -15,7 +15,7 @@ threat:
   Technique:
     - T1078: Valid Accounts
 prevention:
-  - Enable all end-user notifications within the Okta Admin Console, empowering end-users to report suspicious activity against their own accounts.
+  - Enable all end-user notifications are enabled within the Okta Admin Console, empowering end-users to report suspicious activity against their own accounts.
   - Make employees aware of the reporting process and their ability to terminate their own session in the settings page. 
 detection:
   okta_systemlog:

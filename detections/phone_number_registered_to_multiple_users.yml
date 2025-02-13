@@ -5,7 +5,7 @@ description: |
   An adversary may register the same SMS phone number as MFA to multiple accounts they have compromised in order to maintain persistence. 
   This detections requires the Okta org to allow SMS as an MFA factor.
 references:
-  - Internal Threat Research
+  - Threat Research
 author: Okta
 created_date: '2025-01-15'
 modified_date: '2025-01-15'
