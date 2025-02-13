@@ -1,8 +1,8 @@
-title: Okta Phishing Detection with FastPass Origin Check
-id: e3a21d2c43100be37cd865d4d1f72ff7
+title: Okta AiTM Phishing Detection with FastPass
+id: d317ba7832d50618ad769b2ea22a4473
 description: |
   Detects when a user enrolled in FastPass fails to authenticate via a real-time AiTM phishing proxy.
-  An adversary may attempt to compromise a user via AiTM phishing infrastructure, Okta Fastpass logs an event when we block an authentication when this is suspected. 
+  An adversary may attempt to compromise a user via AiTM phishing infrastructure, Okta Fastpass logs an event when it suspects an authentication is ocurring through a phishing proxy.
 references:
   - https://sec.okta.com/shareddetections
   - https://sec.okta.com/fastpassphishingdetection

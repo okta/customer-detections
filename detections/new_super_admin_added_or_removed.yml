@@ -3,8 +3,8 @@ id: 6b27e2df29e33ac66e321e411b703d02
 description: |
   Detects when an Okta Super Administrator is either created or removed
   An adversary with access to an Okta Administrator my attempt to either:
-    1 - Create a new super administrator account for themselves to maintain persistence
-    2 - Revoke all other super administrator privileges to prevent response actions from being taken 
+    1 - Create a new super administrator account for themselves to maintain persistence.
+    2 - Revoke all other super administrator privileges to prevent response actions from being taken.
 references:
   - http://help.okta.com/en-us/content/topics/security/administrators.htm
 author: Okta
@@ -29,4 +29,5 @@ detection:
     OIE: |
       eventType sw "user.account.privilege" and (debugContext.debugData.privilegeRevoked co "Super administrator" or debugContext.debugData.privilegeGranted co "Super administrator")
 false_positives:
-  - Onboarding or offboarding legitimate Okta administrators or service accounts.  
+  - Onboarding or offboarding legitimate Okta administrators or service accounts.
+  - To focus on creation events filter on eventType user.account.privilege.grant, for revocation user.account.privilege.revoke.

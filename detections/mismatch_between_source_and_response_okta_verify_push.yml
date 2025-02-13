@@ -3,7 +3,7 @@ id: 6d16360eb451ac60db533258c0c5b48e
 description: |
   Detects when an adversary has stolen a user password attempts to trick a user into accepting a Okta Verify Push request.
   The following detection identified variations in client-based values for source and response events to identify suspicious request behavior.
-  The detection is enhanved if the org is evaluating behavior conditions in the authentication policies using Okta Behavior Detection.
+  The detection is enhanced if the org is evaluating behavior conditions in the authentication policies using Okta Behavior Detection.
 references:
   - https://sec.okta.com/shareddetections
   - https://research.splunk.com/application/8085b79b-9b85-4e67-ad63-351c9e9a5e9a/
@@ -51,4 +51,4 @@ detection:
     ```Create a ratio of successful sign ins to pushes. If the push and response come from the same IP, it's likely legit. Note that the current ratio is quite aggressive. Aside from tuning the ratio you could add other conditions, for example: dc Country > 1, other behaviors (NEW Geo-Location=POSITIVE), device.managed=false, client.os!={SOE_OS}```
    | search ((ratio < 0.5 AND total_pushes > 2) OR (total_rejected > 0)) AND dc_ip > 1 AND suspect_device_from_source > 0 AND suspect_ip_from_source > 0
 false_positives:
-  - Depending on how strict the ratio is, should be very rare. 
+  - Depends on how aggressive the ratio is, tune to fit your environment after establishing baselines. 

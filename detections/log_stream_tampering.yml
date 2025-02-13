@@ -1,8 +1,8 @@
 title: Log Stream Tampering
 id: 6595e64287a21e6e7f63f0ab037a4401
 description: |
-  Detects Okta log stream configuration changes
-  An adversary with access to an Okta Administrator may attempt to disable log streams to a SIEM in order to prevent detection of their activities
+  Detects Okta log stream configuration changes such as deactivation, creation or deletion. 
+  An adversary with access to an Okta Administrator may attempt to disable log streams to a SIEM in order to prevent detection of their activities.
 references:
   - https://help.okta.com/en-us/content/topics/reports/log-streaming/about-log-streams.htm
 author: Okta
@@ -24,5 +24,5 @@ detection:
     OIE: |
       eventType sw "system.log_stream.lifecycle"
 false_positives:
-  - Approved changes to log streams where changing a log stream is expected
+  - Approved changes to log streams where changing a log stream is expected.
   - This query can be further filtered to only look at disable, deletion or update events.

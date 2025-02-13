@@ -1,5 +1,5 @@
 title: Hunt on Factor Resets
-id: c743cf73c0c508da3bf286367e548111
+id: b692f1a182193b734597c25df583c526
 description: |
   Detects an adversary resetting MFA factors after compromising an account, hunt for indication of malicious factor resets
 references:

@@ -2,7 +2,6 @@ title: User Reported Suspicious Activity
 id: 71ad731ed751b3c134aac81d830e0aa3
 description: |
   Detects when an end user clicks "Report Suspicious Activity" on an Okta notification or in the recent activity dashboard.
-  It is recommended that Okta administrators enable all security notifications in the Okta Admin Console.
   Alerting on this event will help streamline end user suspicious activity alerts directly to security teams for investigation and incident response. 
 references:
   - https://help.okta.com/en-us/content/topics/security/suspicious-activity-reporting.htm
@@ -16,11 +15,11 @@ threat:
   Technique:
     - T1078: Valid Accounts
 prevention:
-  - Configure strict authentication policies that take a risk-based approach. 
-  - <add more here>
+  - Enable all end-user notifications within the Okta Admin Console, empowering end-users to report suspicious activity against their own accounts.
+  - Make employees aware of the reporting process and their ability to terminate their own session in the settings page. 
 detection:
   okta_systemlog:
     OIE: |
       eventType eq "user.account.report_suspicious_activity_by_enduser"
 false_positives:
-  - End users reporting suspicious activity that is actually legitimate. 
+  - End users reporting suspicious activity that is legitimate. 

@@ -14,12 +14,12 @@ threat:
   Tactic:
     - Credential Access
   Technique:
-    - T1621 Multi-Factor Authentication Request Generation
+    - T1621: Multi-Factor Authentication Request Generation
 prevention:
-  - Leverage Okta FastPass over traditional MFA push notifications.
+  - Protect sign-in flows by enforcing strong MFA authenticators such as phishing-resistant with Okta FastPass and FIDO2 WebAuthn.
 detection:
   okta_systemlog:
     OIE: |
       debugContext.debugData.pushWithNumberChallengeResponseType eq "OV_WITH_CHALLENGE_RESPONSE_INVALID"
 false_positives:
-  - End users clicking in the wrong Okta Verify number challenge during a legitimate login activity. 
+  - End users clicking the wrong Okta Verify number challenge during legitimate login activity. 

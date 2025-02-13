@@ -1,8 +1,8 @@
 title: Request to access Admin Console from new device or IP
-id: 6b9260b1e02041a665d4e4a5117cfe16
+id: 832e92ebf3bbf6a6fcb094aefa7e792c
 description: |
   Detects when a user accesses the Okta Admin Console from a new device or IP. 
-  An adversary may compromise an administrative account, and attempt to access the admin console from a new IP or device. 
+  An adversary may compromise an administrative account and attempt to access the admin console from a new IP or device. 
 references:
   - https://sec.okta.com/leastprivilege
 author: Okta
@@ -25,5 +25,5 @@ detection:
     OIE: |
       eventType eq "policy.evaluate_sign_on" and target.displayName eq "Okta Admin Console" and ((debugContext.debugData.behaviors co "New Device=POSITIVE" and debugContext.debugData.behaviors co "New IP=POSITIVE") OR (debugContext.debugData.logOnlySecurityData co "\"New Device\":\"POSITIVE\"" or debugContext.debugData.logOnlySecurityData co "\"New IP\":\"POSITIVE\""))
 false_positives:
-  - Okta Admins leveraging a new legitimate corporate device
-  - Okta Admins logging into the admin console from a new legitimate IP
+  - Okta Admins leveraging a new legitimate corporate device.
+  - Okta Admins logging into the admin console from a new legitimate IP.

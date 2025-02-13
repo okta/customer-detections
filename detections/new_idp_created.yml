@@ -1,5 +1,5 @@
-title: Creation of an Identity Provider by a Super Administrator or Org Administrator
-id: 9d2dfd1cdd991ca70b747f1db89be5af
+title: Creation of a new Okta Identity Provider
+id: 5081584907f1037ac2e423866b55c433
 description: |
   Detects creation of an external identity provider.
   Threat actors may configure a second Identity Provider to act as an "impersonation app" to access applications within the compromised Org on behalf of other users.

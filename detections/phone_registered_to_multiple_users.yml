@@ -1,7 +1,7 @@
 title: Phone Number Registered to Multiple Users
 id: d1e09d985740ae32f8267b0800e3b012
 description: |
-  Detects when a specific phone number is registered to multiple users.
+  Detects when a phone number is registered to multiple users.
   An adversary may register the same SMS phone number as MFA to multiple accounts they have compromised in order to maintain persistence. 
   This detections requires the Okta org to allow SMS as an MFA factor.
 references:
@@ -22,10 +22,10 @@ prevention:
 detection:
   explanation: | 
     The query below: 
-    Retrieves events where an SMS phone verification message is sent, this event includes the Mobile ID and phone number
-    Extracts the mobile phone ID from the target fields, this ID is the same when the phone number is the same
+    Retrieves events where an SMS phone MFA message is sent, this event includes the Mobile ID and phone number.
+    Extracts the mobile phone ID from the target fields, this ID is the same when the phone number is the same.
     Groups the results by the "MobilePhone" that was used, and counts the distinct number of userIDs that leveraged that respective "MobilePhone"
-    Alerts when 2 or more unique user IDs were observed using the same mobile phone number for SMS verification
+    Alerts when 2 or more unique user IDs were observed using the same mobile phone number for SMS verification. It's recommended to run this query over a longer period of time.
   splunk: |
     index=main sourcetype=oktaim2:log AND eventType="system.sms.send_phone_verification_message"
     | eval targets=mvzip('target{}.type', 'target{}.id', ": ")

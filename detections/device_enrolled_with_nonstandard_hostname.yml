@@ -1,7 +1,7 @@
-title: Device Enrolled from Non-Standard Hostname
-id: 8e25083375dfb534ef6aeb1df300640a
+title: Device Enrolled with Non-Standard Hostname
+id: 4f6161a02dbd790f1b1c2c9f5287ab45
 description: |
-  Detects when a a new device is added to a user that doesn't follow standard hostname nomenclature used at a specific company
+  Detects when a new device is enrolled by a user that doesn't follow standard hostname nomenclature used by a specific company
   An adversary with access to a compromised account may enroll their own device to leverage as MFA. This device does not often follow standard hostname nomenclature used in the company. 
 references:
   - null
@@ -23,10 +23,9 @@ prevention:
 detection:
   explanation: | 
     The query below:
-    Retrieves authentication or global session policy update events.
-    Parses useful fields from JSON to display and filter on.
-    Filters on successful policy updates where the policy changed from requiring 2FA to only requiring 1FA.
-    Aggregates the output by the user performing the update and log ID.
+    Retrieves device enrollment and device added log events.
+    Extracts relevant fields from the raw log.
+    Filters where the hostname of the device being enrolled doesn't match a regex that follows your organization's nomenclature.
   splunk: |
     index=main sourcetype=OktaIM2:log AND eventType IN ("device.user.add", "device.enrollment.create") ```OPTIONAL: To filter only on Computers and not Mobile Devices add: AND client.device="Computer"```
     ```Extract relevant fields from JSON in the log```
@@ -36,7 +35,8 @@ detection:
     | spath "target{}.detailEntry.osVersion" output="OS_Version"
     ```Filter when the hostname of the device being enrolled doesn't follow standard hostname nomenclature regex```
     | where NOT match(hostname, "<insert your standard hostname nomenclature regex here>")
-    ```Display the information in a table```
+    ```Display the information```
     | stats values(published) as timestamp values(displayMessage) as message values(actor.id) as actor_id values(actor.alternateId) as username values(client.ipAddress) as source_ip values(OS) as OS values(OS_Version) as OS_Version values(managed) as managed_device by hostname
 false_positives:
-    - Approved changes to authentication policies where downgrading MFA is expected
+    - Mobile phone hostnames that aren't expected to follow any sort of hostname standard. Tune this rule to exclude mobile devices.
+    - Legitimate BYOD or personal devices that a user enrolls. 
