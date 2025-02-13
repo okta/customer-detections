@@ -5,15 +5,15 @@
 # Okta Security Detection Catalog
 Welcome to the Okta Security Detection Catalog. This repository contains a collection of detection rules for security monitoring and detailed descriptions of log fields used for threat analysis within Okta environments. 
 
-## Okta Security Detection Catalog
-Welcome to the Okta Security Detection Catalog. This repository contains a collection of detection rules for security monitoring and detailed descriptions of log fields used for threat analysis within Okta environments. 
+## Who We Are
+Okta Identity Defense Operations is a team of security practitioners that help Okta customers investigate and respond to security incidents. If you are an Okta customer and need support with a security breach or incident, open a support case and indicate that you are investigating a security incident.
 
 ## File Structure
 | Folder | Description |
 | ------------- | ------------- |
 | `detections/`  | List of YAML files for recommended security detections Okta customers can implement within their security monitoring system.   |
 | `hunts/`  | Threat hunting queries useful for aiding in detection use case creation  |
-| `logs/`  | CSV file with descriptions and examples of all log fields within the Okta system log  |
+| `logs/`  | CSV file with descriptions and examples of log fields within the Okta system log  |
 
 ## Getting Started
 The System Log provides a detailed log of user, admin and support events relevant to use of the Okta Workforce Identity Cloud.
