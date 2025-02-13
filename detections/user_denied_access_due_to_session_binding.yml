@@ -2,7 +2,8 @@ title: User Denied Access due to Session Binding
 id: 1fae6f177a9b8ab64d8d31781ae5926f
 description: |
   Detects violations of Okta's built-in ASN binding feature for administrative sessions.
-  This feature is enabled by default and fires an event when it detects an ASN change mid-session for administrators. 
+  This feature is enabled by default and fires an event when it detects an ASN change mid-session for administrators.
+  An adversary may steal okta session cookies for an administrative session and import them onto their own device connected to a separate ASN.
 references:
   - https://sec.okta.com/protectingadminsessions
 author: Okta
@@ -14,9 +15,11 @@ threat:
   Technique:
     - T1539: Steal Web Session Cookie
 prevention:
-  - Enable Protected Actions in the Okta Admin Console. This forces step-up authentication before an administrative user can modify critical settings, such as enabling a third-party Identity Provider or resetting all factors of an administrative user, greatly reducing what actions an adversary can perform with a stolen session token.
-  - Configure a Re-authentication Frequency of “Every Sign-In Attempt” to all administrative applications. This greatly diminishes access to applications using a stolen user session without persistent access to MFA.
-  - Configure strict authentication policies for administrative applications. Require the device to originate from a company-owned network zone, be a managed device, and require re-authentication if device context has changed.
+    - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
+    - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
+    - Enable Protected Actions (under Settings > Features) to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+    - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+    - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
 detection:
   okta_systemlog:
     OIE: | 

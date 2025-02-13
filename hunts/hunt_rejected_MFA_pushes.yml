@@ -14,7 +14,7 @@ threat:
     - T1621: Multi-Factor Authentication Request Generation
 prevention:
   - Require Okta Number Challenges on all MFA pushes
-  - Leverage Okta FastPass over traditional MFA push notifications
+  - Protect sign-in flows by enforcing strong MFA authenticators such as phishing-resistant with Okta FastPass and FIDO2 WebAuthn.
 detection:
   okta_systemlog:
     OIE: |
