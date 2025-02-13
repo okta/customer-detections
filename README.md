@@ -5,6 +5,9 @@
 # Okta Security Detection Catalog
 Welcome to the Okta Security Detection Catalog. This repository contains a collection of detection rules for security monitoring and detailed descriptions of log fields used for threat analysis within Okta environments. 
 
+## Okta Security Detection Catalog
+Welcome to the Okta Security Detection Catalog. This repository contains a collection of detection rules for security monitoring and detailed descriptions of log fields used for threat analysis within Okta environments. 
+
 ## File Structure
 | Folder | Description |
 | ------------- | ------------- |

@@ -72,7 +72,7 @@ Event.System,null,
 Event.System.DebugContext.DebugData.AuthenticatorMethodChallengeTime,2025-01-10T15:17:49.778Z,Timestamp the user was challenged for an authenticator. 
 Event.System.DebugContext.DebugData.AuthorizationServer,aus...,Unique ID of configured authorization server.
 Event.System.DebugContext.DebugData.AuthorizationServerName,app-prod,Configured name of authorization server.
-Event.System.DebugContext.DebugData.Behaviors,"{New Geo-Location=NEGATIVE, New Device=NEGATIVE, New IP=NEGATIVE, New State=NEGATIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}","The result of behavior detection evaluation which is present if behaviors are 
+Event.System.DebugContext.DebugData.Behaviors,"{New Geo-Location=NEGATIVE, New Device=NEGATIVE, New IP=NEGATIVE, ...}","The result of behavior detection evaluation which is present if behaviors are 
 evaluated in the request."
 Event.System.DebugContext.DebugData.ClientAuthType,"none, private_key_jwt",Auth type used depending on the grant. 
 Event.System.DebugContext.DebugData.DefaultAuthorizationServer,FALSE,Boolean if default authorization server was used.
