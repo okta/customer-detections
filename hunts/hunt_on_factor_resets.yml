@@ -1,7 +1,8 @@
 title: Hunt on Factor Resets
 id: b692f1a182193b734597c25df583c526
 description: |
-  Detects an adversary resetting MFA factors after compromising an account, hunt for indication of malicious factor resets
+  Detects MFA factors being resets.
+  An adversary may reset MFA factors after compromising an account to ensure they can persistently re-authenticate. 
 references:
   - https://sec.okta.com/articles/2023/08/cross-tenant-impersonation-prevention-and-detection
   - https://help.okta.com/oie/en-us/content/topics/identity-engine/authenticators/require-phishing-resistant-authenticator.htm?cshid=csh-require-phish-resistant

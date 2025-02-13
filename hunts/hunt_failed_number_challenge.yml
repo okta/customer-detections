@@ -16,7 +16,7 @@ threat:
   Technique:
     - T1621: Multi-Factor Authentication Request Generation
 prevention:
-  - Protect sign-in flows by enforcing strong MFA authenticators such as phishing-resistant with Okta FastPass and FIDO2 WebAuthn.
+  - Protect sign-in flows by enforcing strong MFA authenticators such as phishing-resistance with Okta FastPass and FIDO2 WebAuthn.
 detection:
   okta_systemlog:
     OIE: |

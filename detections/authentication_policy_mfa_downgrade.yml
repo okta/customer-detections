@@ -23,20 +23,25 @@ prevention:
 detection:
   explanation: | 
     The query below:
-    Retrieves successful authentication or global session policy update events
-    Filters on policy updates where the policy changed from requiring 2FA to only requiring 1FA
-    Aggregates the output by the user performing the update and log ID 
+    Retrieves successful policy update events (policy.rule.update)
+    Extract relevant JSON from the log to display in the search
+    Filters on policy updates where the policy changed from requiring 2FA to only requiring 1FA using the target fields
+    Display results grouped by the policy name and rule ID that was changed. 
   splunk: |
     index=main sourcetype=OktaIM2:log AND eventType="policy.rule.update" AND outcome.result=SUCCESS
+    | spath target{} output=targets
+    | eval PolicyRuleChanges=mvindex(targets,1)
+    | spath input=PolicyRuleChanges path=displayName output=policy_changed
+    | spath input=PolicyRuleChanges path=id output=policy_rule_id
     ```Parse out the changeDetails that show specifically what was changed within the authentication policy```
-    | spath target{}.changeDetails.from.policyRuleConditionsJson output=change_from
-    | spath target{}.changeDetails.to.policyRuleConditionsJson output=change_to
+    | spath input=PolicyRuleChanges path=changeDetails.from.policyRuleActionJson output=change_from
+    | spath input=PolicyRuleChanges path=changeDetails.to.policyRuleActionJson output=change_to
     ```Extract the factorMode field from Nested JSON which displays whether the authentication policy requires 1FA or 2FA```
     | spath input=change_from path="appSignOn.verificationMethod.factorMode" output=from_factor
     | spath input=change_to path="appSignOn.verificationMethod.factorMode" output=to_factor
     ```Filter on the factorMode field to look for when the authentication policy was originally set to 2FA then was changed to 1FA```
     | where from_factor = "2FA" AND to_factor = "1FA"
     ```Display the information in a table```
-    | stats values(client.ipAddress) as src_ip values(client.userAgent.rawUserAgent) as user_agent values(from_factor) as original_factor values(to_factor) as changed_to_factor values(change_from) as full_original_policy values(change_to) as full_policy_changed_to by published actor.id actor.alternateId
-false_positives:
+    | stats values(actor.id) as user_id values(actor.alternateId) as username values(client.ipAddress) as src_ip values(client.userAgent.rawUserAgent) as user_agent values(from_factor) as original_factor values(to_factor) as changed_to_factor values(change_from) as full_original_policy values(change_to) as full_policy_changed_to by policy_changed policy_rule_id
+  false_positives:
     - Approved changes to authentication policies where downgrading MFA is expected
