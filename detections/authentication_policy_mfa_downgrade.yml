@@ -18,7 +18,7 @@ threat:
     - T1556.006: Modify Authentication Process - Multi-Factor Authentication
 prevention:
   - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm).
-  - Enable Protected Actions (under Settings > Features) to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+  - Enable Protected Actions to force re-authentication whenever an administrative user attempts to perform sensitive actions.
   - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
 detection:
   explanation: | 
