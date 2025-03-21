@@ -1,0 +1,31 @@
+title: Creation of a new Okta Identity Provider
+id: 5081584907f1037ac2e423866b55c433
+description: |
+  Detects creation of an external identity provider.
+  Threat actors may configure a second Identity Provider to act as an "impersonation app" to access applications within the compromised Org on behalf of other users.
+  This second Identity Provider, also controlled by the attacker, would act as a “source” IdP in an inbound federation relationship (sometimes called “Org2Org”) with the target.
+references:
+  - https://sec.okta.com/articles/2023/08/cross-tenant-impersonation-prevention-and-detection
+author: Okta
+created_date: '2023-08-31'
+modified_date: '2023-08-31'
+threat:
+  Tactic:
+    - Persistence
+    - Lateral Movement
+  Technique:
+    - T1078: Valid Accounts
+    - T1550: Use Alternate Authentication Material
+prevention:
+  - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
+  - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
+  - Enable Protected Actions to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+  - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+  - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "system.idp.lifecycle.create"
+false_positives:
+  - Legitimate new IDPs being created, should be very rare
+  - To alert on all events relating to an IDP leverage this query - eventType sw "system.idp.lifecycle"

@@ -1,0 +1,32 @@
+title: Suspicious Use of an Okta Session Cookie
+id: 5532601c33db3f51f8db046fe5f9c4c2
+description: |
+  Detects when an IP and browser or OS changes mid-session. 
+  An adversary that has stolen an Okta cookie may attempt to import it into their own device & browser in order to access the account. 
+  This detection looks for one or more policy evaluation events in which multiple client values (IP, UA, etc.) change associated to the same Device Token for a specific user. 
+references:
+  - https://sec.okta.com/shareddetections
+author: Okta
+created_date: '2023-04-06'
+modified_date: '2023-04-06'
+threat:
+  Tactic:
+    - Credential Access
+  Technique:
+    - T1539: Steal Web Session Cookie
+prevention:
+  - Setup strict authentication policies based on risk of the application being accesssed if compromised.
+  - For high risk applications, ensure re-authentication is configured to every time the app is accessed. This ensures that if a session cookie is stolen, the threat actor will be prompted again for an MFA factor when accessing these apps. 
+detection:
+  explanation: | 
+    The query below: 
+    Retrieves policy evaluation events from successful authentication events. 
+    Aggregates/Groups by Device Token and User, providing the first policy evaluation event in the search window.
+    Evaluates whether there is more than one IP and whether there is more than one OS or browser for each combination of User/Device Token.
+  splunk: |
+    index=main sourcetype=OktaIM2:log eventType IN (policy.evaluate_sign_on) outcome.result IN (ALLOW, SUCCESS)
+    | stats earliest(_time) as _time values(client.ipAddress) as src_ip values(client.userAgent.rawUserAgent) as user_agent values(client.userAgent.os) as userAgentOS_list values(client.userAgent.browser) as userAgentBrowser_list values(device.os_platform) as okta_device_os dc(client.userAgent.browser) as dc_userAgentBrowser dc(client.userAgent.os) as dc_userAgentOS dc(client.ipAddress) as dc_src_ip values(outcome.reason) as reason by debugContext.debugData.dtHash actor.alternateId
+    ``` If we see different Operating Systems or Browsers from a UserAccount using with the same DTHash ```
+    | where dc_src_ip>1 AND (dc_userAgentOS>1 OR dc_userAgentBrowser>1)
+false_positives:
+  - Environment specific use cases or automations.

@@ -1,0 +1,47 @@
+title: Authentication Policy MFA Downgrade
+id: 0c2634a68f9ac593c58349e0de80bb67
+description: |
+  Detects when an Okta Administrator changes an authentication policy from requiring 2FA to only requiring 1FA.
+  An adversary with access to a compromised Okta Admin account may try to downgrade MFA for certain applications such as password managers to bypass MFA. 
+references:
+  - https://www.reliaquest.com/blog/scattered-spider-x-ransomhub-a-new-partnership/
+  - https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/add-app-sign-on-policy-rule.htm
+author: Okta
+created_date: '2025-02-11'
+modified_date: '2025-02-11'
+threat:
+  Tactic:
+    - Credential Access
+    - Defense Evasion
+    - Persistence
+  Technique:
+    - T1556.006: Modify Authentication Process - Multi-Factor Authentication
+prevention:
+  - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm).
+  - Enable Protected Actions to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+  - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
+detection:
+  explanation: | 
+    The query below:
+    Retrieves successful policy update events (policy.rule.update)
+    Extract relevant JSON from the log to display in the search
+    Filters on policy updates where the policy changed from requiring 2FA to only requiring 1FA using the target fields
+    Display results grouped by the policy name and rule ID that was changed. 
+  splunk: |
+    index=main sourcetype=OktaIM2:log AND eventType="policy.rule.update" AND outcome.result=SUCCESS
+    | spath target{} output=targets
+    | eval PolicyRuleChanges=mvindex(targets,1)
+    | spath input=PolicyRuleChanges path=displayName output=policy_changed
+    | spath input=PolicyRuleChanges path=id output=policy_rule_id
+    ```Parse out the changeDetails that show specifically what was changed within the authentication policy```
+    | spath input=PolicyRuleChanges path=changeDetails.from.policyRuleActionJson output=change_from
+    | spath input=PolicyRuleChanges path=changeDetails.to.policyRuleActionJson output=change_to
+    ```Extract the factorMode field from Nested JSON which displays whether the authentication policy requires 1FA or 2FA```
+    | spath input=change_from path="appSignOn.verificationMethod.factorMode" output=from_factor
+    | spath input=change_to path="appSignOn.verificationMethod.factorMode" output=to_factor
+    ```Filter on the factorMode field to look for when the authentication policy was originally set to 2FA then was changed to 1FA```
+    | where from_factor = "2FA" AND to_factor = "1FA"
+    ```Display the information in a table```
+    | stats values(actor.id) as user_id values(actor.alternateId) as username values(client.ipAddress) as src_ip values(client.userAgent.rawUserAgent) as user_agent values(from_factor) as original_factor values(to_factor) as changed_to_factor values(change_from) as full_original_policy values(change_to) as full_policy_changed_to by policy_changed policy_rule_id
+  false_positives:
+    - Approved changes to authentication policies where downgrading MFA is expected

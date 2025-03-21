@@ -1,0 +1,29 @@
+title: Okta AiTM Phishing Detection with FastPass
+id: d317ba7832d50618ad769b2ea22a4473
+description: |
+  Detects when a user enrolled in FastPass fails to authenticate via a real-time AiTM phishing proxy.
+  An adversary may attempt to compromise a user via AiTM phishing infrastructure, Okta Fastpass logs an event when it suspects an authentication is ocurring through a phishing proxy.
+references:
+  - https://sec.okta.com/shareddetections
+  - https://sec.okta.com/fastpassphishingdetection
+author: Okta
+created_date: '2024-11-07'
+modified_date: '2024-11-07'
+threat:
+  Tactic:
+    - Initial Access
+    - Credential Access
+    - Collection
+  Technique:
+    - T1557: Adversary-in-the-Middle
+    - T1566: Phishing
+    - T1539: Steal Web Session Cookie
+prevention:
+  - Configure authentication policies to ensure Okta Fastpass is used in all authentication flows.
+  - Perform proactive domain monitoring to detect new phishing domains impersonating your brand.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "user.authentication.auth_via_mfa" AND result eq "FAILURE" AND outcome.reason eq "FastPass declined phishing attempt"
+false_positives:
+  - Planned and approved offensive security engagements

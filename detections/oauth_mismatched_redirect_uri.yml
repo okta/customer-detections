@@ -1,0 +1,25 @@
+title: Oauth Mismatched Redirect URI
+id: 24b40c3835be13b6b1828e38c0c248b5
+description: |
+  Detects an unexpected redirect when granting oauth tokens.
+  An adversary leveraging phishing infrastructure to compromise users may issue redirects to the phishing domain during the oauth flow. 
+references:
+  - https://www.oauth.com/oauth2-servers/redirect-uris/
+author: Okta
+created_date: '2025-03-11'
+modified_date: '2025-03-11'
+threat:
+  Tactic:
+    - Credential Access
+  Technique:
+    - T1528: Steal Application Access Token
+prevention:
+  - Configure authentication policies to ensure Okta Fastpass is used in all authentication flows.
+  - Perform proactive domain monitoring to detect new phishing domains impersonating your brand.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "app.oauth2.token.grant" and outcome.reason eq "mismatched_redirect_uri" and outcome.result eq "FAILURE"
+false_positives:
+  - Expected redirect URIs should be excluded.
+  - Approved phishing engagements. 

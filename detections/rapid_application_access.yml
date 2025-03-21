@@ -1,0 +1,40 @@
+title: Rapid Okta Application Access
+id: 2c6f8d09fd3f5bc3eb735e293497ca63
+description: |
+  Detects a single user accessing more than 10 distinct applications within 1 minute.
+  An adversary after gaining initial access may immediately try and open as many applications as possible from the Okta Dashboard before sessions expire.  
+references:
+  - null
+author: Okta
+created_date: '2025-02-11'
+modified_date: '2025-02-11'
+threat:
+  Tactic:
+    - Discovery
+  Technique:
+    - T1538: Cloud Service Dashboard
+prevention:
+  - Configure a Re-authentication Frequency of “Every Sign-In Attempt” to all high impact applications. This greatly diminishes access to applications using a stolen user session without persistent access to MFA.
+  - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+detection:
+  explanation: | 
+    The query below:
+    Filters on events for applications being successfully accessed that are IDP initiated (the application was accessed from the Okta Dashboard).
+    Extract the Application name being accessed and storing it in the "targets" field.
+    Set the time span to 1 minute.
+    Distinct count the applications being accessed and group it by the timespan and username.
+    Only show results where 10 or more applications were accessed within the timespan.
+  splunk: |
+    index=main sourcetype=OktaIM2:log AND eventType="user.authentication.sso" AND debugContext.debugData.initiationType="IDP_INITIATED" AND outcome.result="SUCCESS"
+    ```Extract Application info from the targets JSON```
+    | eval targets=mvzip('target{}.type', 'target{}.alternateId', ": ")
+    | eval targets=mvfilter(targets LIKE "AppInstance%")
+    ```Set the timespan to search - Tune to fit your environment```
+    | bin _time span=1m
+    ```Distinct count the Applications being accessed and group by the user and time```
+    | stats values(targets) as appname dc(targets) as app_count values(client.ipAddress) as source_ip values(client.userAgent.rawUserAgent) as UserAgent by actor.id actor.alternateId _time
+    ```only show results where 10 apps were accessed in a minute. Tune to your environment```
+    | where app_count >= 10
+false_positives:
+    - Potential automation setups where a service account is expected to be rapidly accessing applications.
+    - Legitimate end users rapid accessing applications - you can further enrich this by only looking at applications accessed from an anonymizer.
