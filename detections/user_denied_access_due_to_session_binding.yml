@@ -1,0 +1,28 @@
+title: User Denied Access due to Session Binding
+id: 1fae6f177a9b8ab64d8d31781ae5926f
+description: |
+  Detects violations of Okta's built-in ASN binding feature for administrative sessions.
+  This feature is enabled by default and fires an event when it detects an ASN change mid-session for administrators.
+  An adversary may steal okta session cookies for an administrative session and import them onto their own device connected to a separate ASN.
+references:
+  - https://sec.okta.com/protectingadminsessions
+author: Okta
+created_date: '2024-03-21'
+modified_date: '2024-03-21'
+threat:
+  Tactic:
+    - Credential Access
+  Technique:
+    - T1539: Steal Web Session Cookie
+prevention:
+    - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
+    - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
+    - Enable Protected Actions to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+    - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+    - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
+detection:
+  okta_systemlog:
+    OIE: | 
+      eventType eq "security.session.detect_client_roaming"
+false_positives:
+  -  If connected to a VPN and have a Proxy agent installed on the machine (Netspoke, Zscaler), initially ASN assigned by VPN provider, and the proxy agent also tries to assign an ASN. 

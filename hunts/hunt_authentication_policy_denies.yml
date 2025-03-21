@@ -1,0 +1,24 @@
+title: Hunt on Authentication Policy Blocks
+id: 073696c56701806c3ca06a28be18cf07
+description: |
+  Detects when an authentication is blocked via the Okta Authentication Policy.
+  An adversary with access to a compromised user may attempt to authenticate to applications but get denied due to restrictions in the authentication policy. 
+references:
+  - null
+author: Okta
+created_date: '2025-03-11'
+modified_date: '2025-03-11'
+threat:
+  Tactic:
+    - Initial Access
+  Technique:
+    - T1078: Valid Accounts
+prevention:
+  - Protect sign-in flows by enforcing strong MFA authenticators such as phishing-resistance with Okta FastPass and FIDO2 WebAuthn.
+  - Require devices be managed and registered and/or meet strong device assurance policies within Authentication Policies. 
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "policy.evaluate_sign_on" and outcome.result eq "DENY"
+false_positives:
+  - Legitimate failed policy evaluations due to various reasons. 

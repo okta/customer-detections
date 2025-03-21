@@ -1,0 +1,25 @@
+title: Hunt on Failed Number Challenge
+id: be422109b2c01d71d0ebd9b1d860ae95
+description: |
+  Detects possible account takeover attempts when a user failed the number challenge during push notification in Okta Verify.
+  This detection requires number challenge to be enabled and used.
+references:
+  - https://help.okta.com/oie/en-us/content/topics/identity-engine/authenticators/configure-okta-verify-options.htm#:~:text=Push%20notification%20(number%20challenge)
+  - https://support.okta.com/help/s/article/Number-Challenge-for-Okta-Verify
+  - https://support.okta.com/help/s/article/what-triggers-a-number-challenge-in-okta-verify?language=en_US
+author: Okta
+created_date: '2025-01-21'
+modified_date: '2025-01-21'
+threat:
+  Tactic:
+    - Credential Access
+  Technique:
+    - T1621: Multi-Factor Authentication Request Generation
+prevention:
+  - Protect sign-in flows by enforcing strong MFA authenticators such as phishing-resistance with Okta FastPass and FIDO2 WebAuthn.
+detection:
+  okta_systemlog:
+    OIE: |
+      debugContext.debugData.pushWithNumberChallengeResponseType eq "OV_WITH_CHALLENGE_RESPONSE_INVALID"
+false_positives:
+  - End users clicking the wrong Okta Verify number challenge during legitimate login activity. 

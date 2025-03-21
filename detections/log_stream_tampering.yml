@@ -1,0 +1,28 @@
+title: Log Stream Tampering
+id: 6595e64287a21e6e7f63f0ab037a4401
+description: |
+  Detects Okta log stream configuration changes such as deactivation, creation or deletion. 
+  An adversary with access to an Okta Administrator may attempt to disable log streams to a SIEM in order to prevent detection of their activities.
+references:
+  - https://help.okta.com/en-us/content/topics/reports/log-streaming/about-log-streams.htm
+author: Okta
+created_date: '2025-02-11'
+modified_date: '2025-02-11'
+threat:
+  Tactic:
+    - Defense Evasion
+  Technique:
+    - T1562.008: Impair Defenses - Disable or Modify Cloud Logs
+prevention:
+  - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
+  - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
+  - Enable Protected Actions to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+  - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+  - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType sw "system.log_stream.lifecycle"
+false_positives:
+  - Approved changes to log streams where changing a log stream is expected.
+  - This query can be further filtered to only look at disable, deletion or update events.
