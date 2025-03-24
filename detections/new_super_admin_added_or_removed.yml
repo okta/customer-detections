@@ -1,0 +1,33 @@
+title: New Okta Super Admin Created or Removed
+id: 6b27e2df29e33ac66e321e411b703d02
+description: |
+  Detects when an Okta Super Administrator is either created or removed
+  An adversary with access to an Okta Administrator my attempt to either:
+    1 - Create a new super administrator account for themselves to maintain persistence.
+    2 - Revoke all other super administrator privileges to prevent response actions from being taken.
+references:
+  - http://help.okta.com/en-us/content/topics/security/administrators.htm
+author: Okta
+created_date: '2025-02-11'
+modified_date: '2025-02-11'
+threat:
+  Tactic:
+    - Persistence
+    - Privilege Escalation
+    - Defense Evasion
+  Technique:
+    - T1078: Valid Accounts
+    - T1090: Account Manipulation
+prevention:
+  - Implement Zero Standing Privileges via Okta Govern Admin Roles (https://help.okta.com/en-us/content/topics/security/governance-admin-roles/govern-admin-roles.htm)
+  - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
+  - Enable Protected Actions to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+  - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+  - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType sw "user.account.privilege" and (debugContext.debugData.privilegeRevoked co "Super administrator" or debugContext.debugData.privilegeGranted co "Super administrator")
+false_positives:
+  - Onboarding or offboarding legitimate Okta administrators or service accounts.
+  - To focus on creation events filter on eventType user.account.privilege.grant, for revocation user.account.privilege.revoke.

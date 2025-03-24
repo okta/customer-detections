@@ -1,0 +1,120 @@
+Field,Example,Description
+Actor,null,Information about the identity performing the action identified in Event.EventType
+actor.alternateId,example@domain.com,An alternative way to identify the actor. For users this is the username value.
+actor.detailEntry,"""detailEntry"": {
+      ""osVersion"": ""15.2.0"",
+      ""osPlatform"": ""MACOS"",
+      ""deviceStatus"": ""ACTIVE""
+    }",Optional additional context about the actor.
+actor.displayName,Jane Doe,Display name of the identity performing the activity. If the identity is a user this will typically be their full name. 
+actor.id,00uxxxxxxxxxxxxxxxxx,Unique ID of the identity performing the action. If the entity is a user this will start with 00u.
+actor.type,User,"The type of actor associated with the identity, such as a user or application."
+,,
+Client,null,Information about the client performing the action identified in the Event.EventType.
+client.device,"Computer, Mobile",Type of device performing the action.
+client.geographicalContext,null,Metadata pertaining to the geolocation of the client IP.
+client.geographicalContext.City,Los Angeles,City the client IP is registered to.
+client.geographicalContext.Country/region,United States,Country or region the client IP is registered to.
+client.geographicalContext.Geolocation.Lat,-75.068819,Latitude the client IP is registered to.
+client.geographicalContext.Geolocation.Lon,124.464726,Longitude the client IP is registered to.
+client.geographicalContext.PostalCode,12345,Postal or Zip code the client IP is registered to.
+client.geographicalContext.State,Virginia,State or Province the client IP is registered to.
+client.id,okta.1234abc-123a-123a-123a-1234568abc,"For OAuth requests, this is the ID of the OAuth client making the request. For SSWS token requests, this is the ID of the agent making the request."
+client.ipAdress,8.8.8.8,IP address of the client.
+client.userAgent.browser,Chrome,Client Browser of the client derived from the User Agent.
+client.userAgent.os,Mac OS X,OS of the client derived from the User Agent.
+client.userAgent.rawUserAgent,"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",Raw User Agent String of the client.
+client.zone,Corporate IP Range,"A Network Zone name will be present only when it is relevant in the context of policy evaluation. When the Zone is a decisive criteria in determination of the appropriate policy rule, it will be present, otherwise the value will be null"
+,,
+Device,null,Device telemetry if applicable.
+device.device_integrator,"{""CROWDSTRIKE"":{""....""}}",Metadata from the device if device integration is setup.
+device.disk_encryption_type,ALL_INTERNAL_VOLUMES,Type of disk encryption setup on the authenticating device.
+device.id,guo....,Unique Okta generated ID of the authenticating Device.
+device.managed,TRUE,Boolean value if the device is managed in Okta.
+device.os_platform,OSX,Operating system platform.
+device.os_version,15.2.0,Operating system version.
+device.registered,TRUE,Boolean value if the device is registered in Okta.
+device.screen_lock_type,BIOMETRIC,What type of lock is configured on the device locally.
+device.secure_hardware_present,TRUE,Boolean value if the device has secure hardware implemented.
+,,
+Event.AuthenticationContext,null,Metadata pertaining to the authentication.
+authenticationContext.authenticationProvider,"FACTOR_PROVIDER, ACTIVE_DIRECTORY, SOCIAL, LDAP, FEDERATION",Provider verifying user credentials.
+authenticationContext.authenticationStep,0,The zero-based step number in the authentication pipeline. Currently unused and always set to 0.
+authenticationContext.credentialProvider,"""DUO"" ""GOOGLE""  ""OKTA_CREDENTIAL_PROVIDER"" ""RSA"" ""SYMANTEC"" ""YUBIKEY""","A credential provider is a software service that manages identities and their associated credentials. When authentication occurs through credentials provided by a credential provider, the credential provider is recorded here."
+authenticationContext.externalSessionId,idxA1A_111AAA2-22BBB333CCC,"Okta created session ID. All authenticated activities should have an externalSessionId except those that originate from an Okta first party service such as Access Requests, Okta Privileged Access and Workflows. "
+authenticationContext.rootSessionId,idxA111AA-AAA222_BBB333CCC,"Identifies events from all sessions that share a common root session. Some actions that can be attributed to a user, such as those taken by an Okta system actor on behalf of a user, may have a different externalSessionId value. The rootSessionId field allows all of those to be identified and grouped together."
+authenticationContext.authenticatorContext,null,Context about the authenticator used.
+authenticationContext.authenticatorContext.applicationVersion,123.0.1234.123,Version of the application facilitating the authentication.
+authenticationContext.authenticatorContext.binaryIdentifier,com.google.Chrome.helper,Process identifier of the application facilitating the authentication.
+authenticationContext.authenticatorContext.binaryPath,/Applications/Google Chrome.app/Google Chrome Helper,File path of the application facilitating the authentication.
+authenticationContext.authenticatorContext.bindingMethod,LOOPBACK,Binding method used during the authentication; see fastpass whitepaper for details.
+authenticationContext.authenticatorContext.requestOrigin,https://{company}.okta.com,Origin header value of the authentication.
+authenticationContext.authenticatorContext.signerDistinguishedName,Google LLC,Signer of the application facilitating the authentication.
+authenticationContext.authenticatorContext.signerKeyIdentifier,111aaa222bbb333ccc444ddd555eee666,Hash of the signer's key.
+authenticationContext.authenticatorContext.userConsent,APPROVED_USER_VERIFICATION,Outcome of user verification.
+authenticationContext.authenticatorContext.validationStatus,SUCCESS,Outcome of the authenticator validation.
+,,
+displayMessage,Authentication of user via MFA,This is a user friendly display message which conveys the action that the event indicates.
+eventType,user.session.access_admin_app,Event identifier of the action being performed see (https://developer.okta.com/docs/reference/api/event-types/).
+outcome,null,Metadata pertaining to the outcome of the event.
+outcome.reason,INVALID_CREDENTIALS,Reason for the outcome.result.
+outcome.result,"SUCCESS, FAILURE, CHALLENGE",The outcome of the action being performed defined in the eventType.
+published,2024-12-05T17:23:52.807Z,Timestamp the log event was published in UTC.
+securityContext,null,Additional network context for the client IP.
+securityContext.asNumber,123456,ASN the client IP is authenticating from.
+securityContext.asOrg,palo alto networks inc,Organization the ASN is registered to.
+securityContext.domain,example.com,Apex domain the client IP is registered to.
+securityContext.isProxy,"true, false","Boolean result if the IP is registered to a proxy or anonymizer service, derived from a service provider."
+securityContext.isp,google,ISP the client IP is registered to.
+severity,"INFO, WARN, ERROR","Indicates if the log being generated is informational, a warning or an error. "
+,,
+DebugContext,null,Extra debug data pertaining to the eventType being logged. 
+debugContext.debugData.authenticatorMethodChallengeTime,2025-01-10T15:17:49.778Z,Timestamp the user was challenged for an authenticator. 
+debugContext.debugData.authorizationServer,aus...,Unique ID of configured authorization server.
+debugContext.debugData.authorizationServerName,app-prod,Configured name of the authorization server.
+debugContext.debugData.behaviors,"{New Geo-Location=NEGATIVE, New Device=NEGATIVE, New IP=NEGATIVE, New State=NEGATIVE, ...}","The result of behavior detection evaluation which is present if behaviors are 
+evaluated in the request."
+debugContext.debugData.clientAuthType,"none, private_key_jwt",Auth type used depending on the grant. 
+debugContext.debugData.defaultAuthorizationServer,FALSE,Boolean if default authorization server was used.
+debugContext.debugData.deviceFingerprint,111aaa222bbb333ccc444ddd555eee666,Client generated unique identifier that is based off of various aspects of the end user’s browser. The device fingerprint is similar to the Device token but it is not stored as a cookie.
+debugContext.debugData.dtHash,111aaa222bbb333ccc444ddd555eee666,Hash of the device token. The device token is a backend generated unique string that is returned as a browser cookie.
+debugContext.debugData.factor,"SIGNED_NONCE, OKTA_VERIFY_PUSH, OKTA_SOFT_TOKEN, ...",MFA Factor used - SIGNED_NONCE is Okta Fastpass.
+debugContext.debugData.grantType,refresh_token,Type of grant being used.
+debugContext.debugData.grantedScopes,"offline_access, profile, openid",Scopes that were granted.
+debugContext.debugData.keyTypeUsedForAuthentication,PROOF_OF_POSSESSION,Type of MFA being used as configured in the authentication policy. 
+debugContext.debugData.logOnlySecurityData,"{\""risk\"":{\""level\"":\""LOW\""},\""behaviors\"":{...}",JSON result of the risk level and behaviors of an authentication. In API responses or Log Streams this is stringified JSON with backslashes.
+debugContext.debugData.origin,https://{company}.okta.com,Origin header value of the request.
+debugContext.debugData.policy,00p..,Authorization Server policy hit for this event.
+debugContext.debugData.initiationType,"SP_INITIATIED, IDP_INITIATED",Determines whether the authentication was initiated through a service provider or through the IDP.
+debugContext.debugData.requestId,111aaa222bbb333ccc444ddd555eee,Unique ID associated to the request. 
+debugContext.debugData.redirectUri,https://<customer>.okta.com/enduser/callback,Redirect URI associated with an authentication.
+debugContext.debugData.requestUrl,/app/google/{appid}/sso/saml/mail,URL of the request.
+debugContext.debugData.requestedScopes,openid,Scopes being requested. 
+debugContext.debugData.responseTime,120,Response time in ms.
+debugContext.debugData.risk,Risk{level=LOW},"Contains the level of risk for a particular request (LOW, MEDIUM, or HIGH) dependent on the result of behavior detections."
+debugContext.debugData.signOnMode,"OpenID Connect, SAML 2.0",Protocol used to facilitate the authentication.
+debugContext.debugData.threatSuspected,TRUE,The event has met enough criteria to be considered a threat.
+debugContext.debugData.tunnels,"[{""anonymous"":true,""operator"":NORD_VPN,""type"":""VPN""}]",This will contain details on all relevant proxy or VPN information associated with this IP address.
+legacyEventType,core.user.factor.attempt_success,"Refers to the eventtype in the prior generation of the System Log, which is EOL."
+transaction.id,111aaa222bbb333ccc444ddd555eee,"Identifies events that have occurred together as part of an operation (for example, a request to the Okta servers) https://developer.okta.com/docs/reference/system-log-query/"
+,,
+Request,null,Metadata pertaining to the request.
+request.ipChain,"""ipChain"": [{...}]
+","Represents a sequence of network-related information including intermediary systems, firewalls, or security layers involved in the request. This is an array of unnamed objects."
+request.ipChain.geographicalContext.City,Pittsburgh,City the IP in the chain is registered to.
+request.ipChain.geographicalContext.Country/region,Pennsylvania ,State or Province the IP in the chain is registered to.
+request.ipChain.geographicalContext.postalCode,12345,Postal code the IP in the chain is registered to. 
+request.ipChain.geographicalContext.Geolocation.Lat,-75.068819,Latitude the IP in the chain is registered to.
+request.ipChain.geographicalContext.Geolocation.Lon,124.464726,Longitude the IP in the chain is registered to.
+request.ipChain.ip,8.8.8.8,IP address in this step of the network chain.
+,,
+Target,null,"Metadata pertaining to the target, these fields differs based on the eventType and target.type. This is an array with zero to many unnamed objects within it."
+target.alternateId,"example@domain.com, Okta Dashboard, ...","An alternative way to identify the target, generally a name dependent on the Target.Type"
+target.detailEntry.SignOnModeType,SAML_2_0,Protocol used to facilitate the authentication to the target application.
+target.detailEntry.Expires,2025-01-10T16:17:51.000Z,Time the target will expire.
+target.detailEntry.MethodTypeUsed,Use Okta FastPass,Method used depending on the target.type. 
+target.detailEntryMethodUsedVerifiedProperties,"[DEVICE_BOUND, PHISHING_RESISTANT, USER_VERIFYING, USER_PRESENCE, HARDWARE_PROTECTED]",Properties used for verification depending on the target.type.
+target.detailEntry.Subject,00u...,"Subject of the oauth token, usually the user ID that is issuing it."
+target.displayName,Jane Doe,"Configured name of the target. Depending on the target.type it could be a full name, policy name, token name, etc. "
+target.id,0ua...,"Unique ID of the target, depending on the target.type it could be a user id, policy id, token id, etc. "
+target.type,"AppUser, AppInstance, Rule",The target type that the eventType is being performed against. The above fields will be populated based on this type. 
