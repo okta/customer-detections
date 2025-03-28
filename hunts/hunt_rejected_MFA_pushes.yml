@@ -19,6 +19,6 @@ prevention:
 detection:
   okta_systemlog:
     OIE: |
-      eventType eq "user.mfa.okta_verify.deny_push"	
+      eventType eq "user.authentication.auth_via_mfa" and debugContext.debugData.pushOnlyResponseType eq "OV_RESPONSE_DENY"
 false_positives:
   - End users accidentally pressing the wrong button during a push notification
