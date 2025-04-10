@@ -1,0 +1,27 @@
+title: Hunt on MFA Abandonment
+id: 1d8e2e061cbf17326933d17f61881b5c
+description: |
+  Detects MFA events that were abandoned. If an MFA prompt is not accepted or completed after a set period of time, it will be abandoned. 
+  An adversary with access to compromised passwords may try to push bomb the victim hoping they accept the MFA prompt.
+  Note: This is currently early access (as of April 10th, 2025) and must be enabled under "Settings > Features" in the admin console.
+references:
+  - https://help.okta.com/oie/en-us/content/topics/reports/mfa-abandonment.htm
+author: Okta
+created_date: '2025-04-10'
+modified_date: '2025-04-10'
+threat:
+  Tactic:
+    - Credential Access
+  Technique:
+    - T1621: Multi-Factor Authentication Request Generation
+prevention:
+  - Protect sign-in flows by enforcing strong MFA authenticators such as phishing-resistance with Okta FastPass and FIDO2 WebAuthn.
+  - Implement passwordless authentication within your Okta tenant (https://help.okta.com/oie/en-us/content/topics/identity-engine/password-optional/password-optional-disabled.htm)
+  - Require devices authenticating through your Okta tenant to be managed via authentication policies. 
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "user.authentication.auth_via_mfa" and (outcome.result eq "UNANSWERED" or outcome.result eq "ABANDONED")
+false_positives:
+  - Users not responding to legitimate MFA prompts
+  - Further filter this to look for multiple instances against a single account or events from known proxies. 

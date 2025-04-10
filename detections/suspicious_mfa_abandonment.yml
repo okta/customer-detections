@@ -1,0 +1,37 @@
+title: Suspicious MFA Abandonment
+id: b62937f1267543f143786725e5787b0b
+description: |
+  Detects suspicious patterns associated with MFA abandonment. 
+  An adversary with access to compromised passwords may try to push bomb the victim hoping they accept an MFA prompt.
+  Note: This is currently early access (as of April 10th, 2025) and must be enabled under "Settings > Features" in the admin console.
+references:
+  - https://help.okta.com/oie/en-us/content/topics/reports/mfa-abandonment.htm
+author: Okta
+created_date: '2025-04-10'
+modified_date: '2025-04-10'
+threat:
+  Tactic:
+    - Credential Access
+  Technique:
+    - T1621: Multi-Factor Authentication Request Generation
+prevention:
+  - Protect sign-in flows by enforcing strong MFA authenticators such as phishing-resistance with Okta FastPass or FIDO2 WebAuthn.
+  - Implement passwordless authentication within your Okta tenant (https://help.okta.com/oie/en-us/content/topics/identity-engine/password-optional/password-optional-disabled.htm)
+  - Require devices authenticating through your Okta tenant to be managed via authentication policies. 
+detection:
+  explanation: |
+    The query below:
+    Filters on MFA events where the outcome result was either "UNANSWERED" or "ABANDONED".
+    Groups and counts the results by source IP. Displays the count of unique usernames, the raw usernames and whether the request came from a proxy.
+    Filters the results to one of three outcomes:
+    1. 5 or more MFA abandonment events from a single IP to a single user.
+    2. Single IP issuing MFA abandonment to 5 different unique users.
+    3. If the MFA abandonment comes from a known proxy.
+    It's recommended to run this detection over an hour long period. 
+  splunk: |
+    index=main AND sourcetype=OktaIM2:log AND eventType=user.authentication.auth_via_mfa AND outcome.result IN ("UNANSWERED", "ABANDONED")
+    | stats earliest(_time) as _time values(actor.alternateId) as username dc(actor.id) as user_count values(securityContext.isProxy) as isProxy values(outcome.reason) as outcome_reason count by client.ipAddress
+    | where (user_count = 1 AND count > 5) OR (user_count > 5) OR (isProxy = "true")
+false_positives:
+  - Users not responding to legitimate MFA prompts from a corporate VPN IP.
+  - Company approved IPs being flagged as proxies.
