@@ -1,0 +1,25 @@
+title: FastPass Auth via Suspicious Binary
+id: d26f5a1d2c82b0e099f45a0ffe2c8da6
+description: |
+  Detects suspicious binaries authenticating successfully via Okta Fastpass.
+  An adversary with access to a compromised device may proxy fastpass auths through the compromised device to gain access to Okta. 
+  
+  Note: This detection relies on the use of Okta Fastpass in your environment.
+references:
+  - https://www.okta.com/blog/2025/04/stay-secure-with-fastpass-and-trusted-app-filters/
+author: Okta
+created_date: '2025-04-11'
+modified_date: '2024-04-11'
+threat:
+  Tactic:
+    - Defense Evasion
+  Technique:
+    - T1604: Proxy Through Victim
+prevention:
+  - Configure trusted app filters within auth policies as defined in the reference URL. 
+detection:
+  okta_systemlog:
+    OIE: |
+      debugContext.debugData.factor eq "SIGNED_NONCE" and outcome.result eq "SUCCESS" and authenticationContext.authenticatorContext.bindingMethod eq "LOOPBACK" and (authenticationContext.authenticatorContext.validationStatus eq "NO_SIGNATURE" or not (authenticationContext.authenticatorContext.binaryIdentifier co "Edge" or authenticationContext.authenticatorContext.binaryIdentifier co "Chrome" or authenticationContext.authenticatorContext.binaryIdentifier co "firefox" or authenticationContext.authenticatorContext.binaryIdentifier co "Safari" or authenticationContext.authenticatorContext.binaryIdentifier co "Brave" or authenticationContext.authenticatorContext.binaryIdentifier co "Microsoft"))
+false_positives:
+  - Corporate approved binaries. Consider baselining the authenticationContext.authenticatorContext.binaryIdentifier used in your environment, and alert on everything else.
