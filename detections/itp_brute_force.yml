@@ -1,7 +1,7 @@
 title: ITP Push Bombing
 id: 8a26f484504f6444804ec0095ee389cb
 description: |
-  Identity Threat Protection (ITP) has detected a push bomb ofor MFA fatigue attack and logged the event with
+  Identity Threat Protection (ITP) has detected a push bomb or MFA fatigue attack and logged the event with
   event type user.risk.detect.      
 references:
   - https://help.okta.com/oie/en-us/content/topics/itp/risk-detections.htm
