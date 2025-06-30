@@ -25,5 +25,8 @@ detection:
   okta_systemlog:
     OIE: |
       eventType eq "user.authentication.auth_via_mfa" AND result eq "FAILURE" AND outcome.reason eq "FastPass declined phishing attempt"
+  splunk: |
+    index=* sourcetype=OktaIM2:log eventType="user.authentication.auth_via_mfa" outcome.result="FAILURE" outcome.reason="FastPass declined phishing attempt" \
+    | table _time, actor.alternateId, displayMessage
 false_positives:
   - Planned and approved offensive security engagements
