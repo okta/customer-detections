@@ -23,5 +23,7 @@ detection:
   okta_systemlog:
     OIE: |
       eventType eq "user.session.access_admin_app" AND outcome.result eq "FAILURE"
+  splunk: |
+    index=* sourcetype=OktaIM2:log eventType="user.session.access_admin_app" outcome.result="FAILURE" | table _time,actor.displayName, outcome.reason, client.userAgent.rawUserAgent
 false_positives:
   - Legitimate administrative users causing a failure due to user-error. Enhance this detection looking for multiple instances of this occurring from the same source.
