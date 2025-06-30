@@ -23,5 +23,9 @@ detection:
   okta_systemlog:
     OIE: |
       eventType eq "user.session.access_admin_app" AND outcome.result eq "FAILURE"
+  splunk:
+    index=* sourcetype=OktaIM2:log debugContext.debugData.factor="SIGNED_NONCE" outcome.result="SUCCESS" authenticationContext.authenticatorContext.bindingMethod="LOOPBACK" (authenticationContext.authenticatorContext.validationStatus="NO_SIGNATURE" OR NOT (authenticationContext.authenticatorContext.binaryIdentifier="*Edge*" OR authenticationContext.authenticatorContext.binaryIdentifier="*Chrome*" OR authenticationContext.authenticatorContext.binaryIdentifier="*firefox*" OR authenticationContext.authenticatorContext.binaryIdentifier="*Safari*" OR authenticationContext.authenticatorContext.binaryIdentifier="*Brave*" OR authenticationContext.authenticatorContext.binaryIdentifier="*Microsoft*")) \
+    | table _time, actor.alternateId, authenticationContext.authenticatorContext.validationStatus, authenticationContext.authenticatorContext.binaryIdentifier
+
 false_positives:
   - Legitimate administrative users causing a failure due to user-error. Enhance this detection looking for multiple instances of this occurring from the same source.
