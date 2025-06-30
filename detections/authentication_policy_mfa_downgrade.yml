@@ -28,20 +28,20 @@ detection:
     Filters on policy updates where the policy changed from requiring 2FA to only requiring 1FA using the target fields
     Display results grouped by the policy name and rule ID that was changed. 
   splunk: |
-    index=main sourcetype=OktaIM2:log AND eventType="policy.rule.update" AND outcome.result=SUCCESS
-    | spath target{} output=targets
-    | eval PolicyRuleChanges=mvindex(targets,1)
-    | spath input=PolicyRuleChanges path=displayName output=policy_changed
-    | spath input=PolicyRuleChanges path=id output=policy_rule_id
+    index=* sourcetype=OktaIM2:log eventType="policy.rule.update" outcome.result=SUCCESS 
+    | spath target{} output=targets 
+    | eval PolicyRuleChanges=mvindex(targets,1) 
+    | spath input=PolicyRuleChanges path=displayName output=policy_changed 
+    | spath input=PolicyRuleChanges path=id output=policy_rule_id 
     ```Parse out the changeDetails that show specifically what was changed within the authentication policy```
-    | spath input=PolicyRuleChanges path=changeDetails.from.policyRuleActionJson output=change_from
-    | spath input=PolicyRuleChanges path=changeDetails.to.policyRuleActionJson output=change_to
+    | spath input=PolicyRuleChanges path=changeDetails.from.policyRuleActionJson output=change_from 
+    | spath input=PolicyRuleChanges path=changeDetails.to.policyRuleActionJson output=change_to 
     ```Extract the factorMode field from Nested JSON which displays whether the authentication policy requires 1FA or 2FA```
-    | spath input=change_from path="appSignOn.verificationMethod.factorMode" output=from_factor
-    | spath input=change_to path="appSignOn.verificationMethod.factorMode" output=to_factor
+    | spath input=change_from path="appSignOn.verificationMethod.factorMode" output=from_factor 
+    | spath input=change_to path="appSignOn.verificationMethod.factorMode" output=to_factor 
     ```Filter on the factorMode field to look for when the authentication policy was originally set to 2FA then was changed to 1FA```
-    | where from_factor = "2FA" AND to_factor = "1FA"
+    | where from_factor = "2FA" AND to_factor = "1FA" 
     ```Display the information in a table```
-    | stats values(actor.id) as user_id values(actor.alternateId) as username values(client.ipAddress) as src_ip values(client.userAgent.rawUserAgent) as user_agent values(from_factor) as original_factor values(to_factor) as changed_to_factor values(change_from) as full_original_policy values(change_to) as full_policy_changed_to by policy_changed policy_rule_id
+    | stats values(actor.id) as user_id values(actor.alternateId) as username values(client.ipAddress) as src_ip values(client.userAgent.rawUserAgent) as user_agent values(from_factor) as original_factor values(to_factor) as changed_to_factor
   false_positives:
     - Approved changes to authentication policies where downgrading MFA is expected
