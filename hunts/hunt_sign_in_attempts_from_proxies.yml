@@ -1,4 +1,4 @@
-title: Sign-in Attempts from Anonymizer Proxies
+title: Hunt on Sign-in Attempts from Anonymizer Proxies
 id: fce89e7ad37c483094a637bbb3881e5d
 description: |
   Detects login attempts from IPs that Okta identifies as anonymizers.
