@@ -1,4 +1,4 @@
-title: Identity Verification Failures
+title: Hunt on Identity Verification Failures
 id: c889727a8cc9894d35467fbae6187835
 description: |
   Detects when an ID Proofing attempt failed. Adversaries may try to bypass ID Verification in order to 
