@@ -1,0 +1,29 @@
+title: New AD Agent Created
+id: ca0a00420e4f4c2bb078ee6491484994
+description: |
+  Detects when a new Active Directory (AD) agent is created in Okta.
+  This may indicate an adversary has compromised an Okta admin account and is attempting to create a new AD agent to facilitate further access or persistence within an environment.
+  The eventType "system.ad_agent.created" is logged when a new AD agent is created. This detection is particularly relevant for environments where AD integration is NOT generally used for delegated user management and authentication.
+references:
+  - https://www.okta.com/integrations/active-directory/
+author: Okta
+created_date: "2025-07-01"
+modified_date: "2025-07-01"
+threat:
+  Tactic:
+    - Credential Access
+    - Persistence
+    - Defense Evasion
+  Technique:
+    - T1556.007: "Modify Authentication Process: Hybrid Identity"
+prevention:
+  - Apply the principle of least privilege. Create Custom Admin Roles that exclude this permission (okta.agents.manage) for all but a minimal number of essential administrators.
+  - For the few administrators who require agent management permissions, eliminate standing privileges. Use Okta Access Requests to grant these permissions on a just-in-time (JIT) basis, requiring a time-bound session and an explicit approval workflow (dual authorization) from another administrator.
+  - Mandate the use of high-assurance authenticators like FIDO2 WebAuthn or Okta FastPass for all administrative roles.
+  - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "system.ad_agent.created"
+false_positives:
+  - Legitimate administrative activity by an authorized user creating a new AD agent for legitimate purposes.
