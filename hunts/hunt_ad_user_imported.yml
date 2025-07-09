@@ -1,0 +1,29 @@
+title: Hunt on Users Imported from Active Directory
+id: 66d64a35d10d45f9b6b9c7dadaff6d82
+description: |-
+  Detects when an Okta AD Agent is used to import a user into the Okta environment.
+  This may indicate an adversary has established a new Active Directory (AD) agent and imported users to facilitate further access or persistence within an environment.
+  Therefore , this hunting rule can be utilised to query for imported users, in correlation with the "New AD Agent Created" detection rule.
+  This hunting rule is particularly relevant for environments where AD integration is NOT generally used for delegated user management and authentication.
+  Known authorized AD Agents may be excluded from the rule, in order to limit noise from benign activity.
+references:
+  - https://www.okta.com/integrations/active-directory/
+author: Okta
+created_date: "2025-07-01"
+modified_date: "2025-07-01"
+threat:
+  Tactic:
+    - Persistence
+  Technique:
+    - T1136.003: "Create Account: Cloud Account"
+prevention:
+  - Apply the principle of least privilege. Create Custom Admin Roles that exclude this permission (okta.agents.manage) for all but a minimal number of essential administrators.
+  - For the few administrators who require agent management permissions, eliminate standing privileges. Use Okta Access Requests to grant these permissions on a just-in-time (JIT) basis, requiring a time-bound session and an explicit approval workflow (dual authorization) from another administrator.
+  - Mandate the use of high-assurance authenticators like FIDO2 WebAuthn or Okta FastPass for all administrative roles.
+  - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "system.agent.ad.imported_user"
+false_positives:
+  - Legitimate importing of users from Active Directory (AD) by an authorized AD Agent for legitimate purposes, such as onboarding new employees or synchronizing user accounts.

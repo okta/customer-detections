@@ -1,0 +1,28 @@
+title: Hunt on Rich Client Authentication Abuse
+id: 77716e0b05754b51adbc3db9b87b2c0d
+description: |-
+  Detects when a user attempts to use Rich Client Authentication to authenticate to Okta.
+  Rich Client Authentication (basic authentication) is typically performed by an adversary in an attempt to bypass MFA and other security controls/policies, which may facilitate several bruteforce techniques.
+  Basic Authentication, in the Office 365 suite, is a legacy authentication mechanism that relies solely on username and password. It has proven ineffective and is not recommended for modern IT environments, especially when authentication flows are exposed to the internet.
+  This hunt is designed to look for activity where Rich Client Authentication is being abused, especially where basic authentication has been disabled.
+references:
+  - https://www.okta.com/resources/whitepaper/securing-office-365-with-okta/
+author: Okta
+created_date: "2025-07-01"
+modified_date: "2025-07-01"
+threat:
+  Tactic:
+    - Credential Access
+  Technique:
+    - T1110: Brute Force
+prevention:
+  - Follow the Okta Whitepaper on "Securing Office365 with Okta" to disable basic authentication across your organization.
+  - Use external Threat Intelligence Platforms to notify your security team when user credentials related to your organisation are observed in a credential dump.
+  - Immediately rotate credentials for affected users which are observed within credential dumps.
+  - Enforce strong, phishing-resistant authenticators like Okta FastPass or FIDO2 WebAuthn for all users within your environment.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "user.authentication.auth_via_richclient"
+false_positives:
+  - Legacy Microsoft applications, such as Office 2010 and lower, attempting to perform basic authentication.
