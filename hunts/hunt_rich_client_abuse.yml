@@ -7,7 +7,9 @@ description: |-
   This hunt is designed to look for activity where Rich Client Authentication is being abused, especially where basic authentication has been disabled.
 references:
   - https://www.okta.com/resources/whitepaper/securing-office-365-with-okta/
-author: Okta
+author:
+  - Okta
+  - Datadog
 created_date: "2025-07-01"
 modified_date: "2025-07-01"
 threat:
@@ -24,5 +26,7 @@ detection:
   okta_systemlog:
     OIE: |
       eventType eq "user.authentication.auth_via_richclient"
+  datadog: |
+    source:okta @evt.name:user.authentication.auth_via_richclient
 false_positives:
   - Legacy Microsoft applications, such as Office 2010 and lower, attempting to perform basic authentication.

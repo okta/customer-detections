@@ -8,7 +8,9 @@ description: |-
   Known authorized AD Agents may be excluded from the rule, in order to limit noise from benign activity.
 references:
   - https://www.okta.com/integrations/active-directory/
-author: Okta
+author:
+  - Okta
+  - Datadog
 created_date: "2025-07-01"
 modified_date: "2025-07-01"
 threat:
@@ -24,6 +26,8 @@ prevention:
 detection:
   okta_systemlog:
     OIE: |
-      eventType eq "system.agent.ad.imported_user"
+      eventType eq "system.agent.ad.import_user"
+  datadog: |
+    source:okta @evt.name:system.agent.ad.import_user
 false_positives:
   - Legitimate importing of users from Active Directory (AD) by an authorized AD Agent for legitimate purposes, such as onboarding new employees or synchronizing user accounts.

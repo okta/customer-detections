@@ -6,7 +6,9 @@ description: |
   The eventType "system.ad_agent.created" is logged when a new AD agent is created. This detection is particularly relevant for environments where AD integration is NOT generally used for delegated user management and authentication.
 references:
   - https://www.okta.com/integrations/active-directory/
-author: Okta
+author:
+  - Okta
+  - Datadog
 created_date: "2025-07-01"
 modified_date: "2025-07-01"
 threat:
@@ -24,6 +26,8 @@ prevention:
 detection:
   okta_systemlog:
     OIE: |
-      eventType eq "system.ad_agent.created"
+      eventType eq "system.agent.ad.import_user"
+  datadog: |
+    source:okta @evt.name:system.agent.ad.import_user
 false_positives:
   - Legitimate administrative activity by an authorized user creating a new AD agent for legitimate purposes.
