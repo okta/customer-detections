@@ -26,8 +26,8 @@ prevention:
 detection:
   okta_systemlog:
     OIE: |
-      eventType eq "system.agent.ad.imported_user"
+      eventType eq "system.agent.ad.import_user"
   datadog: |
-    source:okta @eventType:system.agent.ad.imported_user
+    source:okta @evt.name:system.agent.ad.import_user
 false_positives:
   - Legitimate importing of users from Active Directory (AD) by an authorized AD Agent for legitimate purposes, such as onboarding new employees or synchronizing user accounts.

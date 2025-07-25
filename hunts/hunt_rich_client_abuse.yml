@@ -27,6 +27,6 @@ detection:
     OIE: |
       eventType eq "user.authentication.auth_via_richclient"
   datadog: |
-    source:okta @eventType:user.authentication.auth_via_richclient
+    source:okta @evt.name:user.authentication.auth_via_richclient
 false_positives:
   - Legacy Microsoft applications, such as Office 2010 and lower, attempting to perform basic authentication.
