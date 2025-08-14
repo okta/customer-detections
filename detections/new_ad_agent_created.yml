@@ -26,8 +26,8 @@ prevention:
 detection:
   okta_systemlog:
     OIE: |
-      eventType eq "system.agent.ad.import_user"
+      eventType eq "system.agent.ad.create"
   datadog: |
-    source:okta @evt.name:system.agent.ad.import_user
+    source:okta @evt.name:system.agent.ad.create
 false_positives:
   - Legitimate administrative activity by an authorized user creating a new AD agent for legitimate purposes.
