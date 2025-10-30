@@ -14,11 +14,12 @@ Okta Identity Defense Operations is a team of security practitioners that help O
 | `detections/`  | List of YAML files for recommended security detections Okta customers can implement within their security monitoring system.   |
 | `hunts/`  | Threat hunting queries useful for aiding in detection use case creation  |
 | `logs/`  | CSV file with descriptions and examples of log fields within the Okta system log  |
+| `workflows/`  | Okta Workflows templates for security incident response and proactive threat mitigation  |
 
 ## Getting Started
 The System Log provides a detailed log of user, admin and support events relevant to use of the Okta Workforce Identity Cloud.
 
-These events can be [browsed, searched or filtered in the admin console](https://help.okta.com/en-us/content/topics/reports/syslog-filters.htm). They can also be queried and [filtered](https://developer.okta.com/docs/reference/api/system-log/#filtering-results) programmatically via the [System Log API](https://developer.okta.com/docs/reference/api/system-log/), and can be [exported](https://support.okta.com/help/s/article/Exporting-Okta-Log-Data?language=en_US) or [streamed](https://help.okta.com/en/prod/Content/Topics/Reports/log-streaming/about-log-streams.htm) to third-party security monitoring tools. 
+These events can be [browsed, searched or filtered in the admin console](https://help.okta.com/en-us/content/topics/reports/syslog-filters.htm). They can also be queried and [filtered](https://developer.okta.com/docs/api/#filter) programmatically via the [System Log API](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/SystemLog/), and can be [exported](https://support.okta.com/help/s/article/Exporting-Okta-Log-Data?language=en_US) or [streamed](https://help.okta.com/en/prod/Content/Topics/Reports/log-streaming/about-log-streams.htm) to third-party security monitoring tools. 
 
 Okta Security recommends the use of [Log Streaming](https://help.okta.com/en-us/Content/Topics/Reports/log-streaming/about-log-streams.htm) to capture events in third-party security tools in close to real-time, and/or the use of [Event Hooks](https://developer.okta.com/docs/concepts/event-hooks/) and [Workflows](https://www.okta.com/platform/workflows/) for security orchestration opportunities.
 
