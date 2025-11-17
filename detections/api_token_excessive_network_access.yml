@@ -1,0 +1,33 @@
+title: API Token Excessive Network Access
+id:
+description: |
+  Detects when an Okta API token is created or updated to allow access from any IP address.
+  For example, network restrictions are set to 'ANYWHERE' or are excluded.
+  Okta API tokens are highly sensitive credentials and should always be restricted by network zones.
+  An unrestricted token, even read-only, poses a significant security risk.
+  Unrestricted tokens could be used for data exfiltration or to execute administrative actions from anywhere globally if compromised.
+references:
+  - https://attack.mitre.org/techniques/T1134/
+  - https://developer.okta.com/docs/guides/create-an-api-token/
+author:
+  - Okta
+created_date: '2025-06-01'
+modified_date: '2025-06-01'
+threat:
+  Tactic:
+    - Defense Evasion
+    - Persistence
+    - Credential Access
+  Technique:
+    - T1134: Access Token Manipulation
+prevention:
+  - Always enforce Network Zones and Trusted Origins on all API tokens.
+  - Implement the principle of least privilege; API tokens should only have the permissions necessary to perform their required tasks.
+  - Apply the principle of "zero standing privileges" and use Access Requests to provision API token creation/management permissions on a just-in-time (JIT) basis.
+  - Rotate API tokens regularly.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType in ["system.api_token.create", "system.api_token.update"] AND debugContext.debugData.networkConnection eq "ANYWHERE"
+false_positives:
+  - Legitimate administrative misconfiguration where an administrator did not realize the security implications of setting the network restriction to "ANYWHERE."
