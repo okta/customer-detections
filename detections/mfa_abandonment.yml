@@ -1,5 +1,5 @@
 title: MFA Abandonment
-id:
+id: a01d6b5a01ffdc32eba39244b1662201
 description: |
   Detects when a Multi-Factor Authentication (MFA) prompt is unanswered or abandoned multiple times by a user.
   While this can sometimes be benign (e.g., user error), multiple MFA abandonment events could indicate a security threat.

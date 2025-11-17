@@ -1,5 +1,5 @@
 title: API Token Excessive Network Access
-id:
+id: c490537fcdae239605717ee314bd61c9
 description: |
   Detects when an Okta API token is created or updated to allow access from any IP address.
   For example, network restrictions are set to 'ANYWHERE' or are excluded.

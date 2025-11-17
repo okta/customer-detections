@@ -1,5 +1,5 @@
 title: Protected Action Settings Update
-id: 
+id: 49b9fc1fb5072b21bcb6ecc423128c3e
 description: |
   Detects any Okta protected action settings update.
   This activity could indicate an adversary has elevated their access and is taking actions on objectives.
