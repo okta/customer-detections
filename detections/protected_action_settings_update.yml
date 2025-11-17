@@ -1,0 +1,30 @@
+title: Protected Action Settings Update
+id: 49b9fc1fb5072b21bcb6ecc423128c3e
+description: |
+  Detects any Okta protected action settings update.
+  This activity could indicate an adversary has elevated their access and is taking actions on objectives.
+  Protected actions settings updates are typically rare, and often require an approved change request.
+references:
+  - https://attack.mitre.org/techniques/T1548/003/
+  - https://help.okta.com/oie/en-us/content/topics/security/admin-console-protected-actions.htm
+author:
+  - Okta
+created_date: '2025-06-01'
+modified_date: '2025-06-01'
+threat:
+  Tactic:
+    - Privilege Escalation
+    - Defense Evasion
+  Technique:
+    - T1548.003: Abuse Windows Management Instrumentation
+    - T1562.003: Impair Defenses - Service Stop
+prevention:
+  - Enable Protected Actions to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+  - Apply the principle of least privilege for administrators. Create Custom Admin Roles with only necessary permissions.
+  - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "security.protected_action.settings.update"
+false_positives:
+  - An approved change request by an authorized administrator.
