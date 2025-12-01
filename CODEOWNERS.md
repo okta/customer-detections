@@ -1,0 +1,1 @@
+* @okta/repo-customer-detections-codeowner
