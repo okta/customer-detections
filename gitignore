@@ -2,7 +2,6 @@
 .mypy_cache
 .pytest_cache
 .coverage
-detections_modified.txt
 
 # Virtual environment
 venv/
@@ -44,5 +43,3 @@ __pypackages__/
 terraform/**/tfplan
 
 !.vscode/settings.json
-
-utils/enterprise-attack.json
