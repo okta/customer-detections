@@ -1,8 +1,8 @@
 title: Device Registered to Multiple Users
 id: f2ae616490db4cc6515b5f8ff7785262
 description: |
-  Detects when the same device is registered for MFA to multiple users. 
-  An adversary may register their own MFA devices, often leveraging the same device for multiple compromised accounts.  
+  Detects when the same device is registered for MFA to multiple users.
+  An adversary may register their own MFA devices, often leveraging the same device for multiple compromised accounts.
 references:
   - Threat Research
 author: Okta
@@ -17,13 +17,13 @@ threat:
     - T1556.006: Modify Authentication Process.Multi-Factor Authentication
 prevention:
   - Configure authentication policies to only allow managed devices to authenticate.
-  - If unmanaged devices are required, configure device assurance policies to ensure all devices meet a secure baseline. 
-  - Configure strong policy-based enrolments. Using a combination of Event Hooks, Okta Workflows and Okta Account Management policy, create a policy where after initial enrollment, all subsequent enrollments require phishing resistant MFA. 
+  - If unmanaged devices are required, configure device assurance policies to ensure all devices meet a secure baseline.
+  - Configure strong policy-based enrolments. Using a combination of Event Hooks, Okta Workflows and Okta Account Management policy, create a policy where after initial enrollment, all subsequent enrollments require phishing resistant MFA.
 detection:
-  explanation: | 
-    The query below: 
+  explanation: |
+    The query below:
     Retrieves events where a user added a device as an MFA factor.
-    Groups the results by the device ID and counts the distinct number of userIDs that have added that same device ID over the supplied period of time. It's recommended this query be ran over a longer period of time. 
+    Groups the results by the device ID and counts the distinct number of userIDs that have added that same device ID over the supplied period of time. It's recommended this query be ran over a longer period of time.
     Alerts when 2 or more unique user IDs were observed registering the same device ID.
   splunk: |
     index=main sourcetype=OktaIM2:log AND eventType="device.user.add"

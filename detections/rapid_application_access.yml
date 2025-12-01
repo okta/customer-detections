@@ -2,7 +2,7 @@ title: Rapid Okta Application Access
 id: 2c6f8d09fd3f5bc3eb735e293497ca63
 description: |
   Detects a single user accessing more than 10 distinct applications within 1 minute.
-  An adversary after gaining initial access may immediately try and open as many applications as possible from the Okta Dashboard before sessions expire.  
+  An adversary after gaining initial access may immediately try and open as many applications as possible from the Okta Dashboard before sessions expire.
 references:
   - null
 author: Okta
@@ -17,7 +17,7 @@ prevention:
   - Configure a Re-authentication Frequency of “Every Sign-In Attempt” to all high impact applications. This greatly diminishes access to applications using a stolen user session without persistent access to MFA.
   - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
 detection:
-  explanation: | 
+  explanation: |
     The query below:
     Filters on events for applications being successfully accessed that are IDP initiated (the application was accessed from the Okta Dashboard).
     Extract the Application name being accessed and storing it in the "targets" field.
@@ -36,5 +36,5 @@ detection:
     ```only show results where 10 apps were accessed in a minute. Tune to your environment```
     | where app_count >= 10
 false_positives:
-    - Potential automation setups where a service account is expected to be rapidly accessing applications.
-    - Legitimate end users rapid accessing applications - you can further enrich this by only looking at applications accessed from an anonymizer.
+  - Potential automation setups where a service account is expected to be rapidly accessing applications.
+  - Legitimate end users rapid accessing applications - you can further enrich this by only looking at applications accessed from an anonymizer.

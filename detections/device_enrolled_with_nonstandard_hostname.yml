@@ -2,7 +2,7 @@ title: Device Enrolled with Non-Standard Hostname
 id: 4f6161a02dbd790f1b1c2c9f5287ab45
 description: |
   Detects when a new device is enrolled by a user that doesn't follow standard hostname nomenclature used in the organization.
-  An adversary with access to a compromised account may enroll their own device to leverage as MFA. This device does not often follow standard hostname nomenclature used in the organization. 
+  An adversary with access to a compromised account may enroll their own device to leverage as MFA. This device does not often follow standard hostname nomenclature used in the organization.
 references:
   - null
 author: Okta
@@ -18,10 +18,10 @@ threat:
     - T1078: Valid Accounts
 prevention:
   - Configure authentication policies to only allow managed devices to authenticate.
-  - If unmanaged devices are required, configure device assurance policies to ensure all devices meet a secure baseline. 
-  - Configure strong policy-based enrolments. Using a combination of Event Hooks, Okta Workflows and Okta Account Management policy, create a policy where after initial enrollment, all subsequent enrollments require phishing resistant MFA. 
+  - If unmanaged devices are required, configure device assurance policies to ensure all devices meet a secure baseline.
+  - Configure strong policy-based enrolments. Using a combination of Event Hooks, Okta Workflows and Okta Account Management policy, create a policy where after initial enrollment, all subsequent enrollments require phishing resistant MFA.
 detection:
-  explanation: | 
+  explanation: |
     The query below:
     Retrieves device enrollment and device added log events.
     Extracts relevant fields from the raw log.
@@ -38,5 +38,5 @@ detection:
     ```Display the information```
     | stats values(published) as timestamp values(displayMessage) as message values(actor.id) as actor_id values(actor.alternateId) as username values(client.ipAddress) as source_ip values(OS) as OS values(OS_Version) as OS_Version values(managed) as managed_device by hostname
 false_positives:
-    - Mobile phone hostnames that aren't expected to follow any sort of hostname standard. Tune this rule to exclude mobile devices.
-    - Legitimate BYOD or personal devices that a user enrolls. 
+  - Mobile phone hostnames that aren't expected to follow any sort of hostname standard. Tune this rule to exclude mobile devices.
+  - Legitimate BYOD or personal devices that a user enrolls.

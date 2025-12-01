@@ -1,8 +1,8 @@
 title: Request to access Admin Console from new device or IP
 id: 832e92ebf3bbf6a6fcb094aefa7e792c
 description: |
-  Detects when a user accesses the Okta Admin Console from a new device or IP. 
-  An adversary may compromise an administrative account and attempt to access the admin console from a new IP or device. 
+  Detects when a user accesses the Okta Admin Console from a new device or IP.
+  An adversary may compromise an administrative account and attempt to access the admin console from a new IP or device.
 references:
   - https://sec.okta.com/leastprivilege
 author: Okta

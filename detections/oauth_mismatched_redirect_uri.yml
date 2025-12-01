@@ -2,7 +2,7 @@ title: Oauth Mismatched Redirect URI
 id: 24b40c3835be13b6b1828e38c0c248b5
 description: |
   Detects an unexpected redirect when granting oauth tokens.
-  An adversary leveraging phishing infrastructure to compromise users may issue redirects to the phishing domain during the oauth flow. 
+  An adversary leveraging phishing infrastructure to compromise users may issue redirects to the phishing domain during the oauth flow.
 references:
   - https://www.oauth.com/oauth2-servers/redirect-uris/
 author: Okta
@@ -22,4 +22,4 @@ detection:
       eventType eq "app.oauth2.token.grant" and outcome.reason eq "mismatched_redirect_uri" and outcome.result eq "FAILURE"
 false_positives:
   - Expected redirect URIs should be excluded.
-  - Approved phishing engagements. 
+  - Approved phishing engagements.
