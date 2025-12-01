@@ -3,8 +3,15 @@
 .pytest_cache
 .coverage
 
-# Virtual environment
+# Environments
+.env
+.envrc
+.venv
+env/
 venv/
+ENV/
+env.bak/
+venv.bak/
 
 # Byte-compiled files
 __pycache__/
@@ -16,9 +23,6 @@ __pycache__/
 dist/
 build/
 *.egg-info/
-
-# Local development settings
-.env
 
 # IDE files
 .vscode/
