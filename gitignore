@@ -1,0 +1,48 @@
+.python-version
+.mypy_cache
+.pytest_cache
+.coverage
+detections_modified.txt
+
+# Virtual environment
+venv/
+
+# Byte-compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution
+dist/
+build/
+*.egg-info/
+
+# Local development settings
+.env
+
+# IDE files
+.vscode/
+.idea/
+
+# Compiled Python files
+*.pyc
+
+# Miscellaneous
+*.DS_Store
+*.sqlite3
+*.log
+
+# Dependency folders
+__pypackages__/
+
+# Terraform
+/terraform/**/.terraform/
+/terraform/**/.terraform.lock.hcl
+/volume/*
+/docker/*
+terraform/**/tfplan
+
+!.vscode/settings.json
+
+utils/enterprise-attack.json
