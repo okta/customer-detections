@@ -2,7 +2,7 @@ title: Access to Admin Console Denied
 id: e6e88bfdbc27a65cddf1225c9ff0fb12
 description: |
   Detects when an attempt was made to access the Okta Admin Console but failed.
-  Adversaries may try to access the Okta Admin Console after compromising an Okta admin but get denied due to policy constraints. 
+  Adversaries may try to access the Okta Admin Console after compromising an Okta admin but get denied due to policy constraints.
 references:
   - https://sec.okta.com/leastprivilege
 author: Okta

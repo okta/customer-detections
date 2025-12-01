@@ -22,4 +22,4 @@ detection:
     OIE: |
       debugContext.debugData.pushWithNumberChallengeResponseType eq "OV_WITH_CHALLENGE_RESPONSE_INVALID"
 false_positives:
-  - End users clicking the wrong Okta Verify number challenge during legitimate login activity. 
+  - End users clicking the wrong Okta Verify number challenge during legitimate login activity.

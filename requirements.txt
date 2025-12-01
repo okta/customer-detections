@@ -1,0 +1,4 @@
+pytest
+pyyaml
+yamllint
+pre-commit

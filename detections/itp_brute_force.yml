@@ -2,7 +2,7 @@ title: ITP Push Bombing
 id: 8a26f484504f6444804ec0095ee389cb
 description: |
   Identity Threat Protection (ITP) has detected a push bomb or MFA fatigue attack and logged the event with
-  event type user.risk.detect.      
+  event type user.risk.detect.
 references:
   - https://help.okta.com/oie/en-us/content/topics/itp/risk-detections.htm
   - https://www.okta.com/blog/2022/09/mfa-fatigue-growing-security-concern/
@@ -17,10 +17,8 @@ threat:
     - T1556.006: Modify Authentication Process.Multi-Factor Authentication
     - T1562.008: Impair Defenses - Disable or Modify Tools
 prevention:
-  - Consider migrating to a higher assurance factor like Okta FastPass, WebAuthn, or enabling the Okta Verify Number Challenge to reduce 
-    efficacy of MFA fatigue attacks.
-  - An ITP Action can be configured to notify SecOps team members in Slack or other notification system instead 
-    of a SIEM based detection.   
+  - Consider migrating to a higher assurance factor like Okta FastPass, WebAuthn, or enabling the Okta Verify Number Challenge to reduce efficacy of MFA fatigue attacks.
+  - An ITP Action can be configured to notify SecOps team members in Slack or other notification system instead of a SIEM based detection.
 detection:
   okta_systemlog:
     OIE: |

@@ -2,8 +2,8 @@ title: FastPass Auth via Suspicious Binary
 id: d26f5a1d2c82b0e099f45a0ffe2c8da6
 description: |
   Detects suspicious binaries authenticating successfully via Okta Fastpass.
-  An adversary with access to a compromised device may proxy fastpass auths through the compromised device to gain access to Okta. 
-  
+  An adversary with access to a compromised device may proxy fastpass auths through the compromised device to gain access to Okta.
+
   Note: This detection relies on the use of Okta Fastpass in your environment.
 references:
   - https://www.okta.com/blog/2025/04/stay-secure-with-fastpass-and-trusted-app-filters/
@@ -16,7 +16,7 @@ threat:
   Technique:
     - T1604: Proxy Through Victim
 prevention:
-  - Configure trusted app filters within auth policies as defined in the reference URL. 
+  - Configure trusted app filters within auth policies as defined in the reference URL.
 detection:
   okta_systemlog:
     OIE: |

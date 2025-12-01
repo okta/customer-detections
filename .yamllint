@@ -1,0 +1,20 @@
+# https://yamllint.readthedocs.io/en/latest/configuration.html
+extends: default
+
+ignore:
+    - .github/
+    - logs/
+    - tests/
+    - workflows/
+
+rules:
+    comments:
+        require-starting-space: true
+        min-spaces-from-content: 1
+    comments-indentation: disable
+    document-start: disable
+    empty-lines: {max: 2, max-start: 2, max-end: 2}
+    indentation: {spaces: 2, indent-sequences: whatever}
+    line-length: disable
+    new-line-at-end-of-file: enable
+    trailing-spaces: {}

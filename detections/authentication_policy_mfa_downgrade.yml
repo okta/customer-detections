@@ -2,7 +2,7 @@ title: Authentication Policy MFA Downgrade
 id: 0c2634a68f9ac593c58349e0de80bb67
 description: |
   Detects when an Okta Administrator changes an authentication policy from requiring 2FA to only requiring 1FA.
-  An adversary with access to a compromised Okta Admin account may try to downgrade MFA for certain applications such as password managers to bypass MFA. 
+  An adversary with access to a compromised Okta Admin account may try to downgrade MFA for certain applications such as password managers to bypass MFA.
 references:
   - https://www.reliaquest.com/blog/scattered-spider-x-ransomhub-a-new-partnership/
   - https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/add-app-sign-on-policy-rule.htm
@@ -21,12 +21,12 @@ prevention:
   - Enable Protected Actions to force re-authentication whenever an administrative user attempts to perform sensitive actions.
   - Enforce dedicated admin policies - Assign all administrators to groups. Require users in these groups to sign-in from managed devices and via phishing resistant MFA (Okta FastPass, FIDO2 WebAuthn). Restrict this access to trusted Network Zones and deny access from anonymizing proxies.
 detection:
-  explanation: | 
+  explanation: |
     The query below:
     Retrieves successful policy update events (policy.rule.update)
     Extract relevant JSON from the log to display in the search
     Filters on policy updates where the policy changed from requiring 2FA to only requiring 1FA using the target fields
-    Display results grouped by the policy name and rule ID that was changed. 
+    Display results grouped by the policy name and rule ID that was changed.
   splunk: |
     index=main sourcetype=OktaIM2:log AND eventType="policy.rule.update" AND outcome.result=SUCCESS
     | spath target{} output=targets
@@ -43,5 +43,5 @@ detection:
     | where from_factor = "2FA" AND to_factor = "1FA"
     ```Display the information in a table```
     | stats values(actor.id) as user_id values(actor.alternateId) as username values(client.ipAddress) as src_ip values(client.userAgent.rawUserAgent) as user_agent values(from_factor) as original_factor values(to_factor) as changed_to_factor values(change_from) as full_original_policy values(change_to) as full_policy_changed_to by policy_changed policy_rule_id
-  false_positives:
-    - Approved changes to authentication policies where downgrading MFA is expected
+false_positives:
+  - Approved changes to authentication policies where downgrading MFA is expected
