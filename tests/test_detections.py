@@ -13,17 +13,14 @@ RULE_DIRS = [
 
 
 def list_yaml_files():
-    """Yield all .yml and .yaml files from rule directories (normalized paths)."""
     yaml_files = []
     for rule_dir in RULE_DIRS:
-        # Resolve the directory path cleanly (removes 'tests/../')
         clean_dir = os.path.abspath(rule_dir)
         
         if not os.path.exists(clean_dir):
             print(f"WARNING: Directory not found: {clean_dir}")
             continue
 
-        # Find files and ensure they are absolute/clean paths
         found = glob(os.path.join(clean_dir, "*.yml")) + \
                 glob(os.path.join(clean_dir, "*.yaml"))
                 
@@ -41,7 +38,7 @@ def load_yaml_file(path):
 
 @pytest.mark.parametrize("yaml_file", list_yaml_files())
 def test_yaml_parses(yaml_file):
-    """Ensure every YAML rule parses successfully."""
+    #Ensure YAML parses correctly
     try:
         data = load_yaml_file(yaml_file)
         assert isinstance(data, dict), f"YAML must be a dict in {yaml_file}"
@@ -78,7 +75,7 @@ def test_required_fields(yaml_file):
 # -------- UNIQUE ID VALIDATION ---------
 
 def test_unique_ids():
-    """Ensure IDs are globally unique across detections + hunts."""
+    #Ensures theres no duplicate hashes
     seen_ids = {}
     for yaml_file in list_yaml_files():
         data = load_yaml_file(yaml_file)
@@ -98,7 +95,6 @@ def test_unique_ids():
 
 @pytest.mark.parametrize("yaml_file", list_yaml_files())
 def test_detection_block(yaml_file):
-    """Ensure detection block exists and contains at least one query."""
     data = load_yaml_file(yaml_file)
     detection = data.get("detection")
 
@@ -110,30 +106,21 @@ def test_detection_block(yaml_file):
 
 @pytest.mark.parametrize("yaml_file", list_yaml_files())
 def test_yamllint_compliance(yaml_file):
-    """Run yamllint on a single file using the project's .yamllint config."""
-    
-    # 1. Force the correct path to .yamllint
-    # We go up two levels from this test file (tests/ -> repo_root/)
+    #Run yamllint on files
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     config_path = os.path.join(repo_root, ".yamllint")
     
-    # SAFETY CHECK: Fail if config is missing
     if not os.path.exists(config_path):
         pytest.fail(f"Config not found at: {config_path}")
 
-    # 2. Load the config
-    # We print the path so you can see it in pytest output (use -s)
     print(f"DEBUG: Using config from {config_path}")
     conf = yamllint.config.YamlLintConfig(file=config_path)
 
-    # 3. Read the file content
     with open(yaml_file, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # 4. RUN THE LINTER (Wrapped in list() to force execution!)
     problems = list(yamllint.linter.run(content, conf, yaml_file))
 
-    # 5. Fail if any errors found
     if problems:
         error_msg = f"Yamllint violations in {os.path.basename(yaml_file)}:\n"
         for p in problems:
