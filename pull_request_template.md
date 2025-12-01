@@ -1,4 +1,4 @@
-**By submitting a PR to this repository, you agree to the terms within the [Okta Code of Conduct](LINK_TO_CODE_OF_CONDUCT). Please see the [contributing guidelines](LINK_TO_CONTRIBUTING_GUIDELINES) for how to create and submit a high-quality PR for this repo.**
+**By submitting a PR to this repository, you agree to the terms within the [Okta Code of Conduct](https://github.com/okta/customer-detections/blob/master/CODE-OF-CONDUCT.md). Please see the [contributing guidelines](LINK_TO_CONTRIBUTING_GUIDELINES) for how to create and submit a high-quality PR for this repo.**
 
 ---
 
