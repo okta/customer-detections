@@ -1,0 +1,31 @@
+title: Access to Admin Console with Weak MFA Factor
+id: needed
+description: |
+  Detects when a user accesses the Okta Admin Console with a weak MFA factor such as password, email, sms, or security question.
+  Adversaries may try to access the Okta Admin Console after compromising an Okta admin but get denied due to policy constraints.
+references:
+  - https://support.okta.com/help/s/blog/a674z000000147HAAQ/mfa-enforcement-for-the-admin-console
+  - https://help.okta.com/en-us/content/topics/security/mfa/mfa-enable-admins.htm
+author:
+  - Datadog
+  - Okta
+created_date: "2025-01-06"
+modified_date: "2025-01-06"
+threat:
+  Tactic:
+    - Initial Access
+  Technique:
+    - T1078: Valid Accounts
+prevention:
+  - Configure an Admin App Policy to enable MFA for the Okta Admin Console.
+  - Assign administrators Custom Admin Roles with the least permissions required for daily tasks, and require dual authorization for JIT (just-in-time) access to more privileged roles.
+  - Enable Protected Actions to force re-authentication whenever an administrative user attempts to perform sensitive actions.
+  - Protect sign-in flows by enforcing phishing-resistant authentication with Okta FastPass and FIDO2 WebAuthn.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "user.authentication.verify" and outcome.result eq "SUCCESS" and target.displayName co ("Okta Admin Console" or "Okta Administration") target.detailEntry.methodTypeUsed eq (password or email or sms or security_question) and not target.detailEntry.methodTypeUsed eq signed_nonce or otp or webauthn or idp or push or totp or duo)
+    datadog: |
+      source:okta @evt.name:user.authentication.verify @target.displayName:("Okta Administration" OR "Okta Admin Console") @evt.outcome:SUCCESS @target.detailEntry.methodTypeUsed:(password OR email OR sms OR security_question) -@target.detailEntry.methodTypeUsed:(signed_nonce OR otp OR webauthn OR idp OR push OR totp OR duo)
+false_positives:
+  - Legitimate administrative users require a break glass solution to access the Okta Admin Console.

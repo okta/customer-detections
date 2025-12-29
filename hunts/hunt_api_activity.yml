@@ -1,0 +1,36 @@
+title: Hunt on Unexpected API Activity
+id: needed
+description: |
+  Detects events initiated through the Okta API.
+  An adversary may compromise credentials and attempt enumeration, modification of user accounts or other sensitive data, or move laterally across connected applications.
+references:
+  - https://developer.okta.com/docs/api/
+  - https://developer.okta.com/docs/api/openapi/okta-management/guides/overview/
+author:
+  - Datadog
+  - Okta
+created_date: "2025-01-06"
+modified_date: "2025-01-06"
+threat:
+  Tactic:
+    - Initial Access
+    - Persistence
+    - Privilege Escalation
+    - Discovery
+  Technique:
+    - T1078: Valid Accounts
+    - T1098: Account Manipulation
+    - T1069: Permission Groups Discovery
+prevention:
+  - Configure authentication policies to require scoped OAuth 2.0 access tokens.
+  - Audit your environment for API keys and deprecate any unused or unnecessary API keys.
+detection:
+  okta_systemlog:
+    OIE: |
+      transaction.detail.requestApiTokenId pr and outcome.result eq ("SUCCESS" OR "ALLOW")
+    datadog: |
+      source:okta @transaction.detail.requestApiTokenId:* @evt.outcome:("SUCCESS" OR "ALLOW")
+false_positives:
+  - Okta administrator or service account is used to perform legitimate API activity.
+  - Group query results to understand user account, user agent, and geo-location behaviors to validate all API activity is expected.
+  - Further tuning can be done by looking at where the event is coming from a known proxy or by correlating with your threat intelligence feeds.
