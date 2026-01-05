@@ -1,5 +1,5 @@
 title: Hunt on Unexpected API Activity
-id: needed
+id: 65947a72b8903ff6c70dff52c8da6720
 description: |
   Detects events initiated through the Okta API.
   An adversary may compromise credentials and attempt enumeration, modification of user accounts or other sensitive data, or move laterally across connected applications.
@@ -27,7 +27,7 @@ prevention:
 detection:
   okta_systemlog:
     OIE: |
-      transaction.detail.requestApiTokenId pr and outcome.result eq ("SUCCESS" OR "ALLOW")
+      transaction.detail.requestApiTokenId pr and (outcome.result eq "SUCCESS" or outcome.result eq "ALLOW")
     datadog: |
       source:okta @transaction.detail.requestApiTokenId:* @evt.outcome:("SUCCESS" OR "ALLOW")
 false_positives:

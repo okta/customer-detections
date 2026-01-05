@@ -1,5 +1,5 @@
 title: User Authenticates from a New Device through a Proxy
-id: needed
+id: 1796b1dff54ce33f748ed43266fc71c6
 description: |
   Detects successful user authentication events, using a new device, from IPs that Okta identifies as proxies in locations not associated with the user's typical behavior.
   An adversary may attempt to login with compromised credentials from a known anonymizer with an unrecognized device.
@@ -24,7 +24,7 @@ prevention:
 detection:
   okta_systemlog:
     OIE: |
-      eventType co "user.authentication" and outcome.result eq "SUCCESS" and securityContext.isProxy eq "true" and user.email ne "system@okta.com" and (debugContext.debugData.behaviors co "New Device=POSITIVE" and debugContext.debugData.behaviors co "New Geo-Location=POSITIVE")
+      eventType co "user.authentication" and outcome.result eq "SUCCESS" and securityContext.isProxy eq "true" and actor.alternateId ne "system@okta.com" and (debugContext.debugData.behaviors co "New Device=POSITIVE" and debugContext.debugData.behaviors co "New Geo-Location=POSITIVE")
     datadog: |
       source:okta @evt.name:user.authentication* @evt.outcome:SUCCESS @securityContext.isProxy:true -@usr.email:system@okta.com @debugContext.debugData.behaviors:(*Device=POSITIVE* AND *Location=POSITIVE*)
 false_positives:
