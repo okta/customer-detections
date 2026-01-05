@@ -1,5 +1,5 @@
 title: Hunt on User Access to Cloud Infrastructure from a New Device
-id: needed
+id: 7ceaa0087510132bae2d35abf14d7fdc
 description: |
   Detects authentication events to cloud infrastructure related applications from a new device.
   An adversary may attempt to access critical cloud infrastructure after compromising a user account to move laterally within a corporate environment.
@@ -22,7 +22,7 @@ prevention:
 detection:
   okta_systemlog:
     OIE: |
-      eventType eq "user.authentication.sso" and outcome.result eq "SUCCESS" target{}.type=AppInstance and debugContext.debugData.behaviors co "New Device=POSITIVE" appname co ("aws" OR "amazon" OR "azure" OR "gcp" OR "google")
+      eventType eq "user.authentication.sso" and outcome.result eq "SUCCESS" and target.type eq "AppInstance" and debugContext.debugData.behaviors co "New Device=POSITIVE" and (target.displayName co "aws" or target.displayName co "amazon" or target.displayName co "gcp" or target.displayName co "google" or target.displayName co "azure")
     datadog: |
       source:okta @evt.name:user.authentication.sso @evt.outcome:SUCCESS @target.type:AppInstance @debugContext.debugData.behaviors:*Device=POSITIVE* @target_app:(*aws* OR *amazon* OR *azure* OR *gcp* OR *google*)
 false_positives:
