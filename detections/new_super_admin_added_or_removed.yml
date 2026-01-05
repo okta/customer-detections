@@ -1,5 +1,5 @@
 title: New Okta Super or Organization Admin Created or Removed
-id: needed
+id: 4abe0d6ecb2b2af6a186b5c8b12d4850
 description: |
   Detects when an Okta Super or Organization Administrator is either created or removed
   An adversary with access to an Okta Administrator my attempt to either:
@@ -32,7 +32,7 @@ prevention:
 detection:
   okta_systemlog:
     OIE: |
-      eventType sw "user.account.privilege" and (debugContext.debugData.privilegeRevoked co ("Super administrator" or "Organization administrator") or debugContext.debugData.privilegeGranted co ("Super administrator" or "Organization administrator"))
+      eventType sw "user.account.privilege" and ((debugContext.debugData.privilegeRevoked co "Super administrator" or debugContext.debugData.privilegeRevoked co "Organization administrator") or (debugContext.debugData.privilegeGranted co "Super administrator" or debugContext.debugData.privilegeGranted co "Organization administrator"))
     datadog: |
       source:okta @evt.name:user.account.privilege.* @evt.outcome:SUCCESS @target.displayName:(*Super* OR *Organization*) (@debugContext.debugData.privilegeGranted:(*Super* OR *Organization*) OR @debugContext.debugData.privilegeRevoked:(*Super* OR *Organization*))
 false_positives:
