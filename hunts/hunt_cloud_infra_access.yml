@@ -1,0 +1,31 @@
+title: Hunt on User Access to Cloud Infrastructure from a New Device
+id: 7ceaa0087510132bae2d35abf14d7fdc
+description: |
+  Detects authentication events to cloud infrastructure related applications from a new device.
+  An adversary may attempt to access critical cloud infrastructure after compromising a user account to move laterally within a corporate environment.
+references:
+  - https://help.okta.com/en-us/content/topics/apps/app-config-guides-main.htm
+author:
+  - Datadog
+  - Okta
+created_date: "2025-01-06"
+modified_date: "2025-01-06"
+threat:
+  Tactic:
+    - Initial Access
+  Technique:
+    - T1078: Valid Accounts
+prevention:
+  - Configure authentication policies to only allow managed devices to authenticate.
+  - If unmanaged devices are required, configure device assurance policies to ensure all devices meet a secure baseline.
+  - Configure strong policy-based enrollments. Using a combination of Event Hooks, Okta Workflows and Okta Account Management policy, create a policy where after initial enrollment, all subsequent enrollments require phishing resistant MFA.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "user.authentication.sso" and outcome.result eq "SUCCESS" and target.type eq "AppInstance" and debugContext.debugData.behaviors co "New Device=POSITIVE" and (target.displayName co "aws" or target.displayName co "amazon" or target.displayName co "gcp" or target.displayName co "google" or target.displayName co "azure")
+    datadog: |
+      source:okta @evt.name:user.authentication.sso @evt.outcome:SUCCESS @target.type:AppInstance @debugContext.debugData.behaviors:*Device=POSITIVE* @target_app:(*aws* OR *amazon* OR *azure* OR *gcp* OR *google*)
+false_positives:
+  - Customer users accessing cloud infrastructure from a new device due to device upgrades, onboarding, or other legitimate reasons.
+  - Tune this rule to include your Okta application naming conventions for corporate cloud environments.
+  - Further tuning can be done by looking at if the action is coming from a known proxy.
