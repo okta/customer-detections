@@ -1,0 +1,24 @@
+version: 2.1
+
+jobs:
+  validate:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+      - run:
+          name: Run Yamllint
+          command: yamllint -c .yamllint detections/ hunts/
+      - run:
+          name: Run Pytest
+          command: pytest
+
+workflows:
+  circleci_tests:
+    jobs:
+      - validate
