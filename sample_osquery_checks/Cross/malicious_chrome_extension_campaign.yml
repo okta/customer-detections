@@ -17,7 +17,7 @@ query: |
       ELSE '1'
     END AS chrome_malicious_extensions
   FROM chrome_extensions
-  WHERE name IN ( 
+  WHERE identifier IN ( 
         'obifanppcpchlehkjipahhphbcbjekfa', -- Telegram Multi-account
         'mdcfennpfgkngnibjbpnpaafcjnhcjno', -- Web Client for Telegram - Teleside
         'mmecpiobcdbjkaijljohghhpfgngpjmk', -- YouSide - Youtube Sidebar
