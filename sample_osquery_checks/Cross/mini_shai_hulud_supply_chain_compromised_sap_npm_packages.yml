@@ -1,0 +1,25 @@
+title: Mini Shai-Hulud Supply Chain Compromised SAP NPM Packages
+id: adbcf2d4fd8040ccbe4c685e9ca04bad
+description: |
+  Detects the presence of specific versions of SAP npm packages compromised in the Mini Shai-Hulud supply chain attack. The compromised packages (@cap-js/sqlite v2.2.2, @cap-js/postgres v2.2.2, @cap-js/db-service v2.10.1, and mbt v1.2.48) were injected with a sophisticated credential-stealing malware that executes automatically during npm install via a preinstall hook. The malware downloads the Bun JavaScript runtime to execute an obfuscated payload that targets both developer machines and CI/CD environments, stealing GitHub tokens, npm credentials, GitHub Actions secrets, AWS/Azure/GCP cloud credentials, Kubernetes service account tokens, and other sensitive data. Stolen credentials are exfiltrated through public GitHub repositories with encrypted results. The attack also includes self-propagation capabilities to spread through compromised credentials. Detection of these specific package versions indicates potential credential compromise and requires immediate investigation and secret rotation.
+references:
+  - https://www.aikido.dev/blog/mini-shai-hulud-has-appeared
+  - https://www.wiz.io/blog/mini-shai-hulud-supply-chain-sap-npm
+author:
+  - rafa.bono@okta.com
+platform:
+  - macOS
+  - Windows
+  - Linux
+query: |
+  SELECT 
+    CASE WHEN count(*) = 0 THEN '0' 
+    ELSE '1' 
+    END AS mini_shai_hulud_sap_package 
+  FROM npm_packages 
+  WHERE ( 
+          (name = '@cap-js/sqlite' AND version = '2.2.2') 
+          OR (name = '@cap-js/postgres' AND version = '2.2.2') 
+          OR (name = '@cap-js/db-service' AND version = '2.10.1') 
+          OR (name = 'mbt' AND version = '1.2.48') 
+        );
