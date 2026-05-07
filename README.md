@@ -9,12 +9,12 @@ Welcome to the Okta Security Detection Catalog. This repository contains a colle
 Okta Identity Defense Operations is a team of security practitioners that help Okta customers investigate and respond to security incidents. If you are an Okta customer and need support with a security breach or incident, open a support case and indicate that you are investigating a security incident.
 
 ## File Structure
-| Folder | Description |
-| ------------- | ------------- |
-| `detections/`  | List of YAML files for recommended security detections Okta customers can implement within their security monitoring system.   |
-| `hunts/`  | Threat hunting queries useful for aiding in detection use case creation  |
-| `logs/`  | CSV file with descriptions and examples of log fields within the Okta system log  |
-| `workflows/`  | Okta Workflows templates for security incident response and proactive threat mitigation  |
+| Folder                   | Description                                                                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `detections/`            | List of YAML files for recommended security detections Okta customers can implement within their security monitoring system. |
+| `hunts/`                 | Threat hunting queries useful for aiding in detection use case creation                                                      |
+| `logs/`                  | CSV file with descriptions and examples of log fields within the Okta system log                                             |
+| `workflows/`             | Okta Workflows templates for security incident response and proactive threat mitigation                                      |
 | `sample_osquery_checks/` | Okta osquery check templates for using in Okta's Advanced Posture Checks                                                     |
 
 ## Getting Started
@@ -31,13 +31,13 @@ Most events in System Log follow a similar pattern:\
 
 Some of the queries listed below use the following operators to group multiple events together:
 
-| Operator | Description |
-| ------------- | ------------- |
-| `eq` | Equals |
-| `ne` | Not Equal to | 
-| `sw` | Starts With |
-| `ew` | Ends With | 
-| `co` | Contains |
+| Operator | Description  |
+| -------- | ------------ |
+| `eq`     | Equals       |
+| `ne`     | Not Equal to |
+| `sw`     | Starts With  |
+| `ew`     | Ends With    |
+| `co`     | Contains     |
 
 Okta recommends customers review these detections and run searches using those that appear to be applicable to your environment. Perform any necessary tuning or baselining to ensure they deliver high fidelity results prior to creating an alert. 
 
