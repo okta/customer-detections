@@ -30,7 +30,8 @@ references:
   - <Links to threat intel or vendor documentation>
 author:
   - <Author email>
-platform: <macOS | Windows>
+platform:
+  - macOS | Windows | Linux
 query: |
   <osquery SQL query>
 ```
