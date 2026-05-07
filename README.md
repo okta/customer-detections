@@ -15,6 +15,7 @@ Okta Identity Defense Operations is a team of security practitioners that help O
 | `hunts/`  | Threat hunting queries useful for aiding in detection use case creation  |
 | `logs/`  | CSV file with descriptions and examples of log fields within the Okta system log  |
 | `workflows/`  | Okta Workflows templates for security incident response and proactive threat mitigation  |
+| `sample_osquery_checks/` | Okta osquery check templates for using in Okta's Advanced Posture Checks                                                     |
 
 ## Getting Started
 The System Log provides a detailed log of user, admin and support events relevant to use of the Okta Workforce Identity Cloud.
