@@ -1,0 +1,94 @@
+title: GlassWorm Malicious VSCode Extension Detection
+id: 7da50c1cd65945fe9784c1a435e37264
+description: |
+  Detects the presence of malicious or suspicious Open VSX extensions linked to the GlassWorm supply chain attack campaign. GlassWorm employs a sophisticated sleeper extension strategy where threat actors publish benign-looking clones of popular VSCode extensions to Open VSX marketplace, then later activate them through updates to deliver malware. These extensions are published by newly created GitHub accounts with minimal repository activity (typically one empty repository with an eight-character name). At least six extensions have been confirmed to deliver active malware, while 67 additional extensions are tracked as high-confidence sleepers awaiting activation. The malware uses multiple delivery mechanisms including native binaries (.node files), obfuscated JavaScript payloads, and transitive delivery via extensionPack dependencies. Upon activation, these extensions download VSIX payloads from GitHub releases and install them across multiple IDEs (VS Code, Cursor, Windsurf, VSCodium) using automated installation commands. The extensions closely impersonate legitimate tools using copied icons, descriptions, and naming patterns to appear trustworthy. Detection focuses on identifying known malicious extension identifiers, suspicious publisher patterns, and the presence of characteristic installation artifacts. Organizations using Open VSX or allowing extension installations from non-official marketplaces should monitor for these indicators and restrict extension installations to verified publishers.
+references:
+  - https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm
+author:
+  - rafa.bono@okta.com
+platform:
+  - macOS
+  - Windows
+  - Linux
+query: |
+  SELECT 
+    CASE 
+      WHEN count(*) = 0 THEN '0'
+      ELSE '1'
+    END AS glassworm_vsx_extension 
+  FROM vscode_extensions
+  WHERE name IN (
+      'outsidestormcommand.monochromator-theme', --malicious
+      'keyacrosslaud.auto-loop-for-antigravity', --malicious
+      'krundoven.ironplc-fast-hub', --malicious
+      'boulderzitunnel.vscode-buddies', --malicious
+      'cubedivervolt.html-code-validate', --malicious
+      'winnerdomain17.version-lens-tool', --malicious
+      'peldravix.rpgiv2free-live-tool', --sleeper extension
+      'forkelbat.supersigil-rich-hub', --sleeper extension
+      'fyltroven.gitchat-fast-tool', --sleeper extension
+      'syndakove.todo4vcode-quick-suite', --sleeper extension
+      'vendrakos.rumdl-pro-kit', --sleeper extension
+      'stadiumgripier.vscode-onedark-theme', --sleeper extension
+      'wildlightregain.oxc-lint-format', --sleeper extension
+      'haelthorn.fractal-fast-studio', --sleeper extension
+      'gastholve.shell-pro-kit', --sleeper extension
+      'tossbers.browser-open-tool', --sleeper extension
+      'pranlokev.topmodel-fast-suite', --sleeper extension
+      'weldforick.brightscript-pro-kit', --sleeper extension
+      'stelbavik.hledger-fast-tool', --sleeper extension
+      'brixmundo.eca-easy-tool', --sleeper extension
+      'shinypy.pycode-formatter', --sleeper extension
+      'carveltstone.chatbuddy-auto-suite', --sleeper extension
+      'thunderprosecutor.autopep8-formatter', --sleeper extension
+      'spikearshock.csv-rainbow', --sleeper extension
+      'countrepresent49.code-image-preview', --sleeper extension
+      'lairinspectortrek70.todo-highlighter', --sleeper extension
+      'superneentrance.peacock-colors', --sleeper extension
+      'epichipporedeem.prettier-eslint-formatter', --sleeper extension
+      'archchainturn.twinny-ai-assist', --sleeper extension
+      'spacesalamanderhook.italian-language-pack', --sleeper extension
+      'closedtierenchant.vscode-awesome-icons', --sleeper extension
+      'emotionkyoseparate.turkish-language-pack', --sleeper extension
+      'sremuven.beautify-super-lens', --sleeper extension
+      'goltikov.auto-rich-forge', --sleeper extension
+      'karnikov.better-rich-studio', --sleeper extension
+      'trenarin.autodocstring-auto-studio', --sleeper extension
+      'meldarin.biome-live-tool', --sleeper extension
+      'gronarin.auto-super-kit', --sleeper extension
+      'keltarin.android-deep-hub', --sleeper extension
+      'tralaven.c-easy-tool', --sleeper extension
+      'meltovik.bookmark-rich-tool', --sleeper extension
+      'seldovik.cmake-smart-pilot', --sleeper extension
+      'veldekov.csv-pro-suite', --sleeper extension
+      'brenaven.cursor-rich-helper', --sleeper extension
+      'karnenko.cursorless-pro-pilot', --sleeper extension
+      'faldenko.explorer-auto-hub', --sleeper extension
+      'vornovin.ionic-easy-kit', --sleeper extension
+      'tormekov.htmlmustache-fast-craft', --sleeper extension
+      'dalsoven.intellij-live-pilot', --sleeper extension
+      'krosarin.npm-fast-studio', --sleeper extension
+      'meltuven.graphql-pro-tool', --sleeper extension
+      'veltarik.duplicate-fast-helper', --sleeper extension
+      'tralarin.firefox-rich-lens', --sleeper extension
+      'brixovik.es7-quick-hub', --sleeper extension
+      'krosovik.laravel-quick-pilot', --sleeper extension
+      'grisaven.markdown-live-kit', --sleeper extension
+      'dranaven.flask-live-craft', --sleeper extension
+      'drovenko.data-live-suite', --sleeper extension
+      'krosaven.dot-live-forge', --sleeper extension
+      'sremekov.javascriptsnippets-rich-craft', --sleeper extension
+      'breluven.html-smart-suite', --sleeper extension
+      'trikarin.database-super-tool', --sleeper extension
+      'sremovik.dendron-deep-hub', --sleeper extension
+      'dalsovik.dbclient-quick-suite', --sleeper extension
+      'frelovin.gitpod-deep-helper', --sleeper extension
+      'mrekelid.manpages-fast-kit', --sleeper extension
+      'kuldaran.search-smart-forge', --sleeper extension
+      'prednovik.php-super-pilot', --sleeper extension
+      'tagovich.zener-pro-craft', --sleeper extension
+      'grozdarov.jinjahtml-easy-studio', --sleeper extension
+      'shiverov.open-smart-suite', --sleeper extension
+      'draconzal.phpstan-easy-hub', --sleeper extension
+      'marabenov.graphql-super-craft' --sleeper extension
+    );
