@@ -1,0 +1,83 @@
+title: OpenClaw Personal AI Assistant Detection
+id: d8ddd7afe0054347b4c92e75ec4d599b
+description: |
+    Detects the presence of OpenClaw, an open-source personal AI assistant that may pose security risks in enterprise environments. OpenClaw seeks broad system access by interacting with files, processes, and network resources, making it a powerful tool that could be abused if compromised. The application installs persistence mechanisms through launchd services and deploys binaries across multiple system paths, making complete removal difficult. By default, OpenClaw listens on network ports (9090, 18789, 18791) that could potentially be exploited for remote access or command-and-control activities. This detection evaluates multiple system indicators including launchd services, file paths, running processes, Homebrew packages, npm packages, listening ports, installed applications, and Docker containers to identify OpenClaw installations. A scoring system aggregates findings across these sources, requiring multiple positive indicators (score > 2) before confirming detection to minimize false positives. Organizations may wish to restrict or monitor OpenClaw usage on corporate-issued devices until proper security controls and usage policies can be established.
+references:
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH startup_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM  startup_items
+        WHERE name LIKE '%openclaw%'
+    ),
+    file_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM file
+        WHERE path LIKE '%\Users\%%\.openclaw\'
+        ),
+    claw_process AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM processes
+        WHERE name LIKE '%openclaw%'
+            OR cmdline LIKE '%openclaw%'
+        ),
+    claw_prefetch AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM prefetch
+        WHERE path LIKE '%openclaw%'
+        ),
+    choco_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM chocolatey_packages
+        WHERE name LIKE '%openclaw%'
+        ),
+    npm_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM npm_packages
+        WHERE name LIKE '%openclaw%'
+        ),
+    netports_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM listening_ports
+        WHERE port IN
+            ('9090', -- Default OpenClaw self-hosted port.
+            '18789', -- The main port for the WebSocket Gateway.
+            '18791' -- Used for browser-based control/dashboard access.
+            )
+            OR  path LIKE '%openclaw%'
+        ),
+    programs_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM programs
+        WHERE name LIKE '%openclaw%'
+            OR package_family_name LIKE '%openclaw%'
+        ),
+    process_open_sockets_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM process_open_sockets
+        WHERE path LIKE '%openclaw%'
+        ),
+    final_score AS (
+        SELECT
+            + file_claw.total
+            + claw_process.total
+            + startup_claw.total
+            + npm_claw.total
+            + netports_claw.total
+            + programs_claw.total
+            + claw_prefetch.total
+            + process_open_sockets_claw.total
+            + choco_claw.total
+            AS score
+        FROM startup_claw, file_claw, claw_process, claw_prefetch, choco_claw, process_open_sockets_claw, npm_claw, netports_claw, programs_claw
+        )
+    SELECT
+        CASE
+            WHEN score <= 2 THEN 0
+            WHEN score > 2 THEN 1
+        END AS openclaw_detected
+    FROM final_score
+    ;
