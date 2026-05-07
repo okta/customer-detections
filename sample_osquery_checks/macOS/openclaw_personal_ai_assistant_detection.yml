@@ -1,0 +1,89 @@
+title: OpenClaw Personal AI Assistant Detection
+id: 824119dc9e7a4b5cbfd40ca7e604ed09
+description: |
+    Detects the presence of OpenClaw, an open-source personal AI assistant that may pose security risks in enterprise environments. OpenClaw seeks broad system access by interacting with files, processes, and network resources, making it a powerful tool that could be abused if compromised. The application installs persistence mechanisms through launchd services and deploys binaries across multiple system paths, making complete removal difficult. By default, OpenClaw listens on network ports (9090, 18789, 18791) that could potentially be exploited for remote access or command-and-control activities. This detection evaluates multiple system indicators including launchd services, file paths, running processes, Homebrew packages, npm packages, listening ports, installed applications, and Docker containers to identify OpenClaw installations. A scoring system aggregates findings across these sources, requiring multiple positive indicators (score > 2) before confirming detection to minimize false positives. Organizations may wish to restrict or monitor OpenClaw usage on corporate-issued devices until proper security controls and usage policies can be established.
+references:
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH launch_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM launchd 
+        WHERE name LIKE '%openclaw%'
+      ), 
+    file_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total
+        FROM file 
+        WHERE path LIKE '/Users/%%/.openclaw/openclaw.json' 
+            -- OR path LIKE '/%%/.openclaw/%'
+            OR path LIKE '/Users/%%/.volta/bin/openclaw'
+            OR path LIKE '/Users/%%/.nvm/current/bin/openclaw'
+            OR path LIKE '/usr/bin/openclaw'
+            OR path LIKE '/usr/local/bin/openclaw'
+            OR path LIKE '/opt/homebrew/bin/openclaw'
+            OR path LIKE '/Applications/OpenClaw.app'
+        ),
+    claw_process AS (
+        SELECT COALESCE(COUNT(*), 0) as total 
+        FROM processes 
+        WHERE name LIKE '%openclaw%' 
+            OR cmdline LIKE '%openclaw%'
+        ),
+    homebrew_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total 
+        FROM homebrew_packages 
+        WHERE name LIKE '%openclaw%'
+        ),
+    npm_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total 
+        FROM npm_packages 
+        WHERE name LIKE '%openclaw%'
+        ),
+    netports_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total 
+        FROM listening_ports 
+        WHERE port IN 
+              ('9090', -- Default OpenClaw self-hosted port.
+              '18789', -- The main port for the WebSocket Gateway. 
+              '18791' -- Used for browser-based control/dashboard access.
+              )
+            OR  path LIKE '%openclaw%'
+        ),
+    apps_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total 
+        FROM apps 
+        WHERE name LIKE '%openclaw%'
+            OR bundle_identifier LIKE '%openclaw%'
+        ),
+    docker_image_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total 
+        FROM docker_images 
+        WHERE tags LIKE '%openclaw%'
+        ),
+    docker_container_claw AS (
+        SELECT COALESCE(COUNT(*), 0) as total 
+        FROM docker_containers 
+        WHERE image LIKE '%openclaw%'
+        ),
+    final_score AS (
+        SELECT 
+            + file_claw.total 
+            + claw_process.total 
+            + homebrew_claw.total 
+            + npm_claw.total 
+            + netports_claw.total 
+            + apps_claw.total
+            + docker_image_claw.total
+            + docker_container_claw.total
+            AS score
+        FROM launch_claw, file_claw, claw_process, homebrew_claw, npm_claw, netports_claw, apps_claw, docker_image_claw, docker_container_claw
+        )
+    SELECT 
+        CASE 
+            WHEN score <= 2 THEN 0
+            WHEN score > 2 THEN 1
+        END AS openclaw_detected
+    FROM final_score
+    ;
