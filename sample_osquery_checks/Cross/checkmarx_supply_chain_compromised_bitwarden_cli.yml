@@ -1,19 +1,25 @@
 title: Checkmarx Supply Chain Compromised Bitwarden CLI Detection
 id: 48428b92b5034117979658613566babb
 description: |
-  Detects the presence of the compromised Bitwarden CLI npm package (@bitwarden/cli version 2026.4.0)
-  injected as part of the ongoing Checkmarx supply chain attack campaign. Attackers exploited a GitHub
-  Action in Bitwarden's CI/CD pipeline to embed a malicious payload (bw1.js) in the npm release.
-  Upon execution, the malware harvests a wide range of credentials including GitHub tokens, AWS/Azure/GCP
-  credentials, npm tokens, and SSH keys, then exfiltrates them to attacker-controlled infrastructure
-  (94.154.172.43, audit.checkmarx[.]cx/v1/telemetry) and public staging GitHub repositories with
-  Dune-themed names. It also establishes persistence by injecting payloads into shell profiles (~/.bashrc,
-  ~/.zshrc) and downloads the Bun JavaScript runtime for further payload execution. A Russian locale kill
-  switch causes the malware to exit silently on Russian-localized systems. Only the npm distribution is
-  affected — the Chrome extension, MCP server, and other Bitwarden distributions are not compromised.
-  Detection of this specific package version indicates potential credential compromise and requires
-  immediate removal of the package, rotation of all credentials present on the affected system, and
-  auditing of shell profiles for malicious injections.
+  Detects the presence of the compromised Bitwarden CLI npm package (@bitwarden/cli version
+  2026.4.0), distributed as part of the Checkmarx supply chain attack campaign. Attackers
+  exploited a GitHub Action in Bitwarden's CI/CD pipeline to embed a malicious payload
+  (bw1.js) in the npm release.
+
+  Upon execution, the malware harvests a wide range of credentials including GitHub tokens,
+  AWS/Azure/GCP credentials, npm tokens, and SSH keys. Stolen data is exfiltrated to
+  attacker-controlled infrastructure (94.154.172.43, audit.checkmarx[.]cx/v1/telemetry) and
+  public staging GitHub repositories with Dune-themed names. The malware also establishes
+  persistence by injecting payloads into shell profiles (~/.bashrc, ~/.zshrc) and downloads
+  the Bun JavaScript runtime for further payload execution. A Russian locale kill switch
+  causes the malware to exit silently on Russian-localized systems.
+
+  Only the npm distribution is affected — the Chrome extension, MCP server, and other
+  Bitwarden distributions are not compromised.
+
+  Detection of this specific package version indicates potential credential compromise and
+  requires immediate removal of the package, rotation of all credentials present on the
+  affected system, and auditing of shell profiles for malicious injections.
 references:
   - https://socket.dev/blog/bitwarden-cli-compromised
 author:
