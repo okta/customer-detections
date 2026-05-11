@@ -2,7 +2,7 @@ title: ITP User Risk Changed to High
 id: aeda20597eedb11a86c4334a529b763a
 description: |
   Identity Threat Protection (ITP) has elevated a user's risk to HIGH and logged the event with event type user.risk.detect.
-  This detection relies on properly configured Entity Risk Policies to elevate risk to high under certain conditions acceptable for your business. 
+  This detection relies on properly configured Entity Risk Policies to elevate risk to high under certain conditions acceptable for your business.
 references:
   - https://help.okta.com/oie/en-us/content/topics/itp/detections.htm
 author: Okta
