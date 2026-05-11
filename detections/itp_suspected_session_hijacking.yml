@@ -1,0 +1,26 @@
+title: ITP Suspected Session Hijacking
+id: 31a02247b01948672a948400380f9568
+description: |
+  Identity Threat Protection (ITP) has detected potential session hijacking and logged the event with event type user.risk.detect.
+references:
+  - https://help.okta.com/oie/en-us/content/topics/itp/detections.htm
+  - https://help.okta.com/oie/en-us/content/topics/itp/detections-session-influenced.htm
+author: Okta
+created_date: '2026-05-11'
+modified_date: '2026-05-11'
+threat:
+  Tactic:
+    - Credential Access
+    - Collection
+  Technique:
+    - T1185: Browser Session Hijacking
+    - T1539: Steal Web Session Cookie
+prevention:
+  - Configure ITP's entity risk policy to execute universal logout if this detection is fired.
+  - Configure authentication policies to ensure phishing resistant MFA like Okta Fastpass is used in all authentication flows.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "user.risk.detect" and debugContext.debugData.risk co "reasons=Associated sessionId is suspected to be hijacked"
+false_positives:
+  - Session context changes by IP from a user's telecom provider to company owned VPNs/Gateways. Exclude these in the entity risk policy.
