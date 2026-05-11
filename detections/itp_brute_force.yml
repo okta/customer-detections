@@ -4,7 +4,7 @@ description: |
   Identity Threat Protection (ITP) has detected a push bomb or MFA fatigue attack and logged the event with
   event type user.risk.detect.
 references:
-  - https://help.okta.com/oie/en-us/content/topics/itp/risk-detections.htm
+  - https://help.okta.com/oie/en-us/content/topics/itp/detections.htm
   - https://www.okta.com/blog/2022/09/mfa-fatigue-growing-security-concern/
 author: Okta
 created_date: '2025-05-21'
