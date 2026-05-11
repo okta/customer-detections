@@ -1,0 +1,65 @@
+title: BufferZoneCorp Supply Chain Campaign Detection
+id: 13b477e7468e42baa9e82733bed55723
+description: |
+  Detects artifacts from the BufferZoneCorp supply chain attack campaign, which distributes
+  malicious Ruby gems and Go modules designed to steal developer credentials and establish
+  persistent backdoor access. The campaign is orchestrated via the BufferZoneCorp GitHub
+  account and uses two distinct attack vectors.
+
+  The Ruby vector publishes seven gems under the 'knot-theory' publisher identity
+  (knot-activesupport-logger, knot-devise-jwt-helper, knot-rack-session-store,
+  knot-rails-assets-pipeline, knot-rspec-formatter-json, knot-date-utils-rb, and
+  knot-simple-formatter). These gems execute a credential-harvesting payload at install time
+  via extconf.rb, stealing SSH keys, AWS credentials, npm tokens, GitHub CLI config, and
+  RubyGems tokens. All data is exfiltrated to
+  webhook[.]site/49c21843-c27c-4a1b-b1f6-037c3998055f.
+
+  The Go vector distributes nine modules (go-metrics-sdk, go-weather-sdk, go-retryablehttp,
+  go-stdlib-ext, grpc-client, net-helper, config-loader, log-core, and go-envconfig) that
+  poison CI/CD pipelines by disabling Go module verification (GOSUMDB), manipulating GOPROXY,
+  and injecting fake 'go' wrappers into PATH. The most severe module (go-stdlib-ext) also
+  establishes persistent SSH backdoor access by appending a hardcoded attacker-controlled
+  ed25519 key (deploy@buildserver) to the victim's authorized_keys file.
+
+  Detection aggregates two signals — presence of knot-* gem directories in common Ruby
+  installation paths, and the specific attacker SSH public key in authorized_keys — into a
+  score. A score greater than 0 (any single positive indicator) triggers detection, as both
+  signals are specific enough to warrant immediate investigation.
+
+  A positive result requires removal of affected packages, rotation of all credentials on the
+  system, removal of the backdoor SSH key, and audit of CI/CD pipeline configurations and
+  go.sum files.
+references:
+  - https://socket.dev/blog/malicious-ruby-gems-and-go-modules-steal-secrets-poison-ci
+author:
+  - rafa.bono@okta.com
+platform:
+  - macOS
+  - Linux
+query: |
+  WITH ruby_gems AS (
+      SELECT COALESCE(COUNT(*), 0) AS total
+      FROM file
+      WHERE path LIKE '/usr/%%/gems/knot-%'
+         OR path LIKE '/opt/%%/gems/knot-%'
+         OR path LIKE '/home/%%/gems/knot-%'
+         OR path LIKE '/Users/%%/gems/knot-%'
+  ),
+  ssh_backdoor AS (
+      SELECT COALESCE(COUNT(*), 0) AS total
+      FROM authorized_keys
+      WHERE key = 'AAAAC3NzaC1lZDI1NTE5AAAAIBp9VZGMxqFpTwKbKJi7dS2mNrX3LqEoHcYsWfAkZvUt'
+  ),
+  final_score AS (
+      SELECT
+          CASE WHEN ruby_gems.total > 0 THEN 1 ELSE 0 END
+          + CASE WHEN ssh_backdoor.total > 0 THEN 1 ELSE 0 END
+          AS score
+      FROM ruby_gems, ssh_backdoor
+  )
+  SELECT
+      CASE
+          WHEN score = 0 THEN 0
+          WHEN score > 0 THEN 1
+      END AS bufferzonecorp_campaign_detected
+  FROM final_score;

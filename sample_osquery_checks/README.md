@@ -6,7 +6,7 @@ This folder contains sample osquery checks that can be used with [Okta Advanced 
 
 Advanced Posture Checks extend Okta's device assurance capabilities by letting you write your own SQL-based osquery checks instead of relying solely on built-in device attributes. When a user tries to access a protected resource, Okta Verify runs the configured osquery checks on the device and returns the results to Okta, which evaluates them against the device assurance policy before granting access.
 
-This enables enforcement of highly specific security requirements — such as the absence of known-malicious software, unauthorized tools, or compromised packages — as a condition of access. Checks run via [osquery](https://osquery.io/), a lightweight endpoint agent that exposes OS data through a SQL interface.
+This enables enforcement of highly specific security requirements, such as the absence of known-malicious software, unauthorized tools, or compromised packages; as a condition of access. Checks run via [osquery](https://osquery.io/), a lightweight endpoint agent that exposes OS data through a SQL interface.
 
 ## Folder Structure
 
