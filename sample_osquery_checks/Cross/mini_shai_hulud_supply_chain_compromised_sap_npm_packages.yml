@@ -1,8 +1,32 @@
-title: Mini Shai-Hulud Supply Chain Compromised SAP NPM Packages
-id: adbcf2d4fd8040ccbe4c685e9ca04bad
+title: Mini Shai-Hulud TeamPCP npm and PyPI Supply Chain Detection
+id: d897e5aa0b034053a866e31b41b8eb58
 description: |
-  Detects the presence of specific versions of SAP npm packages compromised in the Mini Shai-Hulud supply chain attack. The compromised packages (@cap-js/sqlite v2.2.2, @cap-js/postgres v2.2.2, @cap-js/db-service v2.10.1, and mbt v1.2.48) were injected with a sophisticated credential-stealing malware that executes automatically during npm install via a preinstall hook. The malware downloads the Bun JavaScript runtime to execute an obfuscated payload that targets both developer machines and CI/CD environments, stealing GitHub tokens, npm credentials, GitHub Actions secrets, AWS/Azure/GCP cloud credentials, Kubernetes service account tokens, and other sensitive data. Stolen credentials are exfiltrated through public GitHub repositories with encrypted results. The attack also includes self-propagation capabilities to spread through compromised credentials. Detection of these specific package versions indicates potential credential compromise and requires immediate investigation and secret rotation.
+  On May 11, 2026, the threat actor TeamPCP — also responsible for prior supply chain
+  attacks against SAP, Checkmarx, Bitwarden, Lightning, Intercom, and Trivy — launched
+  a coordinated compromise of over 100 npm packages and two PyPI packages across multiple
+  high-value namespaces including @tanstack, @uipath, @mistralai, and dozens of smaller
+  packages. The TanStack compromise exploited a GitHub Actions cache-poisoning chain: the
+  attacker forked the repository, triggered a pull_request_target workflow that poisoned
+  the pnpm store cache, and then extracted OIDC tokens from GitHub Actions runner process
+  memory to publish malicious versions without ever possessing npm credentials. UiPath
+  packages were compromised using the same preinstall-script delivery mechanism seen in
+  the earlier SAP attack. The two trojanized PyPI packages (guardrails-ai@0.10.1 and
+  mistralai@2.4.6) contain only 13 lines of malicious code that download a secondary
+  payload from git-tanstack[.]com, and additionally target 1Password and Bitwarden vault
+  data — a first for TeamPCP. Once any payload executes, the malware is a self-propagating
+  credential-stealer worm targeting CI/CD tokens (GitHub Actions OIDC, GitLab, CircleCI),
+  cloud credentials (AWS IMDSv2, GCP, Azure), Kubernetes service accounts, and HashiCorp
+  Vault, exfiltrating via three redundant channels: a typosquat domain (git-tanstack[.]com),
+  the decentralized Session messenger network, and GitHub API dead drops. This detection
+  checks all affected npm and PyPI packages at their exact malicious versions as reported
+  by Wiz Research on 2026-05-11. A positive result from either signal means a malicious
+  package is installed; isolate the machine, remove the gh-token-monitor LaunchAgent
+  (see companion macOS detection) before revoking credentials, then rotate all GitHub,
+  npm, AWS, GCP, CI/CD, and vault secrets found on the device. Registry lookups were not
+  performed because npm and PyPI were actively removing these versions at time of writing;
+  version data sourced directly from the Wiz blog IOC table.
 references:
+  - https://www.wiz.io/blog/mini-shai-hulud-strikes-again-tanstack-more-npm-packages-compromised
   - https://www.aikido.dev/blog/mini-shai-hulud-has-appeared
   - https://www.wiz.io/blog/mini-shai-hulud-supply-chain-sap-npm
 author:
@@ -12,14 +36,155 @@ platform:
   - Windows
   - Linux
 query: |
-  SELECT 
-    CASE WHEN count(*) = 0 THEN '0' 
-    ELSE '1' 
-    END AS mini_shai_hulud_sap_package 
-  FROM npm_packages 
-  WHERE ( 
-          (name = '@cap-js/sqlite' AND version = '2.2.2') 
-          OR (name = '@cap-js/postgres' AND version = '2.2.2') 
-          OR (name = '@cap-js/db-service' AND version = '2.10.1') 
-          OR (name = 'mbt' AND version = '1.2.48') 
-        );
+  WITH npm_hits AS (
+    SELECT COALESCE(COUNT(*), 0) AS total
+    FROM npm_packages
+    WHERE (name = '@beproduct/nestjs-auth' AND version IN ('0.1.2','0.1.3','0.1.4','0.1.5','0.1.6','0.1.7','0.1.8','0.1.9','0.1.10','0.1.11','0.1.12','0.1.13','0.1.14','0.1.15','0.1.16'))
+       OR (name = '@dirigible-ai/sdk' AND version IN ('0.6.2','0.6.3'))
+       OR (name = '@draftauth/client' AND version IN ('0.2.1','0.2.2'))
+       OR (name = '@draftauth/core' AND version IN ('0.13.1','0.13.2'))
+       OR (name = '@draftlab/auth' AND version IN ('0.24.1','0.24.2'))
+       OR (name = '@draftlab/auth-router' AND version IN ('0.5.1','0.5.2'))
+       OR (name = '@draftlab/db' AND version IN ('0.16.1','0.16.2'))
+       OR (name = '@mistralai/mistralai' AND version IN ('2.2.2','2.2.3','2.2.4'))
+       OR (name = '@ml-toolkit-ts/preprocessing' AND version IN ('1.0.2','1.0.3'))
+       OR (name = '@ml-toolkit-ts/xgboost' AND version IN ('1.0.3','1.0.4'))
+       OR (name = '@supersurkhet/cli' AND version IN ('0.0.2','0.0.3','0.0.4','0.0.5'))
+       OR (name = '@supersurkhet/sdk' AND version IN ('0.0.2','0.0.3','0.0.4','0.0.5'))
+       OR (name = '@tanstack/arktype-adapter' AND version IN ('1.166.12','1.166.15'))
+       OR (name = '@tanstack/eslint-plugin-router' AND version IN ('1.161.9','1.161.12'))
+       OR (name = '@tanstack/eslint-plugin-start' AND version IN ('0.0.4','0.0.7'))
+       OR (name = '@tanstack/history' AND version IN ('1.161.9','1.161.12'))
+       OR (name = '@tanstack/nitro-v2-vite-plugin' AND version IN ('1.154.12','1.154.15'))
+       OR (name = '@tanstack/react-router' AND version IN ('1.169.5','1.169.8'))
+       OR (name = '@tanstack/react-router-devtools' AND version IN ('1.166.16','1.166.19'))
+       OR (name = '@tanstack/react-router-ssr-query' AND version IN ('1.166.15','1.166.18'))
+       OR (name = '@tanstack/react-start' AND version IN ('1.167.68','1.167.71'))
+       OR (name = '@tanstack/react-start-client' AND version IN ('1.166.51','1.166.54'))
+       OR (name = '@tanstack/react-start-rsc' AND version IN ('0.0.47','0.0.50'))
+       OR (name = '@tanstack/react-start-server' AND version IN ('1.166.55','1.166.58'))
+       OR (name = '@tanstack/router-cli' AND version IN ('1.166.46','1.166.49'))
+       OR (name = '@tanstack/router-core' AND version IN ('1.169.5','1.169.8'))
+       OR (name = '@tanstack/router-devtools' AND version IN ('1.166.16','1.166.19'))
+       OR (name = '@tanstack/router-devtools-core' AND version IN ('1.167.6','1.167.9'))
+       OR (name = '@tanstack/router-generator' AND version IN ('1.166.45','1.166.48'))
+       OR (name = '@tanstack/router-plugin' AND version IN ('1.167.38','1.167.41'))
+       OR (name = '@tanstack/router-ssr-query-core' AND version IN ('1.168.3','1.168.6'))
+       OR (name = '@tanstack/router-utils' AND version IN ('1.161.11','1.161.14'))
+       OR (name = '@tanstack/router-vite-plugin' AND version IN ('1.166.53','1.166.56'))
+       OR (name = '@tanstack/solid-router' AND version IN ('1.169.5','1.169.8'))
+       OR (name = '@tanstack/solid-router-devtools' AND version IN ('1.166.16','1.166.19'))
+       OR (name = '@tanstack/solid-router-ssr-query' AND version IN ('1.166.15','1.166.18'))
+       OR (name = '@tanstack/solid-start' AND version IN ('1.167.65','1.167.68'))
+       OR (name = '@tanstack/solid-start-client' AND version IN ('1.166.50','1.166.53'))
+       OR (name = '@tanstack/solid-start-server' AND version IN ('1.166.54','1.166.57'))
+       OR (name = '@tanstack/start-client-core' AND version IN ('1.168.5','1.168.8'))
+       OR (name = '@tanstack/start-fn-stubs' AND version IN ('1.161.9','1.161.12'))
+       OR (name = '@tanstack/start-plugin-core' AND version IN ('1.169.23','1.169.26'))
+       OR (name = '@tanstack/start-server-core' AND version IN ('1.167.33','1.167.36'))
+       OR (name = '@tanstack/start-static-server-functions' AND version IN ('1.166.44','1.166.47'))
+       OR (name = '@tanstack/start-storage-context' AND version IN ('1.166.38','1.166.41'))
+       OR (name = '@tanstack/valibot-adapter' AND version IN ('1.166.12','1.166.15'))
+       OR (name = '@tanstack/virtual-file-routes' AND version IN ('1.161.10','1.161.13'))
+       OR (name = '@tanstack/vue-router' AND version IN ('1.169.5','1.169.8'))
+       OR (name = '@tanstack/vue-router-devtools' AND version IN ('1.166.16','1.166.19'))
+       OR (name = '@tanstack/vue-router-ssr-query' AND version IN ('1.166.15','1.166.18'))
+       OR (name = '@tanstack/vue-start' AND version IN ('1.167.61','1.167.64'))
+       OR (name = '@tanstack/vue-start-client' AND version IN ('1.166.46','1.166.49'))
+       OR (name = '@tanstack/vue-start-server' AND version IN ('1.166.50','1.166.53'))
+       OR (name = '@tanstack/zod-adapter' AND version IN ('1.166.12','1.166.15'))
+       OR (name = '@taskflow-corp/cli' AND version IN ('0.1.24','0.1.25','0.1.26','0.1.27'))
+       OR (name = '@tolka/cli' AND version = '1.0.2')
+       OR (name = '@uipath/access-policy-sdk' AND version = '0.3.1')
+       OR (name = '@uipath/access-policy-tool' AND version = '0.3.1')
+       OR (name = '@uipath/admin-tool' AND version = '0.1.1')
+       OR (name = '@uipath/agent-sdk' AND version = '1.0.2')
+       OR (name = '@uipath/agent-tool' AND version = '1.0.1')
+       OR (name = '@uipath/aops-policy-tool' AND version = '0.3.1')
+       OR (name = '@uipath/ap-chat' AND version = '1.5.7')
+       OR (name = '@uipath/api-workflow-tool' AND version = '1.0.1')
+       OR (name = '@uipath/apollo-core' AND version = '5.9.2')
+       OR (name = '@uipath/apollo-wind' AND version = '2.16.2')
+       OR (name = '@uipath/auth' AND version = '1.0.1')
+       OR (name = '@uipath/case-tool' AND version = '1.0.1')
+       OR (name = '@uipath/cli' AND version = '1.0.1')
+       OR (name = '@uipath/codedagent-tool' AND version = '1.0.1')
+       OR (name = '@uipath/codedagents-tool' AND version = '0.1.12')
+       OR (name = '@uipath/codedapp-tool' AND version = '1.0.1')
+       OR (name = '@uipath/common' AND version = '1.0.1')
+       OR (name = '@uipath/context-grounding-tool' AND version = '0.1.1')
+       OR (name = '@uipath/data-fabric-tool' AND version = '1.0.2')
+       OR (name = '@uipath/docsai-tool' AND version = '1.0.1')
+       OR (name = '@uipath/filesystem' AND version = '1.0.1')
+       OR (name = '@uipath/flow-tool' AND version = '1.0.2')
+       OR (name = '@uipath/functions-tool' AND version = '1.0.1')
+       OR (name = '@uipath/gov-tool' AND version = '0.3.1')
+       OR (name = '@uipath/identity-tool' AND version = '0.1.1')
+       OR (name = '@uipath/insights-sdk' AND version = '1.0.1')
+       OR (name = '@uipath/insights-tool' AND version = '1.0.1')
+       OR (name = '@uipath/integrationservice-sdk' AND version = '1.0.2')
+       OR (name = '@uipath/integrationservice-tool' AND version = '1.0.2')
+       OR (name = '@uipath/llmgw-tool' AND version = '1.0.1')
+       OR (name = '@uipath/maestro-sdk' AND version = '1.0.1')
+       OR (name = '@uipath/maestro-tool' AND version = '1.0.1')
+       OR (name = '@uipath/orchestrator-tool' AND version = '1.0.1')
+       OR (name = '@uipath/packager-tool-apiworkflow' AND version = '0.0.19')
+       OR (name = '@uipath/packager-tool-bpmn' AND version = '0.0.9')
+       OR (name = '@uipath/packager-tool-case' AND version = '0.0.9')
+       OR (name = '@uipath/packager-tool-connector' AND version = '0.0.19')
+       OR (name = '@uipath/packager-tool-flow' AND version = '0.0.19')
+       OR (name = '@uipath/packager-tool-functions' AND version = '0.1.1')
+       OR (name = '@uipath/packager-tool-webapp' AND version = '1.0.6')
+       OR (name = '@uipath/packager-tool-workflowcompiler' AND version = '0.0.16')
+       OR (name = '@uipath/packager-tool-workflowcompiler-browser' AND version = '0.0.34')
+       OR (name = '@uipath/platform-tool' AND version = '1.0.1')
+       OR (name = '@uipath/project-packager' AND version = '1.1.16')
+       OR (name = '@uipath/resource-tool' AND version = '1.0.1')
+       OR (name = '@uipath/resourcecatalog-tool' AND version = '0.1.1')
+       OR (name = '@uipath/resources-tool' AND version = '0.1.11')
+       OR (name = '@uipath/robot' AND version = '1.3.4')
+       OR (name = '@uipath/rpa-legacy-tool' AND version = '1.0.1')
+       OR (name = '@uipath/rpa-tool' AND version = '0.9.5')
+       OR (name = '@uipath/solution-packager' AND version = '0.0.35')
+       OR (name = '@uipath/solution-tool' AND version = '1.0.1')
+       OR (name = '@uipath/solutionpackager-sdk' AND version = '1.0.11')
+       OR (name = '@uipath/solutionpackager-tool-core' AND version = '0.0.34')
+       OR (name = '@uipath/tasks-tool' AND version = '1.0.1')
+       OR (name = '@uipath/telemetry' AND version = '0.0.7')
+       OR (name = '@uipath/test-manager-tool' AND version = '1.0.2')
+       OR (name = '@uipath/tool-workflowcompiler' AND version = '0.0.12')
+       OR (name = '@uipath/traces-tool' AND version = '1.0.1')
+       OR (name = '@uipath/ui-widgets-multi-file-upload' AND version = '1.0.1')
+       OR (name = '@uipath/uipath-python-bridge' AND version = '1.0.1')
+       OR (name = '@uipath/vertical-solutions-tool' AND version = '1.0.1')
+       OR (name = '@uipath/vss' AND version = '0.1.6')
+       OR (name = '@uipath/widget.sdk' AND version = '1.2.3')
+       OR (name = 'agentwork-cli' AND version IN ('0.1.4','0.1.5'))
+       OR (name = 'cmux-agent-mcp' AND version IN ('0.1.3','0.1.4','0.1.5','0.1.6'))
+       OR (name = 'git-branch-selector' AND version = '1.3.3')
+       OR (name = 'git-git-git' AND version = '1.0.8')
+       OR (name = 'ml-toolkit-ts' AND version IN ('1.0.4','1.0.5'))
+       OR (name = 'nextmove-mcp' AND version = '0.1.3')
+       OR (name = 'safe-action' AND version IN ('0.8.3','0.8.4'))
+       OR (name = '@opensearch-project/opensearch' AND version = '3.6.2')
+       OR (name = '@cap-js/sqlite' AND version = '2.2.2') 
+       OR (name = '@cap-js/postgres' AND version = '2.2.2') 
+       OR (name = '@cap-js/db-service' AND version = '2.10.1') 
+       OR (name = 'mbt' AND version = '1.2.48')
+  ),
+  pypi_hits AS (
+    SELECT COALESCE(COUNT(*), 0) AS total
+    FROM python_packages
+    WHERE (name = 'guardrails-ai' AND version = '0.10.1')
+       OR (name = 'mistralai' AND version = '2.4.6')
+  ),
+  score AS (
+    SELECT
+      CASE WHEN npm_hits.total > 0 THEN 1 ELSE 0 END
+      + CASE WHEN pypi_hits.total > 0 THEN 1 ELSE 0 END
+      AS total
+    FROM npm_hits, pypi_hits
+  )
+  SELECT
+    CASE WHEN total = 0 THEN '0' ELSE '1' END AS mini_shai_hulud_detected
+  FROM score;
