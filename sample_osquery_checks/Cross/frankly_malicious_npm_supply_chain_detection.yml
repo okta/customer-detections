@@ -1,0 +1,79 @@
+title: Frankly Malicious NPM Supply Chain Campaign Detection
+id: 1bfc4ed3dd5e4beb9b9f07d615362606
+description: |
+  "Frankly Malicious" is a coordinated npm supply chain campaign discovered by Panther Threat
+  Research in late April 2026, comprising 38 malicious packages published by an Indonesian-speaking
+  threat actor across four rotating accounts: frengki4321, raya4321, cketol, and frengki0707 (all
+  tied to the alias "frank"). The attack vector is dependency confusion — *-internal-* package names
+  cause CI/CD pipelines to resolve attacker-controlled public packages over legitimate private ones
+  with no user interaction beyond npm install. Five clusters impersonate internal tooling for Apple,
+  Google/GCP, Alibaba/Aliyun, and a generic multi-target group; a shared frank-* namespace serves
+  as the cross-cluster exfiltration backbone. Once installed, postinstall hooks execute a four-stage
+  kill chain: system fingerprinting, targeted credential harvesting (NPM_TOKEN, NODE_AUTH_TOKEN,
+  ~/.aws/credentials, ~/.kube/config, Aliyun RAM keys, database secrets), lateral enumeration, and
+  C2 beacon transmission to webhook.site endpoints. This detection matches all 38 packages using
+  exact name+version pairs sourced from the blog's IOC table (frengki4321) and npm registry lookups
+  (raya4321, frengki0707). Ten cketol packages were tombstoned by npm before versions could be
+  recovered; those are matched by name only. If triggered, immediately remove the flagged package,
+  rotate all cloud credentials and NPM tokens present on the machine, inspect ~/.npmrc and
+  ~/.ssh/id_rsa for tampering, and audit outbound traffic for webhook.site or requestcatcher.com
+  connections.
+references:
+  - https://panther.com/blog/frankly-malicious-inside-a-38-package-npm-supply-chain-campaign-targeting-tech-giants
+author:
+  - rafa.bono@okta.com
+platform:
+  - macOS
+  - Windows
+  - Linux
+query: |
+  SELECT
+    CASE WHEN count(*) = 0 THEN '0'
+    ELSE '1'
+    END AS frankly_malicious_npm_detected
+  FROM npm_packages
+  WHERE
+    -- frengki4321 account --versions from blog IOC table
+    (name = 'ac-sasskit-beta' AND version = '1.0.0')
+    OR (name = 'apple-appstore-full-library-utility' AND version = '1.0.0')
+    OR (name = 'apple-internal-security-audit-v99' AND version IN ('1.0.0','1.0.1','1.0.2','1.0.3'))
+    OR (name = 'apple-app-store-server-library-v3' AND version = '1.0.0')
+    OR (name = 'apple-internal-security-library-v99' AND version = '1.0.0')
+    -- raya4321 account -- versions from npm registry
+    OR (name = 'apple-security-internal-scanner-v3' AND version = '1.0.0')
+    OR (name = 'apple-infra-ultimate-bypass' AND version = '3.0.0')
+    OR (name = 'apple-infra-gcp-leak' AND version = '1.2.0')
+    OR (name = 'apple-infra-final-escape' AND version IN ('1.6.5','1.7.0'))
+    OR (name = 'apple-infra-network-v2' AND version = '1.0.0')
+    OR (name = 'apple-internal-pki-utils' AND version IN ('1.0.1','1.0.2'))
+    OR (name = 'apple-cloud-infrastructure-monitor' AND version = '1.1.0')
+    OR (name = 'aliyun-internal-config' AND version = '99.9.9')
+    OR (name = 'alicloud-pop-core' AND version = '1.0.0')
+    OR (name = 'agents-a365-runtime' AND version IN ('1.3.5','1.3.6','1.3.8'))
+    OR (name = 'frank-at-alibaba-internal' AND version IN ('99.9.9','99.9.10','99.9.11','99.9.12','99.9.13'))
+    OR (name = 'npm-global-util' AND version IN ('1.0.0','1.0.9','1.1.1','1.1.4','1.1.8','1.2.0','1.3.1','1.3.2','1.3.3','1.3.4','1.3.5','1.3.6','1.3.7','1.3.8','1.3.9','1.3.10','1.3.11'))
+    -- cketol account -- tombstoned by npm; original versions unrecoverable, matched by name only
+    OR name IN (
+        'apple-app-store-server-library-poc',
+        'apple-internal-config',
+        'apple-infra-escape-audit',
+        'apple-infra-stealth-audit',
+        'gcp-internal-research-poc',
+        'frank-newton3-db-poc',
+        'frank-newton3-db-final',
+        'frank-newton3-user-hunt',
+        'frank-newton3-final-audit',
+        'internal-sys-audit-check'
+    )
+    -- frengki0707 account -- versions from npm registry
+    OR (name = 'apple-internal-test-utility' AND version IN ('1.0.0','1.0.1','1.0.6'))
+    OR (name = 'apple-cktool-internal-api-v9' AND version = '99.9.9')
+    OR (name = 'frank-apple-sync-service' AND version = '1.3.0')
+    OR (name = 'frank-research-poc-apple' AND version IN ('1.1.0','1.1.2','1.1.4'))
+    OR (name = 'google-cloud-internal-core-utils' AND version = '1.2.50')
+    OR (name = 'google-logging-utils-internal' AND version IN ('1.1.3','9.9.9','1.1.4'))
+    OR (name = 'google-cloud-mono-repo-helper' AND version = '1.0.1777211772')
+    OR (name = 'google-cloud-internal-build-helper' AND version = '1.2.45')
+    OR (name = 'google-internal-cloud-audit-security-check' AND version IN ('99.9.1777210552','99.9.1777210553'))
+    OR (name = 'frank-bot-gogle-cloning' AND version IN ('1.0.2','1.0.6','1.1.0','1.1.1','1.1.2','1.1.3','1.1.5'))
+    OR  name = '@frengki0707/google-cloud-clone';
