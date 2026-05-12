@@ -1,0 +1,24 @@
+title: ITP User Risk Changed to High
+id: aeda20597eedb11a86c4334a529b763a
+description: |
+  Identity Threat Protection (ITP) has elevated a user's risk to HIGH and logged the event with event type user.risk.detect.
+  This detection relies on properly configured Entity Risk Policies to elevate risk to high under certain conditions acceptable for your business.
+references:
+  - https://help.okta.com/oie/en-us/content/topics/itp/detections.htm
+author: Okta
+created_date: '2026-05-11'
+modified_date: '2026-05-11'
+threat:
+  Tactic:
+    - Resource Development
+  Technique:
+    - T1586: Compromise Accounts
+prevention:
+  - Configure ITP's entity risk policy to execute universal logout and/or an Okta workflow to automatically contain/remediate the issue.
+  - Configure authentication policies to ensure phishing resistant MFA like Okta Fastpass is used in all authentication flows.
+detection:
+  okta_systemlog:
+    OIE: |
+      eventType eq "user.risk.detect" and debugContext.debugData.risk co " level=HIGH"
+false_positives:
+  - Various false positives may exist for the detections listed in the references section. Okta admins should ensure the entity risk policy is properly configured to handle these potential FPs.
