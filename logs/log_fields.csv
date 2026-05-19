@@ -96,6 +96,7 @@ debugContext.debugData.signOnMode,"OpenID Connect, SAML 2.0",Protocol used to fa
 debugContext.debugData.threatSuspected,TRUE,The event has met enough criteria to be considered a threat.
 debugContext.debugData.tunnels,"[{""anonymous"":true,""operator"":NORD_VPN,""type"":""VPN""}]",This will contain details on all relevant proxy or VPN information associated with this IP address.
 legacyEventType,core.user.factor.attempt_success,"Refers to the eventtype in the prior generation of the System Log, which is EOL."
+debugContext.debugData.traceId,65d65fa6-b5a9-50e9-b6f1-637b9fb71c50,"A unique identifier to track all events associated with the risk."
 transaction.id,111aaa222bbb333ccc444ddd555eee,"Identifies events that have occurred together as part of an operation (for example, a request to the Okta servers) https://developer.okta.com/docs/reference/system-log-query/"
 ,,
 Request,null,Metadata pertaining to the request.
