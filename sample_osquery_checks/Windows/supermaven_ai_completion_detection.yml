@@ -1,0 +1,67 @@
+title: Supermaven AI Code Completion Detection
+id: d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1
+description: |
+    Detects the presence of Supermaven, an AI code completion tool that claims the largest
+    context window among code completion products (300,000 tokens). Supermaven installs as a
+    VS Code extension (supermaven.supermaven) that spawns a persistent background binary
+    (supermaven-binary) responsible for communicating with Supermaven's servers. Unlike
+    extensions that only transmit the current file, Supermaven's large context window means
+    it may continuously transmit the content of many open files, recent edits, and cross-file
+    symbols to its cloud service for inference. The supermaven-binary process starts automatically
+    at VS Code launch and runs persistently. This detection evaluates VS Code extension
+    directories, the supermaven-binary process, application data directories, and prefetch
+    entries. A score greater than 1 (at least two positive indicators) is required to confirm
+    detection.
+references:
+    - https://supermaven.com
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_supermaven AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        -- VS Code and Cursor extension directories
+        WHERE path LIKE '%\Users\%%\.vscode\extensions\supermaven.supermaven-%'
+            OR path LIKE '%\Users\%%\.cursor\extensions\supermaven.supermaven-%'
+            -- VS Code global storage and app data
+            OR path LIKE '%\Users\%%\AppData\Roaming\Code\User\globalStorage\supermaven.supermaven\%'
+            OR path LIKE '%\Users\%%\AppData\Roaming\Supermaven\%'
+            OR path LIKE '%\Users\%%\AppData\Local\Supermaven\%'
+    ),
+    process_supermaven AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'supermaven-binary.exe'
+            OR name = 'supermaven-binary'
+            OR name LIKE '%supermaven%'
+    ),
+    prefetch_supermaven AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\supermaven-binary%'
+            OR path LIKE '%\supermaven%'
+    ),
+    sockets_supermaven AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\supermaven-binary%'
+            OR path LIKE '%\supermaven%'
+    ),
+    final_score AS (
+        SELECT
+            file_supermaven.total
+            + process_supermaven.total
+            + prefetch_supermaven.total
+            + sockets_supermaven.total
+            AS score
+        FROM file_supermaven, process_supermaven, prefetch_supermaven, sockets_supermaven
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS supermaven_detected
+    FROM final_score
+    ;

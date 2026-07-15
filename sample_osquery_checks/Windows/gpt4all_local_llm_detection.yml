@@ -1,0 +1,75 @@
+title: GPT4All Local LLM Detection
+id: f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1
+description: |
+    Detects the presence of GPT4All, a desktop application for running open-source language models
+    locally, developed by Nomic AI. GPT4All downloads and stores model weight files on the device
+    (typically in %LOCALAPPDATA%\nomic.ai\GPT4All\) and provides both a graphical interface and
+    an optional local API server on port 4891. The API server is OpenAI-compatible and, when
+    enabled, allows any local process to query the model without authentication. As with other
+    local LLM solutions, inference happens entirely on-device, making cloud-based DLP controls
+    blind to data sent through GPT4All. Organizations should assess whether GPT4All constitutes
+    an approved local inference solution and whether the local API server (if enabled) poses a
+    lateral movement risk. This detection evaluates file paths, running processes, installed
+    programs, the local API port, and prefetch entries. A score greater than 1 (at least two
+    positive indicators) is required to confirm detection.
+references:
+    - https://gpt4all.io
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\Users\%%\AppData\Local\Programs\GPT4All\GPT4All.exe'
+            OR path LIKE '%\Users\%%\AppData\Local\nomic.ai\GPT4All\%'
+            OR path LIKE '%\Users\%%\AppData\Local\GPT4All\%'
+    ),
+    process_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%GPT4All%'
+            OR name LIKE '%gpt4all%'
+    ),
+    programs_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM programs
+        WHERE name LIKE '%GPT4All%'
+    ),
+    netports_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM listening_ports
+        WHERE port = '4891'
+            AND path LIKE '%GPT4All%'
+    ),
+    prefetch_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\GPT4All%'
+            OR path LIKE '%\gpt4all%'
+    ),
+    sockets_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\GPT4All%'
+    ),
+    final_score AS (
+        SELECT
+            file_gpt4all.total
+            + process_gpt4all.total
+            + programs_gpt4all.total
+            + netports_gpt4all.total
+            + prefetch_gpt4all.total
+            + sockets_gpt4all.total
+            AS score
+        FROM file_gpt4all, process_gpt4all, programs_gpt4all, netports_gpt4all,
+             prefetch_gpt4all, sockets_gpt4all
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS gpt4all_detected
+    FROM final_score
+    ;

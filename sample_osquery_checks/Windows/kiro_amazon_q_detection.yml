@@ -37,6 +37,8 @@ query: |
             OR path LIKE '%\Users\%%\.amazonq\scopes\scope.json'
             -- AWS Toolkit VS Code extension (ships Kiro/Q integration)
             OR path LIKE '%\Users\%%\.vscode\extensions\amazonwebservices.aws-toolkit-vscode-%'
+            -- Legacy Amazon Q CLI binary (named q)
+            OR path LIKE '%\Users\%%\.local\bin\q.exe'
     ),
     process_kiro AS (
         SELECT COALESCE(COUNT(*), 0) AS total

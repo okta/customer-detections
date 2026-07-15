@@ -1,0 +1,79 @@
+title: AnythingLLM Local AI Server Detection
+id: a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2
+description: |
+    Detects the presence of AnythingLLM, a desktop application and local server that enables
+    RAG (Retrieval-Augmented Generation) workflows using locally stored documents. AnythingLLM
+    can ingest and index documents, PDFs, web pages, and other data sources, then query any
+    configured LLM (local or cloud) with that context. This makes it particularly sensitive from
+    a data exposure perspective: corporate documents uploaded into AnythingLLM workspaces may be
+    chunked, embedded, and sent to external LLM APIs depending on the provider configured.
+    AnythingLLM exposes a local web server on port 3001 by default. In server mode it can be
+    accessed over the local network and provides a multi-user API without authentication by
+    default. Storage is kept in ~/Library/Application Support/anythingllm-desktop/ including
+    the SQLite database, vector embeddings, and uploaded document contents. This detection
+    evaluates app bundle presence, application storage, running processes, and the local server
+    port. A score greater than 1 (at least two positive indicators) is required to confirm
+    detection.
+references:
+    - https://anythingllm.com
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH file_anyllm AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/Applications/AnythingLLM.app'
+            OR path LIKE '/Users/%%/Library/Application Support/anythingllm-desktop/%'
+            OR path LIKE '/Users/%%/Library/Application Support/AnythingLLM/%'
+    ),
+    process_anyllm AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%AnythingLLM%'
+            OR name LIKE '%anythingllm%'
+    ),
+    apps_anyllm AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM apps
+        WHERE name LIKE '%AnythingLLM%'
+            OR bundle_identifier LIKE '%anythingllm%'
+    ),
+    netports_anyllm AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM listening_ports
+        WHERE port = '3001'
+            AND path LIKE '%AnythingLLM%'
+    ),
+    docker_image_anyllm AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_images
+        WHERE tags LIKE '%anythingllm%'
+            OR tags LIKE '%mintplexlabs%'
+    ),
+    docker_container_anyllm AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_containers
+        WHERE image LIKE '%anythingllm%'
+            OR image LIKE '%mintplexlabs%'
+    ),
+    final_score AS (
+        SELECT
+            file_anyllm.total
+            + process_anyllm.total
+            + apps_anyllm.total
+            + netports_anyllm.total
+            + docker_image_anyllm.total
+            + docker_container_anyllm.total
+            AS score
+        FROM file_anyllm, process_anyllm, apps_anyllm, netports_anyllm,
+             docker_image_anyllm, docker_container_anyllm
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS anythingllm_detected
+    FROM final_score
+    ;

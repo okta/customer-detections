@@ -28,6 +28,8 @@ query: |
             OR path LIKE '%\Users\%%\.aider\.aider.conf.yml'
             OR path LIKE '%\Users\%%\.aider.conf.yml'
             OR path LIKE '%\Users\%%\.aider\analytics.json'
+            -- pipx installation
+            OR path LIKE '%\Users\%%\.local\pipx\venvs\aider-chat\%'
     ),
     process_aider AS (
         SELECT COALESCE(COUNT(*), 0) AS total

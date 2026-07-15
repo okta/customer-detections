@@ -1,0 +1,80 @@
+title: GPT4All Local LLM Detection
+id: e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+description: |
+    Detects the presence of GPT4All, a desktop application for running open-source language models
+    locally, developed by Nomic AI. GPT4All downloads and stores model weight files on the device
+    (typically in ~/Library/Application Support/nomic.ai/GPT4All/) and provides both a graphical
+    interface and an optional local API server on port 4891. The API server is OpenAI-compatible
+    and, when enabled, allows any local process to query the model without authentication. As with
+    other local LLM solutions, inference happens entirely on-device, making cloud-based DLP
+    controls blind to data sent through GPT4All. The application can also connect to external
+    Nomic Atlas services for document embedding and retrieval, creating an additional data
+    transmission channel. Organizations should assess whether GPT4All constitutes an approved
+    local inference solution and whether the local API server (if enabled) poses a lateral
+    movement risk. This detection evaluates app bundle presence, model storage directories,
+    running processes, and the local API port. A score greater than 1 (at least two positive
+    indicators) is required to confirm detection.
+references:
+    - https://gpt4all.io
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH file_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/Applications/GPT4All.app'
+            OR path LIKE '/Users/%%/Library/Application Support/nomic.ai/GPT4All/%'
+            OR path LIKE '/Users/%%/Library/Application Support/GPT4All/%'
+    ),
+    process_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%GPT4All%'
+            OR name LIKE '%gpt4all%'
+    ),
+    apps_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM apps
+        WHERE name LIKE '%GPT4All%'
+            OR bundle_identifier LIKE '%gpt4all%'
+            OR bundle_identifier LIKE '%nomic%'
+    ),
+    netports_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM listening_ports
+        WHERE port = '4891'
+            AND path LIKE '%GPT4All%'
+    ),
+    docker_image_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_images
+        WHERE tags LIKE '%gpt4all%'
+            OR tags LIKE '%nomic-ai%'
+    ),
+    docker_container_gpt4all AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_containers
+        WHERE image LIKE '%gpt4all%'
+            OR image LIKE '%nomic-ai%'
+    ),
+    final_score AS (
+        SELECT
+            file_gpt4all.total
+            + process_gpt4all.total
+            + apps_gpt4all.total
+            + netports_gpt4all.total
+            + docker_image_gpt4all.total
+            + docker_container_gpt4all.total
+            AS score
+        FROM file_gpt4all, process_gpt4all, apps_gpt4all, netports_gpt4all,
+             docker_image_gpt4all, docker_container_gpt4all
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS gpt4all_detected
+    FROM final_score
+    ;

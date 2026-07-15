@@ -32,6 +32,8 @@ query: |
             OR path LIKE '%\Users\%%\AppData\Roaming\Windsurf\User\settings.json'
             OR path LIKE '%\Users\%%\.codeium\config.json'
             OR path LIKE '%\Users\%%\.windsurf\%'
+            -- MCP configuration
+            OR path LIKE '%\Users\%%\.codeium\windsurf\mcp_config.json'
     ),
     process_windsurf AS (
         SELECT COALESCE(COUNT(*), 0) AS total

@@ -1,0 +1,70 @@
+title: Cline / Roo-Cline AI Coding Agent Detection
+id: f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7
+description: |
+    Detects the presence of Cline (formerly Claude Dev) and its fork Roo-Cline, VS Code
+    extensions that enable fully autonomous agentic AI coding within the editor. Unlike
+    GitHub Copilot and other assistants that make suggestions, Cline/Roo-Cline are agent
+    runtimes: they can read and write any file, execute arbitrary shell commands, manage
+    browser sessions, and call MCP servers — all approved with a single up-front permission
+    grant. Roo-Cline adds additional modes (Architect, Ask, Code, Debug) and more aggressive
+    auto-approval defaults. Both extensions transmit the full content of open files, terminal
+    output, and shell command results to the configured LLM provider. API keys are stored in
+    VS Code's extension global storage. This detection covers both Cline and Roo-Cline across
+    VS Code and Cursor extension directories, as well as VS Code global storage confirming
+    active use. A score greater than 1 (at least two positive indicators) is required to
+    confirm detection.
+references:
+    - https://github.com/cline/cline
+    - https://github.com/RooVetGit/Roo-Code
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_cline AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        -- VS Code extension directories (Cline and Roo-Cline)
+        WHERE path LIKE '%\Users\%%\.vscode\extensions\saoudrizwan.claude-dev-%'
+            OR path LIKE '%\Users\%%\.vscode\extensions\rooveterinaryinc.roo-cline-%'
+            -- Cursor extension directories
+            OR path LIKE '%\Users\%%\.cursor\extensions\saoudrizwan.claude-dev-%'
+            OR path LIKE '%\Users\%%\.cursor\extensions\rooveterinaryinc.roo-cline-%'
+            -- VS Code global storage confirms active usage
+            OR path LIKE '%\Users\%%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\%'
+            OR path LIKE '%\Users\%%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\%'
+    ),
+    process_cline AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE cmdline LIKE '%saoudrizwan.claude-dev%'
+            OR cmdline LIKE '%rooveterinaryinc.roo-cline%'
+    ),
+    prefetch_cline AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%saoudrizwan.claude-dev%'
+            OR path LIKE '%rooveterinaryinc.roo-cline%'
+    ),
+    sockets_cline AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%saoudrizwan.claude-dev%'
+            OR path LIKE '%rooveterinaryinc.roo-cline%'
+    ),
+    final_score AS (
+        SELECT
+            file_cline.total
+            + process_cline.total
+            + prefetch_cline.total
+            + sockets_cline.total
+            AS score
+        FROM file_cline, process_cline, prefetch_cline, sockets_cline
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS cline_detected
+    FROM final_score
+    ;
