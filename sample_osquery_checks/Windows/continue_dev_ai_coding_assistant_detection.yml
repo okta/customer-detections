@@ -1,0 +1,75 @@
+title: Continue.dev AI Coding Assistant Detection
+id: 4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e
+description: |
+    Detects the presence of Continue.dev, an open-source AI coding assistant extension for VS
+    Code and JetBrains IDEs. Unlike single-provider tools such as GitHub Copilot, Continue.dev
+    acts as a universal proxy that can route editor queries to any configured LLM provider —
+    including local models (Ollama, LM Studio, Jan.ai), OpenAI, Anthropic, Google, and any
+    OpenAI-compatible API. Its MCP (Model Context Protocol) support enables deep tool
+    integrations: the extension can be configured to give the model access to the local
+    filesystem, terminal, databases, and external APIs directly from the IDE. The primary
+    configuration file (%USERPROFILE%\.continue\config.yaml or config.json) is stored in
+    plaintext and may contain API keys for multiple LLM providers. Any secrets placed here
+    are readable by any process with user-level access on the device. This detection evaluates
+    the Continue.dev configuration directory, VS Code extension installation, and the
+    background language server process launched by the extension. A score greater than 1
+    (at least two positive indicators) is required to confirm detection.
+references:
+    - https://continue.dev
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_continue AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\Users\%%\.continue\config.yaml'
+            OR path LIKE '%\Users\%%\.continue\config.json'
+            OR path LIKE '%\Users\%%\.continue\config.ts'
+            -- VS Code extension directory
+            OR path LIKE '%\Users\%%\.vscode\extensions\continue.continue-%'
+    ),
+    process_continue AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        -- Language server spawned by the VS Code extension
+        WHERE cmdline LIKE '%\continue.continue-%\out\extension%'
+            OR cmdline LIKE '%\.continue\bin\%'
+            OR name = 'continue-binary.exe'
+    ),
+    npm_continue AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM npm_packages
+        WHERE name LIKE '%continuedev%'
+            OR name LIKE '%@continuedev%'
+    ),
+    prefetch_continue AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\continue-binary%'
+            OR path LIKE '%\continuedev%'
+    ),
+    sockets_continue AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\continue-binary%'
+            OR path LIKE '%\continuedev%'
+    ),
+    final_score AS (
+        SELECT
+            file_continue.total
+            + process_continue.total
+            + npm_continue.total
+            + prefetch_continue.total
+            + sockets_continue.total
+            AS score
+        FROM file_continue, process_continue, npm_continue, prefetch_continue, sockets_continue
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS continue_dev_detected
+    FROM final_score
+    ;

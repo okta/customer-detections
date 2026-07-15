@@ -1,0 +1,75 @@
+title: GitHub Copilot Detection
+id: e2d7f3b0c5a8274f9e2d7f3b0c5a8b4e
+description: |
+    Detects the presence of GitHub Copilot on Windows devices, including the VS Code extension,
+    the Copilot language server, and the Copilot CLI. GitHub Copilot transmits code context
+    from the active editor — including open files, surrounding code, and repository history —
+    to GitHub's servers for AI completion. The Copilot CLI extends this capability to shell
+    commands and git operations. Organizations subject to strict data residency or IP protection
+    requirements may wish to control or audit Copilot usage on corporate devices. This detection
+    evaluates file paths (VS Code extension directory, credential and config files), running
+    processes, npm packages, and prefetch entries to identify GitHub Copilot installations. A
+    score greater than 1 (at least two positive indicators) is required to confirm detection.
+references:
+    - https://github.com/features/copilot
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_copilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\Users\%%\.vscode\extensions\github.copilot-%'
+            OR path LIKE '%\Users\%%\.vscode\extensions\github.copilot-chat-%'
+            OR path LIKE '%\Users\%%\.config\github-copilot\hosts.json'
+            OR path LIKE '%\Users\%%\.config\github-copilot\apps.json'
+            OR path LIKE '%\Users\%%\AppData\Roaming\npm\node_modules\@github\copilot-language-server\package.json'
+            OR path LIKE '%\Users\%%\node_modules\@github\copilot-language-server\package.json'
+    ),
+    process_copilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%copilot%'
+            OR cmdline LIKE '%\copilot-language-server%'
+            OR cmdline LIKE '%\@github\copilot%'
+    ),
+    npm_copilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM npm_packages
+        WHERE name LIKE '%copilot%'
+    ),
+    choco_copilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM chocolatey_packages
+        WHERE name LIKE '%copilot%'
+    ),
+    prefetch_copilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\copilot%'
+    ),
+    sockets_copilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\copilot%'
+    ),
+    final_score AS (
+        SELECT
+            file_copilot.total
+            + process_copilot.total
+            + npm_copilot.total
+            + choco_copilot.total
+            + prefetch_copilot.total
+            + sockets_copilot.total
+            AS score
+        FROM file_copilot, process_copilot, npm_copilot, choco_copilot,
+             prefetch_copilot, sockets_copilot
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS copilot_detected
+    FROM final_score
+    ;

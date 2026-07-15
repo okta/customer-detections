@@ -1,0 +1,64 @@
+title: Aider AI Coding Agent Detection
+id: 8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e
+description: |
+    Detects the presence of Aider, a Python-based autonomous AI coding agent distributed via
+    pip (aider-chat). Aider is classified as high-risk by security researchers due to its use
+    of unsandboxed shell command execution (subprocess with shell=True), unrestricted filesystem
+    access, and polling of the system clipboard every 0.5 seconds which can capture sensitive
+    data. In auto-commit mode Aider can modify files and create git commits without user
+    confirmation. All code context and conversation history is transmitted to the configured
+    LLM provider (OpenAI, Anthropic, Google, etc.). Aider stores API keys in plain text in
+    ~/.aider/ configuration files, creating a secondary credential exposure risk. Note that
+    osquery has no pip/Python package table — this detection relies on binary paths in Python
+    Scripts directories, config files, prefetch entries, and process names. A score greater
+    than 1 (at least two positive indicators) is required to confirm detection.
+references:
+    - https://aider.chat
+    - https://agent-safehouse.dev/docs/agent-investigations/aider
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_aider AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        -- Python Scripts directories (global and user installs)
+        WHERE path LIKE '%\Scripts\aider.exe'
+            OR path LIKE '%\Users\%%\.aider\.aider.conf.yml'
+            OR path LIKE '%\Users\%%\.aider.conf.yml'
+            OR path LIKE '%\Users\%%\.aider\analytics.json'
+    ),
+    process_aider AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'aider.exe'
+            OR name = 'aider'
+            OR cmdline LIKE '%aider-chat%'
+    ),
+    prefetch_aider AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\aider%'
+    ),
+    sockets_aider AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\aider%'
+    ),
+    final_score AS (
+        SELECT
+            file_aider.total
+            + process_aider.total
+            + prefetch_aider.total
+            + sockets_aider.total
+            AS score
+        FROM file_aider, process_aider, prefetch_aider, sockets_aider
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS aider_detected
+    FROM final_score
+    ;
