@@ -1,0 +1,83 @@
+title: llama.cpp Inference Server Detection
+id: c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4
+description: |
+    Detects the presence of llama.cpp, a C++ runtime for running quantized LLM models locally.
+    llama.cpp is the foundational inference engine underlying many local AI tools (Ollama uses
+    it internally) and provides llama-server, a standalone HTTP server exposing an OpenAI-
+    compatible API on port 8080. When llama-server is running, any process on the device or
+    local network can submit completions requests, process arbitrary text through the loaded
+    model, and retrieve model configuration — with no authentication by default. llama.cpp is
+    typically installed via Homebrew on macOS and is often present on developer machines
+    alongside other local LLM tools. Unlike desktop apps, llama.cpp leaves minimal GUI artifacts
+    and may run headlessly as a background server. Model files (GGUF format) can be loaded from
+    arbitrary paths. This detection evaluates binary paths, Homebrew package presence, and
+    running processes. A score greater than 1 (at least two positive indicators) is required to
+    confirm detection.
+references:
+    - https://github.com/ggml-org/llama.cpp
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH file_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/opt/homebrew/bin/llama-server'
+            OR path LIKE '/opt/homebrew/bin/llama-cli'
+            OR path LIKE '/opt/homebrew/bin/llama-run'
+            OR path LIKE '/usr/local/bin/llama-server'
+            OR path LIKE '/usr/local/bin/llama-cli'
+            OR path LIKE '/Users/%%/.local/bin/llama-server'
+    ),
+    process_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'llama-server'
+            OR name = 'llama-cli'
+            OR name = 'llama-run'
+    ),
+    homebrew_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM homebrew_packages
+        WHERE name = 'llama.cpp'
+    ),
+    netports_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM listening_ports
+        WHERE port = '8080'
+            AND path LIKE '%llama%'
+    ),
+    docker_image_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_images
+        WHERE tags LIKE '%llama.cpp%'
+            OR tags LIKE '%llamacpp%'
+            OR tags LIKE '%ghcr.io/ggml-org%'
+    ),
+    docker_container_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_containers
+        WHERE image LIKE '%llama.cpp%'
+            OR image LIKE '%llamacpp%'
+            OR image LIKE '%ggml-org%'
+    ),
+    final_score AS (
+        SELECT
+            file_llamacpp.total
+            + process_llamacpp.total
+            + homebrew_llamacpp.total
+            + netports_llamacpp.total
+            + docker_image_llamacpp.total
+            + docker_container_llamacpp.total
+            AS score
+        FROM file_llamacpp, process_llamacpp, homebrew_llamacpp, netports_llamacpp,
+             docker_image_llamacpp, docker_container_llamacpp
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS llamacpp_detected
+    FROM final_score
+    ;

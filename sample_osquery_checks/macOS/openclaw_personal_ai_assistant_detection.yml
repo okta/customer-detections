@@ -68,9 +68,10 @@ query: |
         WHERE image LIKE '%openclaw%'
         ),
     final_score AS (
-        SELECT 
-            + file_claw.total 
-            + claw_process.total 
+        SELECT
+            + launch_claw.total
+            + file_claw.total
+            + claw_process.total
             + homebrew_claw.total 
             + npm_claw.total 
             + netports_claw.total 

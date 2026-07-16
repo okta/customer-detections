@@ -1,0 +1,99 @@
+title: Claude AI Assistant Detection
+id: a3f812b9c4e15d2f7a8b6c3d9e0f1a2b
+description: |
+    Detects the presence of Anthropic's Claude AI assistant on macOS devices, covering both the
+    Claude Desktop application and the Claude Code CLI tool. Claude Desktop provides a native
+    interface for interacting with Claude models and can access local files through MCP
+    (Model Context Protocol), enabling broad system interactions. Claude Code is an agentic
+    coding tool capable of reading and modifying files, executing shell commands, and interacting
+    with external services on the user's behalf. Both tools may transmit sensitive data including
+    code, file contents, and conversation history to Anthropic's servers. This detection evaluates
+    launchd services, file paths, running processes, Homebrew packages, npm packages, installed
+    applications, and Docker artifacts to identify Claude installations. A score greater than 1
+    (at least two positive indicators) is required to confirm detection.
+references:
+    - https://claude.ai
+    - https://www.anthropic.com
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH launchd_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM launchd
+        WHERE name LIKE '%claude%'
+            OR name LIKE '%anthropic%'
+    ),
+    file_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/Applications/Claude.app'
+            OR path LIKE '/Users/%%/.claude/settings.json'
+            OR path LIKE '/Users/%%/.claude/CLAUDE.md'
+            OR path LIKE '/Users/%%/.local/bin/claude'
+            OR path LIKE '/Users/%%/.volta/bin/claude'
+            OR path LIKE '/usr/local/bin/claude'
+            OR path LIKE '/opt/homebrew/bin/claude'
+            OR path LIKE '/Users/%%/node_modules/@anthropic-ai/claude-code/package.json'
+            -- MCP configuration (Claude Desktop)
+            OR path LIKE '/Users/%%/Library/Application Support/Claude/claude_desktop_config.json'
+    ),
+    process_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%claude%'
+            OR cmdline LIKE '%/@anthropic-ai/claude-code/%'
+            OR cmdline LIKE '%/node_modules/.bin/claude %'
+    ),
+    homebrew_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM homebrew_packages
+        WHERE name LIKE '%claude%'
+            OR name LIKE '%anthropic%'
+    ),
+    npm_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM npm_packages
+        WHERE name LIKE '%claude%'
+            OR name LIKE '%anthropic%'
+    ),
+    apps_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM apps
+        WHERE name LIKE '%claude%'
+            OR bundle_identifier LIKE '%anthropic%'
+    ),
+    docker_image_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_images
+        WHERE tags LIKE '%claude%'
+            OR tags LIKE '%anthropic%'
+    ),
+    docker_container_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_containers
+        WHERE image LIKE '%claude%'
+            OR image LIKE '%anthropic%'
+    ),
+    final_score AS (
+        SELECT
+            launchd_claude.total
+            + file_claude.total
+            + process_claude.total
+            + homebrew_claude.total
+            + npm_claude.total
+            + apps_claude.total
+            + docker_image_claude.total
+            + docker_container_claude.total
+            AS score
+        FROM launchd_claude, file_claude, process_claude, homebrew_claude, npm_claude,
+             apps_claude, docker_image_claude, docker_container_claude
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS claude_detected
+    FROM final_score
+    ;

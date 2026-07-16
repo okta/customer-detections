@@ -1,0 +1,83 @@
+title: Windsurf (Codeium) AI Editor Detection
+id: f7a2c8e1d4b9630f5c2a8e3b6d1f9a7c
+description: |
+    Detects the presence of Windsurf, Codeium's AI-native code editor, on macOS devices. Windsurf
+    is an Electron-based IDE that embeds AI coding assistance through its Cascade agent, which can
+    autonomously read files, run terminal commands, and browse the web on the user's behalf.
+    Windsurf installs a persistent Codeium engine (~/.codeium) that runs alongside the editor and
+    stores code embeddings and interaction history locally. All AI interactions transmit code
+    context to Codeium's servers. The editor leaves a substantial footprint across multiple
+    directories (~/.codeium, ~/.windsurf, ~/Library/Application Support/Windsurf) totaling
+    approximately 1.75 GB. This detection evaluates file paths, running processes, and installed
+    applications to identify Windsurf installations. A score greater than 1 (at least two positive
+    indicators) is required to confirm detection.
+references:
+    - https://windsurf.com
+    - https://codeium.com
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH launchd_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM launchd
+        WHERE name LIKE '%windsurf%'
+            OR name LIKE '%codeium%'
+    ),
+    file_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/Applications/Windsurf.app'
+            OR path LIKE '/Users/%%/.codeium/config.json'
+            OR path LIKE '/Users/%%/.codeium/settings/%'
+            OR path LIKE '/Users/%%/.windsurf/%'
+            OR path LIKE '/Users/%%/Library/Application Support/Windsurf/User/settings.json'
+            -- MCP configuration
+            OR path LIKE '/Users/%%/.codeium/windsurf/mcp_config.json'
+    ),
+    process_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%windsurf%'
+            OR name LIKE '%codeium%'
+    ),
+    apps_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM apps
+        WHERE name LIKE '%windsurf%'
+            OR name LIKE '%codeium%'
+            OR bundle_identifier LIKE '%windsurf%'
+            OR bundle_identifier LIKE '%codeium%'
+    ),
+    docker_image_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_images
+        WHERE tags LIKE '%windsurf%'
+            OR tags LIKE '%codeium%'
+    ),
+    docker_container_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_containers
+        WHERE image LIKE '%windsurf%'
+            OR image LIKE '%codeium%'
+    ),
+    final_score AS (
+        SELECT
+            launchd_windsurf.total
+            + file_windsurf.total
+            + process_windsurf.total
+            + apps_windsurf.total
+            + docker_image_windsurf.total
+            + docker_container_windsurf.total
+            AS score
+        FROM launchd_windsurf, file_windsurf, process_windsurf, apps_windsurf,
+             docker_image_windsurf, docker_container_windsurf
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS windsurf_detected
+    FROM final_score
+    ;

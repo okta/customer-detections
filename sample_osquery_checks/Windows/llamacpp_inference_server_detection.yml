@@ -1,0 +1,79 @@
+title: llama.cpp Inference Server Detection
+id: d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5
+description: |
+    Detects the presence of llama.cpp, a C++ runtime for running quantized LLM models locally.
+    llama.cpp is the foundational inference engine underlying many local AI tools and provides
+    llama-server, a standalone HTTP server exposing an OpenAI-compatible API on port 8080.
+    When llama-server is running, any process on the device or local network can submit
+    completions requests, process arbitrary text through the loaded model, and retrieve model
+    configuration — with no authentication by default. On Windows, llama.cpp binaries are
+    typically compiled from source, distributed as GitHub release archives, or installed via
+    Chocolatey. Unlike desktop apps, llama.cpp leaves minimal GUI artifacts and may run
+    headlessly as a background server accessible from the network. This detection evaluates
+    binary paths, Chocolatey package presence, running processes, the default inference port,
+    and prefetch entries. A score greater than 1 (at least two positive indicators) is required
+    to confirm detection.
+references:
+    - https://github.com/ggml-org/llama.cpp
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\llama-server.exe'
+            OR path LIKE '%\llama-cli.exe'
+            OR path LIKE '%\llama.cpp\%'
+    ),
+    process_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'llama-server.exe'
+            OR name = 'llama-cli.exe'
+            OR name = 'llama-server'
+    ),
+    choco_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM chocolatey_packages
+        WHERE name = 'llama.cpp'
+            OR name LIKE '%llamacpp%'
+    ),
+    netports_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM listening_ports
+        WHERE port = '8080'
+            AND path LIKE '%llama%'
+    ),
+    prefetch_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\llama-server%'
+            OR path LIKE '%\llama-cli%'
+    ),
+    sockets_llamacpp AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\llama-server%'
+            OR path LIKE '%\llama-cli%'
+    ),
+    final_score AS (
+        SELECT
+            file_llamacpp.total
+            + process_llamacpp.total
+            + choco_llamacpp.total
+            + netports_llamacpp.total
+            + prefetch_llamacpp.total
+            + sockets_llamacpp.total
+            AS score
+        FROM file_llamacpp, process_llamacpp, choco_llamacpp, netports_llamacpp,
+             prefetch_llamacpp, sockets_llamacpp
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS llamacpp_detected
+    FROM final_score
+    ;

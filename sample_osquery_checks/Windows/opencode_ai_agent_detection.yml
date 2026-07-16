@@ -1,0 +1,70 @@
+title: OpenCode AI Coding Agent Detection
+id: d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9
+description: |
+    Detects the presence of OpenCode, an open-source terminal-based AI coding agent distributed
+    as an npm package (opencode-ai). OpenCode is a CLI-first agentic tool similar to Claude Code
+    and Gemini CLI — it can autonomously read and write files, execute shell commands, run tests,
+    and interact with MCP servers on the user's behalf. All code context and conversation history
+    is transmitted to the configured LLM provider (OpenAI, Anthropic, AWS Bedrock, or others).
+    OpenCode stores its configuration in %APPDATA%\opencode\ and supports project-level agent
+    instruction files (AGENTS.md). This detection evaluates binary paths, npm package presence,
+    config files, running processes, and prefetch entries. A score greater than 1 (at least two
+    positive indicators) is required to confirm detection.
+references:
+    - https://opencode.ai
+    - https://github.com/sst/opencode
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_opencode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\Users\%%\AppData\Roaming\npm\opencode'
+            OR path LIKE '%\Users\%%\AppData\Roaming\npm\node_modules\opencode-ai\package.json'
+            OR path LIKE '%\Users\%%\AppData\Roaming\opencode\config.json'
+            OR path LIKE '%\Users\%%\AppData\Roaming\opencode\config.jsonc'
+            OR path LIKE '%\Users\%%\node_modules\opencode-ai\package.json'
+    ),
+    process_opencode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'opencode.exe'
+            OR name = 'opencode'
+            OR cmdline LIKE '%\opencode-ai\%'
+            OR cmdline LIKE '%\node_modules\.bin\opencode %'
+    ),
+    npm_opencode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM npm_packages
+        WHERE name = 'opencode-ai'
+            OR name = 'opencode'
+    ),
+    prefetch_opencode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\opencode%'
+    ),
+    sockets_opencode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\opencode%'
+    ),
+    final_score AS (
+        SELECT
+            file_opencode.total
+            + process_opencode.total
+            + npm_opencode.total
+            + prefetch_opencode.total
+            + sockets_opencode.total
+            AS score
+        FROM file_opencode, process_opencode, npm_opencode, prefetch_opencode, sockets_opencode
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS opencode_detected
+    FROM final_score
+    ;

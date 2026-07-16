@@ -1,0 +1,66 @@
+title: Sourcegraph Cody AI Assistant Detection
+id: a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8
+description: |
+    Detects the presence of Sourcegraph Cody, an AI coding assistant with deep code-graph
+    awareness. Cody integrates into VS Code, JetBrains, and other editors via an extension
+    (sourcegraph.cody-ai) and optionally connects to a Sourcegraph instance to provide
+    repository-wide context. Unlike assistants limited to the currently open file, Cody can
+    index and query an entire codebase graph, making it capable of transmitting large volumes
+    of proprietary code to Anthropic's Claude API or the configured provider. In enterprise
+    deployments Cody connects to a self-hosted Sourcegraph instance; in personal use it
+    connects to sourcegraph.com. Both modes require authentication tokens stored in VS Code's
+    extension global storage. The cody-agent background process (node-based) handles the
+    language server protocol and code indexing. This detection evaluates VS Code extension
+    directories across VS Code and Cursor, VS Code global storage, and the cody-agent process
+    name. Full Disk Access is required for the Application Support path. A score greater than
+    1 (at least two positive indicators) is required to confirm detection.
+references:
+    - https://sourcegraph.com/cody
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH file_cody AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        -- VS Code and Cursor extension directories
+        WHERE path LIKE '/Users/%%/.vscode/extensions/sourcegraph.cody-ai-%'
+            OR path LIKE '/Users/%%/.cursor/extensions/sourcegraph.cody-ai-%'
+            -- VS Code global storage confirms active usage (requires Full Disk Access)
+            OR path LIKE '/Users/%%/Library/Application Support/Code/User/globalStorage/sourcegraph.cody-ai/%'
+    ),
+    process_cody AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'cody-agent'
+            OR cmdline LIKE '%sourcegraph.cody-ai%'
+            OR cmdline LIKE '%cody-agent%'
+    ),
+    docker_image_cody AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_images
+        WHERE tags LIKE '%sourcegraph/cody%'
+            OR tags LIKE '%sourcegraph%'
+    ),
+    docker_container_cody AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_containers
+        WHERE image LIKE '%sourcegraph/cody%'
+    ),
+    final_score AS (
+        SELECT
+            file_cody.total
+            + process_cody.total
+            + docker_image_cody.total
+            + docker_container_cody.total
+            AS score
+        FROM file_cody, process_cody, docker_image_cody, docker_container_cody
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS cody_detected
+    FROM final_score
+    ;

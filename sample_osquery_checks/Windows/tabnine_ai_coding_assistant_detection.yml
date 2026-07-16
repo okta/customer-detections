@@ -1,0 +1,68 @@
+title: Tabnine AI Coding Assistant Detection
+id: 7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b
+description: |
+    Detects the presence of Tabnine, an AI code-completion assistant with a large enterprise
+    install base. Tabnine integrates into VS Code, JetBrains IDEs, Vim, and other editors
+    via dedicated plugins and stores a local model cache in %USERPROFILE%\.tabninecache\ that
+    can be several gigabytes. In its cloud tier, all code completions are processed by
+    Tabnine's servers, meaning code context (including partial function implementations,
+    variable names, and comments) is transmitted externally. Tabnine Enterprise customers can
+    self-host the model, but without explicit confirmation, cloud transmission should be
+    assumed. The %USERPROFILE%\.tabnine\ directory may contain authentication tokens. Tabnine's
+    VS Code extension (tabnine.tabnine-vscode) is often silently installed as part of IDE
+    extension packs without the developer's explicit awareness, making it a common source of
+    inadvertent data exfiltration in enterprise environments. This detection evaluates the
+    local cache directory, VS Code and JetBrains extension paths, running processes, and
+    prefetch entries. A score greater than 1 (at least two positive indicators) is required
+    to confirm detection.
+references:
+    - https://www.tabnine.com
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_tabnine AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\Users\%%\.tabninecache\%'
+            OR path LIKE '%\Users\%%\.tabnine\%'
+            -- VS Code extension
+            OR path LIKE '%\Users\%%\.vscode\extensions\tabnine.tabnine-vscode-%'
+            -- JetBrains plugin
+            OR path LIKE '%\Users\%%\AppData\Roaming\JetBrains\%%\plugins\tabnine-jetbrains\%'
+    ),
+    process_tabnine AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%TabNine%'
+            OR name LIKE '%tabnine%'
+    ),
+    prefetch_tabnine AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\TabNine%'
+            OR path LIKE '%\tabnine%'
+    ),
+    sockets_tabnine AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\TabNine%'
+            OR path LIKE '%\tabnine%'
+    ),
+    final_score AS (
+        SELECT
+            file_tabnine.total
+            + process_tabnine.total
+            + prefetch_tabnine.total
+            + sockets_tabnine.total
+            AS score
+        FROM file_tabnine, process_tabnine, prefetch_tabnine, sockets_tabnine
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS tabnine_detected
+    FROM final_score
+    ;

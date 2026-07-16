@@ -1,0 +1,81 @@
+title: Windsurf (Codeium) AI Editor Detection
+id: a6b3f8d2c9e1407f5a6b3f8d2c9e1a3b
+description: |
+    Detects the presence of Windsurf, Codeium's AI-native code editor, on Windows devices.
+    Windsurf is an Electron-based IDE that embeds AI coding assistance through its Cascade agent,
+    which can autonomously read files, run terminal commands, and browse the web on the user's
+    behalf. Windsurf installs a persistent Codeium engine that runs alongside the editor and
+    stores code embeddings and interaction history locally across multiple directories
+    (AppData\Roaming\Windsurf, .codeium, .windsurf). All AI interactions transmit code context
+    to Codeium's servers. This detection evaluates startup items, file paths, running processes,
+    installed programs, and prefetch entries to identify Windsurf installations. A score greater
+    than 1 (at least two positive indicators) is required to confirm detection.
+references:
+    - https://windsurf.com
+    - https://codeium.com
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH startup_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM startup_items
+        WHERE name LIKE '%windsurf%'
+            OR name LIKE '%codeium%'
+    ),
+    file_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\Users\%%\AppData\Local\Programs\windsurf\Windsurf.exe'
+            OR path LIKE '%\Users\%%\AppData\Local\windsurf\%'
+            OR path LIKE '%\Users\%%\AppData\Roaming\Windsurf\User\settings.json'
+            OR path LIKE '%\Users\%%\.codeium\config.json'
+            OR path LIKE '%\Users\%%\.windsurf\%'
+            -- MCP configuration
+            OR path LIKE '%\Users\%%\.codeium\windsurf\mcp_config.json'
+    ),
+    process_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%windsurf%'
+            OR name LIKE '%codeium%'
+    ),
+    programs_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM programs
+        WHERE name LIKE '%windsurf%'
+            OR name LIKE '%codeium%'
+    ),
+    prefetch_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\Programs\windsurf\%'
+            OR path LIKE '%\Windsurf.exe%'
+            OR path LIKE '%\codeium%'
+    ),
+    sockets_windsurf AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\windsurf%'
+            OR path LIKE '%\codeium%'
+    ),
+    final_score AS (
+        SELECT
+            startup_windsurf.total
+            + file_windsurf.total
+            + process_windsurf.total
+            + programs_windsurf.total
+            + prefetch_windsurf.total
+            + sockets_windsurf.total
+            AS score
+        FROM startup_windsurf, file_windsurf, process_windsurf, programs_windsurf,
+             prefetch_windsurf, sockets_windsurf
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS windsurf_detected
+    FROM final_score
+    ;

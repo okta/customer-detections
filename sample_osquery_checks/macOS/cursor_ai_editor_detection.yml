@@ -1,0 +1,81 @@
+title: Cursor AI Editor Detection
+id: e9b3f6d2a7c1450e8f3b9d6a2c5e7f1b
+description: |
+    Detects the presence of Cursor, an AI-native code editor built on VS Code, on macOS devices.
+    Cursor embeds AI coding assistance directly into the editor and by default sends code context
+    — including open files, terminal output, and repository history — to Cursor's servers and
+    third-party AI providers (OpenAI, Anthropic, Google). The editor's Agent mode can autonomously
+    execute code, run terminal commands, and modify files without per-action confirmation. Privacy
+    mode is available but requires explicit opt-in. Organizations may wish to audit Cursor usage
+    on corporate devices to assess data exposure and enforce approved AI tooling policies. This
+    detection evaluates launchd services, file paths, running processes, Homebrew packages, and
+    installed applications to identify Cursor installations. A score greater than 1 (at least
+    two positive indicators) is required to confirm detection.
+references:
+    - https://cursor.com
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH launchd_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM launchd
+        WHERE name LIKE '%cursor%'
+    ),
+    file_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/Applications/Cursor.app'
+            OR path LIKE '/Users/%%/.cursor/mcp.json'
+            OR path LIKE '/Users/%%/.cursor/extensions/%'
+            OR path LIKE '/Users/%%/Library/Application Support/Cursor/User/settings.json'
+    ),
+    process_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%cursor%'
+            AND path NOT LIKE '/System/%'
+            AND path NOT LIKE '/Library/%'
+    ),
+    homebrew_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM homebrew_packages
+        WHERE name LIKE '%cursor%'
+    ),
+    apps_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM apps
+        WHERE (name LIKE '%cursor%' OR bundle_identifier LIKE '%cursor%')
+            AND bundle_identifier NOT LIKE 'com.apple.%'
+    ),
+    docker_image_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_images
+        WHERE tags LIKE '%cursor%'
+    ),
+    docker_container_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_containers
+        WHERE image LIKE '%cursor%'
+    ),
+    final_score AS (
+        SELECT
+            launchd_cursor.total
+            + file_cursor.total
+            + process_cursor.total
+            + homebrew_cursor.total
+            + apps_cursor.total
+            + docker_image_cursor.total
+            + docker_container_cursor.total
+            AS score
+        FROM launchd_cursor, file_cursor, process_cursor, homebrew_cursor, apps_cursor,
+             docker_image_cursor, docker_container_cursor
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS cursor_detected
+    FROM final_score
+    ;

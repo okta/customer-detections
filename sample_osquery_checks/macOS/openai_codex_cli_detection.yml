@@ -1,0 +1,69 @@
+title: OpenAI Codex CLI Detection
+id: c5d923e8b1f47a6d0e3c9f2b8a5d7e1c
+description: |
+    Detects the presence of the OpenAI Codex CLI tool on macOS devices. Codex is an interactive
+    agentic coding assistant distributed as an npm package (@openai/codex) that can autonomously
+    read and write files, execute shell commands, and interact with external services on the
+    user's behalf. When running in auto-approval mode the tool requires no user confirmation
+    before taking actions, which can include modifying source code, running tests, and making
+    network requests. All interactions and code context are transmitted to OpenAI's API. This
+    detection evaluates file paths, running processes, and npm package installations to identify
+    Codex CLI installations. A score greater than 1 (at least two positive indicators) is
+    required to confirm detection.
+references:
+    - https://github.com/openai/codex
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH file_codex AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/Users/%%/.codex/config.json'
+            OR path LIKE '/Users/%%/.volta/bin/codex'
+            OR path LIKE '/Users/%%/.local/bin/codex'
+            OR path LIKE '/usr/local/bin/codex'
+            OR path LIKE '/opt/homebrew/bin/codex'
+            OR path LIKE '/Users/%%/node_modules/@openai/codex/package.json'
+    ),
+    process_codex AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'codex'
+            OR cmdline LIKE '%/@openai/codex/%'
+            OR cmdline LIKE '%/node_modules/.bin/codex %'
+    ),
+    npm_codex AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM npm_packages
+        WHERE name LIKE '%openai/codex%'
+            OR name = 'codex'
+    ),
+    docker_image_codex AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_images
+        WHERE tags LIKE '%openai/codex%'
+    ),
+    docker_container_codex AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_containers
+        WHERE image LIKE '%openai/codex%'
+    ),
+    final_score AS (
+        SELECT
+            file_codex.total
+            + process_codex.total
+            + npm_codex.total
+            + docker_image_codex.total
+            + docker_container_codex.total
+            AS score
+        FROM file_codex, process_codex, npm_codex, docker_image_codex, docker_container_codex
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS codex_detected
+    FROM final_score
+    ;

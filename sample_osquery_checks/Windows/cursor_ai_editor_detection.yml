@@ -1,0 +1,83 @@
+title: Cursor AI Editor Detection
+id: f9a4c1e6b3d7580f2a4c1e6b3d7f5c0f
+description: |
+    Detects the presence of Cursor, an AI-native code editor built on VS Code, on Windows
+    devices. Cursor embeds AI coding assistance directly into the editor and by default sends
+    code context — including open files, terminal output, and repository history — to Cursor's
+    servers and third-party AI providers (OpenAI, Anthropic, Google). The editor's Agent mode
+    can autonomously execute code, run terminal commands, and modify files without per-action
+    confirmation. Privacy mode is available but requires explicit opt-in. Organizations may wish
+    to audit Cursor usage on corporate devices to assess data exposure and enforce approved AI
+    tooling policies. This detection evaluates startup items, file paths, running processes,
+    Chocolatey packages, installed programs, and prefetch entries to identify Cursor
+    installations. A score greater than 1 (at least two positive indicators) is required to
+    confirm detection.
+references:
+    - https://cursor.com
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH startup_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM startup_items
+        WHERE name LIKE '%cursor%'
+    ),
+    file_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\Users\%%\AppData\Local\Programs\cursor\Cursor.exe'
+            OR path LIKE '%\Users\%%\AppData\Local\cursor\%'
+            OR path LIKE '%\Users\%%\.cursor\mcp.json'
+            OR path LIKE '%\Users\%%\AppData\Roaming\Cursor\User\settings.json'
+    ),
+    process_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%cursor%'
+            AND path NOT LIKE '%\Windows\%'
+            AND path NOT LIKE '%\System32\%'
+    ),
+    choco_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM chocolatey_packages
+        WHERE name LIKE '%cursor%'
+    ),
+    programs_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM programs
+        WHERE name LIKE '%cursor%'
+            AND name NOT LIKE '%Microsoft%'
+    ),
+    prefetch_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\Programs\cursor\%'
+            OR path LIKE '%\cursor\Cursor.exe%'
+    ),
+    sockets_cursor AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\Programs\cursor\%'
+    ),
+    final_score AS (
+        SELECT
+            startup_cursor.total
+            + file_cursor.total
+            + process_cursor.total
+            + choco_cursor.total
+            + programs_cursor.total
+            + prefetch_cursor.total
+            + sockets_cursor.total
+            AS score
+        FROM startup_cursor, file_cursor, process_cursor, choco_cursor, programs_cursor,
+             prefetch_cursor, sockets_cursor
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS cursor_detected
+    FROM final_score
+    ;

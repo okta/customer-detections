@@ -1,0 +1,95 @@
+title: Claude AI Assistant Detection
+id: b1c4f8e2a7d3950f6b2c8e4a1d7f3b9c
+description: |
+    Detects the presence of Anthropic's Claude AI assistant on Windows devices, covering both the
+    Claude Desktop application and the Claude Code CLI tool. Claude Desktop provides a native
+    interface for interacting with Claude models and can access local files through MCP
+    (Model Context Protocol), enabling broad system interactions. Claude Code is an agentic
+    coding tool capable of reading and modifying files, executing shell commands, and interacting
+    with external services on the user's behalf. Both tools may transmit sensitive data including
+    code, file contents, and conversation history to Anthropic's servers. This detection evaluates
+    startup items, file paths, running processes, Chocolatey packages, npm packages, installed
+    programs, prefetch entries, and active network sockets to identify Claude installations. A
+    score greater than 1 (at least two positive indicators) is required to confirm detection.
+references:
+    - https://claude.ai
+    - https://www.anthropic.com
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH startup_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM startup_items
+        WHERE name LIKE '%claude%'
+            OR name LIKE '%anthropic%'
+    ),
+    file_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\Users\%%\.claude\settings.json'
+            OR path LIKE '%\Users\%%\.claude\CLAUDE.md'
+            OR path LIKE '%\Users\%%\AppData\Local\AnthropicClaude\%'
+            OR path LIKE '%\Users\%%\AppData\Roaming\Claude\%'
+            OR path LIKE '%\Users\%%\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\package.json'
+            OR path LIKE '%\Users\%%\node_modules\@anthropic-ai\claude-code\package.json'
+    ),
+    process_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%claude%'
+            OR cmdline LIKE '%\@anthropic-ai\claude-code\%'
+            OR cmdline LIKE '%\node_modules\.bin\claude %'
+    ),
+    choco_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM chocolatey_packages
+        WHERE name LIKE '%claude%'
+            OR name LIKE '%anthropic%'
+    ),
+    npm_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM npm_packages
+        WHERE name LIKE '%claude%'
+            OR name LIKE '%anthropic%'
+    ),
+    programs_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM programs
+        WHERE name LIKE '%claude%'
+            OR name LIKE '%anthropic%'
+    ),
+    prefetch_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\claude%'
+            OR path LIKE '%\anthropic%'
+    ),
+    sockets_claude AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\claude%'
+            OR path LIKE '%\anthropic%'
+    ),
+    final_score AS (
+        SELECT
+            startup_claude.total
+            + file_claude.total
+            + process_claude.total
+            + choco_claude.total
+            + npm_claude.total
+            + programs_claude.total
+            + prefetch_claude.total
+            + sockets_claude.total
+            AS score
+        FROM startup_claude, file_claude, process_claude, choco_claude, npm_claude,
+             programs_claude, prefetch_claude, sockets_claude
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS claude_detected
+    FROM final_score
+    ;

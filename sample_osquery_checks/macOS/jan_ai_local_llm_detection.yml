@@ -1,0 +1,79 @@
+title: Jan.ai Local LLM Detection
+id: 1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b
+description: |
+    Detects the presence of Jan.ai, an open-source desktop application for running large
+    language models entirely on-device. Jan.ai downloads and stores model weight files in
+    ~/.jan/models/ and provides an OpenAI-compatible API server on port 1337 (the "Jan API
+    Server"). The local server can be accessed by any application on the device or, if the
+    user changes the bind address, from the local network. As with other local LLM servers
+    (Ollama, LM Studio), all inference happens locally so outbound DLP controls have no
+    visibility into data processed by Jan.ai. Jan.ai additionally supports MCP (Model Context
+    Protocol) tool integrations that can grant local AI models access to the filesystem,
+    shell, and other device resources. Organizations should classify Jan.ai under the same
+    risk category as Ollama and LM Studio. This detection evaluates file paths, running
+    processes, installed applications, and the local API port. A score greater than 1
+    (at least two positive indicators) is required to confirm detection.
+references:
+    - https://jan.ai
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH file_jan AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/Applications/Jan.app'
+            OR path LIKE '/Users/%%/.jan/models/%'
+            OR path LIKE '/Users/%%/.jan/settings.json'
+            OR path LIKE '/Users/%%/.jan/extensions/%'
+    ),
+    process_jan AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'Jan'
+            OR name LIKE '%jan-ai%'
+    ),
+    apps_jan AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM apps
+        WHERE name LIKE '%Jan%'
+            AND (bundle_identifier LIKE '%jan%' OR bundle_identifier LIKE '%jan-ai%')
+    ),
+    netports_jan AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM listening_ports
+        WHERE port = '1337'
+            AND path LIKE '%Jan%'
+    ),
+    docker_image_jan AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_images
+        WHERE tags LIKE '%jan-ai%'
+            OR tags LIKE '%menlo-park-ai%'
+    ),
+    docker_container_jan AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_containers
+        WHERE image LIKE '%jan-ai%'
+            OR image LIKE '%menlo-park-ai%'
+    ),
+    final_score AS (
+        SELECT
+            file_jan.total
+            + process_jan.total
+            + apps_jan.total
+            + netports_jan.total
+            + docker_image_jan.total
+            + docker_container_jan.total
+            AS score
+        FROM file_jan, process_jan, apps_jan, netports_jan,
+             docker_image_jan, docker_container_jan
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS jan_ai_detected
+    FROM final_score
+    ;

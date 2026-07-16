@@ -1,0 +1,87 @@
+title: Ollama Local LLM Server Detection
+id: 5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
+description: |
+    Detects the presence of Ollama, a local LLM server that runs open-source language models
+    (Llama, Mistral, Gemma, etc.) directly on the device. Ollama exposes a REST API on port
+    11434 that by default binds to 0.0.0.0, making it accessible to any machine on the local
+    network without authentication. Any process or network peer can query the model, retrieve
+    loaded model weights, and use the API to process arbitrary text — including sensitive
+    corporate data. Because inference happens locally, outbound data-loss-prevention controls
+    that inspect cloud API traffic will not detect data sent through Ollama. On Windows, Ollama
+    installs a background service and an auto-updater that run at startup. Organizations should
+    assess whether local LLM serving is an approved activity and ensure the OLLAMA_HOST
+    environment variable is restricted to 127.0.0.1 on shared or networked devices. This
+    detection evaluates startup items, file paths, running processes, Chocolatey packages,
+    installed programs, listening ports, and prefetch entries. A score greater than 1 (at least
+    two positive indicators) is required to confirm detection.
+references:
+    - https://ollama.com
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH startup_ollama AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM startup_items
+        WHERE name LIKE '%ollama%'
+    ),
+    file_ollama AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\Users\%%\AppData\Local\Programs\Ollama\ollama.exe'
+            OR path LIKE '%\Users\%%\AppData\Local\Ollama\%'
+            OR path LIKE '%\Users\%%\.ollama\models\%'
+    ),
+    process_ollama AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%ollama%'
+    ),
+    choco_ollama AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM chocolatey_packages
+        WHERE name = 'ollama'
+    ),
+    programs_ollama AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM programs
+        WHERE name LIKE '%ollama%'
+    ),
+    netports_ollama AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM listening_ports
+        WHERE port = '11434'
+            OR path LIKE '%ollama%'
+    ),
+    prefetch_ollama AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\ollama%'
+    ),
+    sockets_ollama AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\ollama%'
+    ),
+    final_score AS (
+        SELECT
+            startup_ollama.total
+            + file_ollama.total
+            + process_ollama.total
+            + choco_ollama.total
+            + programs_ollama.total
+            + netports_ollama.total
+            + prefetch_ollama.total
+            + sockets_ollama.total
+            AS score
+        FROM startup_ollama, file_ollama, process_ollama, choco_ollama, programs_ollama,
+             netports_ollama, prefetch_ollama, sockets_ollama
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS ollama_detected
+    FROM final_score
+    ;

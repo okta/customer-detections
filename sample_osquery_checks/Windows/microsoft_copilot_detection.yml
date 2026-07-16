@@ -1,0 +1,80 @@
+title: Microsoft Copilot Detection
+id: 5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f
+description: |
+    Detects the presence of Microsoft Copilot, the AI assistant built into Windows 11 and
+    later releases. Microsoft Copilot is pre-installed on Windows 11 and Windows 12 systems
+    and deeply integrated into the operating system: it has access to the user's Microsoft
+    account, can read open windows and clipboard contents, and is capable of executing actions
+    on the user's behalf including sending emails, creating calendar events, and interacting
+    with Microsoft 365 apps. Unlike optional third-party AI tools, Copilot is distributed as
+    a Windows Store app (MSIX package under %LOCALAPPDATA%\Packages\Microsoft.Copilot_*)
+    and is difficult to fully disable without Group Policy. All conversations are transmitted
+    to Microsoft's cloud services. Organizations that have not configured a Microsoft 365
+    Copilot enterprise license may still have the consumer version active unless explicitly
+    disabled through MDM or Group Policy. This detection evaluates the MSIX package directory,
+    startup items, running processes, installed programs, and prefetch entries. A score greater
+    than 1 (at least two positive indicators) is required to confirm detection.
+references:
+    - https://support.microsoft.com/en-us/copilot
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_mscopilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        -- MSIX/UWP package store path
+        WHERE path LIKE '%\Users\%%\AppData\Local\Packages\Microsoft.Copilot_%'
+            OR path LIKE '%\Users\%%\AppData\Local\Microsoft\WindowsApps\Copilot.exe'
+    ),
+    startup_mscopilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM startup_items
+        WHERE name LIKE '%Copilot%'
+            AND name NOT LIKE '%GitHub Copilot%'
+    ),
+    process_mscopilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE (name LIKE '%Copilot%' OR name = 'Microsoft.Copilot.exe')
+            AND path NOT LIKE '%\GitHub\%'
+            AND path NOT LIKE '%\Extensions\%'
+    ),
+    programs_mscopilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM programs
+        WHERE name LIKE '%Microsoft Copilot%'
+            OR name = 'Copilot'
+    ),
+    prefetch_mscopilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE (path LIKE '%\Copilot.exe%' OR path LIKE '%\Microsoft.Copilot%')
+            AND path NOT LIKE '%GitHub%'
+    ),
+    sockets_mscopilot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE (path LIKE '%\Copilot.exe' OR path LIKE '%\Microsoft.Copilot%')
+            AND path NOT LIKE '%GitHub%'
+    ),
+    final_score AS (
+        SELECT
+            file_mscopilot.total
+            + startup_mscopilot.total
+            + process_mscopilot.total
+            + programs_mscopilot.total
+            + prefetch_mscopilot.total
+            + sockets_mscopilot.total
+            AS score
+        FROM file_mscopilot, startup_mscopilot, process_mscopilot, programs_mscopilot,
+             prefetch_mscopilot, sockets_mscopilot
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS ms_copilot_detected
+    FROM final_score
+    ;

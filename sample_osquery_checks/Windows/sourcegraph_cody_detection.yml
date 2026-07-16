@@ -1,0 +1,64 @@
+title: Sourcegraph Cody AI Assistant Detection
+id: b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9
+description: |
+    Detects the presence of Sourcegraph Cody, an AI coding assistant with deep code-graph
+    awareness. Cody integrates into VS Code, JetBrains, and other editors via an extension
+    (sourcegraph.cody-ai) and optionally connects to a Sourcegraph instance to provide
+    repository-wide context. Unlike assistants limited to the currently open file, Cody can
+    index and query an entire codebase graph, making it capable of transmitting large volumes
+    of proprietary code to Anthropic's Claude API or the configured provider. The cody-agent
+    background process handles the language server protocol and code indexing. This detection
+    evaluates VS Code extension directories across VS Code and Cursor, VS Code global storage,
+    and the cody-agent process. A score greater than 1 (at least two positive indicators) is
+    required to confirm detection.
+references:
+    - https://sourcegraph.com/cody
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_cody AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        -- VS Code and Cursor extension directories
+        WHERE path LIKE '%\Users\%%\.vscode\extensions\sourcegraph.cody-ai-%'
+            OR path LIKE '%\Users\%%\.cursor\extensions\sourcegraph.cody-ai-%'
+            -- VS Code global storage confirms active usage
+            OR path LIKE '%\Users\%%\AppData\Roaming\Code\User\globalStorage\sourcegraph.cody-ai\%'
+    ),
+    process_cody AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'cody-agent.exe'
+            OR name = 'cody-agent'
+            OR cmdline LIKE '%sourcegraph.cody-ai%'
+            OR cmdline LIKE '%cody-agent%'
+    ),
+    prefetch_cody AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%\cody-agent%'
+            OR path LIKE '%sourcegraph.cody%'
+    ),
+    sockets_cody AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%\cody-agent%'
+    ),
+    final_score AS (
+        SELECT
+            file_cody.total
+            + process_cody.total
+            + prefetch_cody.total
+            + sockets_cody.total
+            AS score
+        FROM file_cody, process_cody, prefetch_cody, sockets_cody
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS cody_detected
+    FROM final_score
+    ;
