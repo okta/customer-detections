@@ -1,0 +1,81 @@
+title: Kimi Code AI Coding Agent Detection
+id: 2d5194aa67a4480390fc2e7cc9b67213
+description: |
+    Detects the presence of Kimi Code, an agentic AI coding tool developed by MoonshotAI (makers
+    of the Kimi AI assistant), on macOS devices. Kimi Code runs in the terminal and can
+    autonomously read and edit code, execute shell commands, search files, fetch web pages, and
+    interact with MCP servers on the user's behalf. All interactions and code context are
+    transmitted to MoonshotAI's servers. The tool is distributed as a single binary via a native
+    install script (curl | bash), Homebrew, or the npm package @moonshot-ai/kimi-code. The binary
+    is named `kimi` and the internal process name is `kimi-code`. User-level configuration is
+    stored under ~/.kimi-code/, including config.toml, tui.toml, and mcp.json. This detection
+    evaluates file paths, running processes, Homebrew packages, npm packages, and Docker artifacts
+    to identify Kimi Code installations. A score greater than 1 (at least two positive indicators)
+    is required to confirm detection.
+references:
+    - https://github.com/MoonshotAI/kimi-code
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH file_kimi AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/Users/%%/.kimi-code/config.toml'
+            OR path LIKE '/Users/%%/.kimi-code/tui.toml'
+            OR path LIKE '/Users/%%/.kimi-code/mcp.json'
+            OR path LIKE '/Users/%%/.kimi-code/bin/kimi'
+            OR path LIKE '/opt/homebrew/bin/kimi'
+            OR path LIKE '/usr/local/bin/kimi'
+            OR path LIKE '/Users/%%/node_modules/@moonshot-ai/kimi-code/package.json'
+    ),
+    process_kimi AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'kimi'
+            OR name = 'kimi-code'
+            OR cmdline LIKE '%/@moonshot-ai/kimi-code/%'
+            OR cmdline LIKE '%/node_modules/.bin/kimi %'
+    ),
+    homebrew_kimi AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM homebrew_packages
+        WHERE name = 'kimi-code'
+    ),
+    npm_kimi AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM npm_packages
+        WHERE name LIKE '%moonshot-ai/kimi-code%'
+    ),
+    docker_image_kimi AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_images
+        WHERE tags LIKE '%kimi-code%'
+            OR tags LIKE '%moonshot-ai%'
+    ),
+    docker_container_kimi AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM docker_containers
+        WHERE image LIKE '%kimi-code%'
+            OR image LIKE '%moonshot-ai%'
+    ),
+    final_score AS (
+        SELECT
+            file_kimi.total
+            + process_kimi.total
+            + homebrew_kimi.total
+            + npm_kimi.total
+            + docker_image_kimi.total
+            + docker_container_kimi.total
+            AS score
+        FROM file_kimi, process_kimi, homebrew_kimi, npm_kimi,
+             docker_image_kimi, docker_container_kimi
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS kimi_code_detected
+    FROM final_score
+    ;
