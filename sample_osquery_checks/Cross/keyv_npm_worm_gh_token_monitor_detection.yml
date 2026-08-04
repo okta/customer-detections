@@ -1,0 +1,125 @@
+title: keyv npm Supply Chain Worm — gh-token-monitor Dead-Man's-Switch Detection
+id: 8d533eddde1349febb1dc94156c9d57e
+description: |
+  On August 4, 2026, a supply chain worm attributed to the "Shai-Hulud" campaign exploited
+  stolen npm publish tokens to poison 2,234 package artifacts across 444 namespaces, including
+  keyv, cache-manager, flat-cache, file-entry-cache, cacheable, cacheable-request,
+  @cacheable/memory, @cacheable/node-cache, @cacheable/utils, @cacheable/net, ecto,
+  @or-sdk/invitations, @picsart/ai-sdk, @qlik/embed-runtime, @deliveroo/reevent, and picasso.js.
+  Each poisoned version injected a malicious preinstall hook (setup.mjs) that ran automatically
+  on `npm install`, downloaded a Bun runtime, executed an obfuscated second-stage payload
+  (Math_Symbol.js / math_init.js, SHA-256 9fc2570b7cef51c1b8df116d144d11ff4096357be7d2c4c6367cfc2509cf1bcc),
+  and exfiltrated AWS, GCP, Azure, GitHub, npm, Stripe, Vault, Kubernetes, and database
+  credentials to attacker-controlled GitHub repositories (marker: "Shai-Hulud: Here We Go Again")
+  via https://npm-cache[.]com:443/router. After exfiltration, a dead-man's-switch persistence
+  component named "gh-token-monitor" was written to disk: a shell script at
+  ~/.local/bin/gh-token-monitor.sh, a config directory at ~/.config/gh-token-monitor/, and a
+  macOS LaunchAgent (~/Library/LaunchAgents/com.user.gh-token-monitor.plist) or Linux systemd
+  user service (~/.config/systemd/user/gh-token-monitor.service). This switch polls GitHub with
+  the stolen token and executes an attacker-supplied handler when that token is revoked, allowing
+  continued access even after credential rotation unless the persistence is removed first.
+  This detection fires on two independent signals: (1) any of the 63 known malicious package
+  versions found installed on disk — all primary versions were removed from npm within hours but
+  remain on infected machines — and (2) the unique on-disk artifacts of the dead-man's-switch
+  component. A positive result means credentials must be treated as fully compromised. Before
+  rotating secrets, remove the dead-man's-switch (kill the LaunchAgent or systemd service and
+  delete the associated files), then rotate all cloud provider keys, GitHub PATs, npm tokens,
+  and any secrets present in the environment at the time of infection.
+references:
+  - https://safedep.io/keyv-npm-supply-chain-compromise/
+  - https://www.aikido.dev/blog/keyv-and-friends-compromised-in-npm-supply-chain-attack
+  - https://socket.dev/supply-chain-attacks/keyv-and-cacheable-compromise
+author:
+  - rafa.bono@okta.com
+platform:
+  - macOS
+  - Linux
+  - Windows
+query: |
+  WITH npm_signal AS (
+      SELECT COALESCE(COUNT(*), 0) AS total
+      FROM npm_packages
+      WHERE (name = 'keyv'                  AND version = '6.0.0')
+         OR (name = 'flat-cache'            AND version = '6.1.24')
+         OR (name = 'file-entry-cache'      AND version = '11.1.6')
+         OR (name = 'cacheable-request'     AND version = '13.0.20')
+         OR (name = 'cacheable'             AND version = '2.5.1')
+         OR (name = 'cache-manager'         AND version = '7.2.10')
+         OR (name = '@cacheable/memory'     AND version = '2.2.1')
+         OR (name = '@cacheable/node-cache' AND version = '3.1.2')
+         OR (name = '@cacheable/utils'      AND version = '2.5.1')
+         OR (name = '@cacheable/net'        AND version = '2.1.1')
+         OR (name = '@deliveroo/reevent'    AND version = '1.0.1')
+         OR (name = '@or-sdk/invitations'   AND version = '1.4.9')
+         OR (name = '@picsart/ai-sdk'       AND version = '3.32.2')
+         OR (name = '@qlik/embed-runtime'   AND version = '1.6.4')
+         OR (name = 'picasso.js'            AND version = '2.11.6')
+         OR (name = 'ecto'                  AND version = '5.0.1')
+         OR (name = '@nebula.js/cli'               AND version = '7.1.2')
+         OR (name = '@nebula.js/cli-sense'          AND version = '7.1.2')
+         OR (name = '@nebula.js/cli-serve'          AND version = '7.1.2')
+         OR (name = '@nebula.js/locale'             AND version = '0.6.2')
+         OR (name = '@nebula.js/sn-action-button'   AND version = '2.3.1')
+         OR (name = '@nebula.js/sn-animator'        AND version = '2.13.1')
+         OR (name = '@nebula.js/sn-distributionplot' AND version = '1.0.7')
+         OR (name = '@nebula.js/sn-layout-container' AND version = '4.4.1')
+         OR (name = '@nebula.js/sn-line-chart'      AND version = '2.7.1')
+         OR (name = '@nebula.js/sn-listbox'         AND version = '0.19.3')
+         OR (name = '@nebula.js/sn-map'             AND version = '0.12.7')
+         OR (name = '@nebula.js/sn-nav-menu'        AND version = '0.14.2')
+         OR (name = '@nebula.js/sn-org-chart'       AND version = '1.7.1')
+         OR (name = '@nebula.js/sn-shape'           AND version = '1.5.1')
+         OR (name = '@nebula.js/sn-slider'          AND version = '0.20.1')
+         OR (name = '@nebula.js/sn-tabbed-container' AND version = '2.4.1')
+         OR (name = '@nebula.js/snapshooter'        AND version = '0.6.1')
+         OR (name = '@nebula.js/stardust'           AND version = '7.1.2')
+         OR (name = '@nebula.js/test-utils'         AND version = '0.6.1')
+         OR (name = '@nebula.js/theme'              AND version = '0.6.1')
+         OR (name = '@qlik/api'                     AND version = '2.14.2')
+         OR (name = '@qlik/browserslist-config'     AND version = '3.0.2')
+         OR (name = '@qlik/carbon-core'             AND version = '2.1.1')
+         OR (name = '@qlik/carboncopy'              AND version = '1.1.6')
+         OR (name = '@qlik/design-tokens'           AND version = '1.3.13')
+         OR (name = '@qlik/dts-bundler'             AND version = '2.0.3')
+         OR (name = '@qlik/embed-react'             AND version = '2.5.3')
+         OR (name = '@qlik/embed-svelte'            AND version = '1.1.4')
+         OR (name = '@qlik/embed-web-components'    AND version = '1.7.3')
+         OR (name = '@qlik/eslint-config'           AND version = '2.0.20')
+         OR (name = '@qlik/eslint-config-base'      AND version = '0.1.1')
+         OR (name = '@qlik/eslint-config-react'     AND version = '0.1.1')
+         OR (name = '@qlik/eslint-config-svelte'    AND version = '0.1.1')
+         OR (name = '@qlik/nebula-table-utils'      AND version = '2.6.9')
+         OR (name = '@qlik/oxfmt-config'            AND version = '0.1.6')
+         OR (name = '@qlik/oxlint-config'           AND version = '0.7.2')
+         OR (name = '@qlik/prettier-config'         AND version = '1.0.3')
+         OR (name = '@qlik/react-native-simple-grid' AND version = '1.5.5')
+         OR (name = '@qlik/runtime-module-loader'   AND version = '1.5.1')
+         OR (name = '@qlik/sdk'                     AND version = '0.28.1')
+         OR (name = '@qlik/sprout-design-docs'      AND version = '1.0.2')
+         OR (name = '@qlik/sprout-gesture'          AND version = '0.0.13')
+         OR (name = '@qlik/sprout-icons'            AND version = '0.12.3')
+         OR (name = '@qlik/sprout-react-table'      AND version = '0.16.7')
+         OR (name = '@qlik/tsconfig'                AND version = '1.0.3')
+         OR (name = 'picasso-plugin-hammer'         AND version = '2.11.6')
+         OR (name = 'qlik-modifiers'                AND version = '0.10.1')
+  ),
+  persistence_signal AS (
+      SELECT COALESCE(COUNT(*), 0) AS total
+      FROM file
+      WHERE path LIKE '/Users/%%/.local/bin/gh-token-monitor.sh'
+         OR path LIKE '/home/%%/.local/bin/gh-token-monitor.sh'
+         OR path LIKE '/Users/%%/Library/LaunchAgents/com.user.gh-token-monitor.plist'
+         OR path LIKE '/Users/%%/.config/gh-token-monitor/token'
+         OR path LIKE '/home/%%/.config/gh-token-monitor/token'
+         OR path LIKE '/home/%%/.config/systemd/user/gh-token-monitor.service'
+  ),
+  final_score AS (
+      SELECT
+          CASE WHEN npm_signal.total > 0 THEN 1 ELSE 0 END
+          + CASE WHEN persistence_signal.total > 0 THEN 1 ELSE 0 END
+          AS score
+      FROM npm_signal, persistence_signal
+  )
+  SELECT
+      CASE WHEN score = 0 THEN '0' WHEN score > 0 THEN '1' END AS keyv_worm_detected
+  FROM final_score;
