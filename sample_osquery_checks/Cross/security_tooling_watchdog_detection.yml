@@ -1,0 +1,120 @@
+title: Security Tooling Watchdog Detection
+id: 4713daa11477455e82c3a65311d8b622
+description: |
+    This posture check is a vendor-agnostic pre-login watchdog that verifies all seven mandatory
+    endpoint security tool categories are actively running before granting access. Each category
+    scores 1 if at least one matching process is found running, 0 otherwise; the check requires
+    all 7 to pass (score >= 7) to return 1 (healthy).
+    (1) Telemetry - Fleet Orbit and osquery daemon, the observability layer the check itself
+    runs on.
+    (2) EDR - CrowdStrike Falcon, SentinelOne, VMware Carbon Black Cloud, Microsoft Defender
+    for Endpoint, Elastic Security, Palo Alto Cortex XDR, FireEye/Trellix, Sophos, Trend Micro,
+    or ESET.
+    (3) MDM - Jamf, Kandji, Mosyle, or Addigy (macOS), or Microsoft Intune (Windows).
+    (4) DLP - Code42/CrashPlan, Symantec DLP Endpoint, Digital Guardian, or Forcepoint DLP.
+    (5) VPN/ZTNA - Palo Alto GlobalProtect, Cisco AnyConnect/Secure Client, Zscaler Client
+    Connector, Cloudflare WARP, Netskope Client, Ivanti Pulse Secure, Tailscale, or Twingate.
+    (6) DNS Security - Infoblox BloxOne or Cisco Umbrella Roaming Client.
+    (7) Vulnerability Management - Tenable Nessus Agent, Rapid7 Insight Agent, or Qualys Cloud
+    Agent.
+    A result of 0 means one or more security layers have crashed, been tampered with, or are
+    missing; the policy should deny access until tooling is restored. Covers macOS and Windows
+    via the cross-platform processes table.
+references: []
+author:
+    - rafa.bono@okta.com
+platform:
+    - macOS
+    - Windows
+query: |
+    WITH telemetry_running AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name IN ('osqueryd', 'orbit', 'osqueryd.exe', 'orbit.exe')
+    ),
+    edr_running AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name IN (
+            'com.crowdstrike.falcon.Agent', 'CSFalconService.exe', 'falcon-sensor',
+            'SentinelAgent', 'SentinelAgent.exe', 'sentineld',
+            'cbagentd', 'CbDefense.exe',
+            'wdavdaemon', 'MsMpEng.exe', 'MsSense.exe',
+            'elastic-agent',
+            'CyveraConsole', 'CyServer.exe',
+            'xagt', 'xagt.exe',
+            'SophosScanD', 'SAVAdminService.exe',
+            'iCoreService', 'Ntrtscan.exe',
+            'esets_daemon', 'ekrn.exe'
+        )
+    ),
+    mdm_running AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name IN (
+            'JamfDaemon', 'JamfAgent',
+            'kandji-daemon',
+            'mosyled',
+            'addigy-agent',
+            'Microsoft.Management.Services.IntuneWindowsAgent.exe'
+        )
+    ),
+    dlp_running AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name IN (
+            'com.code42.agent.extension', 'Code42-AAT', 'Code42MessagingService',
+            'code42-aat.exe', 'Code42Desktop.exe', 'Code42Service.exe',
+            'edpa', 'edpa.exe',
+            'dgagent', 'DGAgent.exe',
+            'Forcepoint_DLP', 'Forcepoint_DLP.exe'
+        )
+    ),
+    vpn_ztna_running AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name IN (
+            'PanGPS', 'GlobalProtect', 'PanGPA.exe', 'PanGPS.exe',
+            'vpnagentd', 'vpnagent.exe',
+            'ZscalerTunnel', 'ZSAService.exe', 'ZSATunnel.exe',
+            'warp-svc', 'warp-svc.exe',
+            'nsClientDaemon', 'nsclient.exe',
+            'pulsesvc', 'PulseSecureService.exe',
+            'tailscaled', 'tailscale.exe',
+            'twingate', 'twingate.exe'
+        )
+    ),
+    dns_security_running AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name IN (
+            'infoblox_rc_service', 'BloxOne Endpoint',
+            'infoblox_rc_service.exe', 'infoblox_rc_control_application.exe',
+            'OpenDNS_Umbrella_Roaming_Client', 'Cisco_Umbrella_Roaming_Client.exe'
+        )
+    ),
+    vuln_scanner_running AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name IN (
+            'nessusagent', 'nessusagent.exe',
+            'ir_agent', 'ir_agent.exe',
+            'qualys-cloud-agent', 'QualysAgent.exe'
+        )
+    ),
+    final_score AS (
+        SELECT
+            CASE WHEN telemetry_running.total > 0 THEN 1 ELSE 0 END
+            + CASE WHEN edr_running.total > 0 THEN 1 ELSE 0 END
+            + CASE WHEN mdm_running.total > 0 THEN 1 ELSE 0 END
+            + CASE WHEN dlp_running.total > 0 THEN 1 ELSE 0 END
+            + CASE WHEN vpn_ztna_running.total > 0 THEN 1 ELSE 0 END
+            + CASE WHEN dns_security_running.total > 0 THEN 1 ELSE 0 END
+            + CASE WHEN vuln_scanner_running.total > 0 THEN 1 ELSE 0 END
+            AS score
+        FROM telemetry_running, edr_running, mdm_running, dlp_running,
+             vpn_ztna_running, dns_security_running, vuln_scanner_running
+    )
+    SELECT
+        CASE WHEN score = 7 THEN 1 ELSE 0 END AS security_tools_healthy
+    FROM final_score;
