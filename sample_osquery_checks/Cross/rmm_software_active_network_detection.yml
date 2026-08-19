@@ -1,0 +1,72 @@
+title: Active RMM (Remote Monitoring and Management) Software Detection
+id: c9abfca9ab4b441fa8f849500c22e0f9
+description: |
+  Remote Monitoring and Management (RMM) tools are legitimate, commercially signed
+  applications (TeamViewer, AnyDesk, ScreenConnect/ConnectWise Control, Atera, NinjaRMM/
+  NinjaOne, Splashtop, Datto RMM, Kaseya VSA, N-able, Syncro, Zoho Assist, RustDesk, LogMeIn,
+  GoTo Resolve/GoToAssist, ISL Online, Pulseway, SimpleHelp, BeyondTrust/Bomgar, RemotePC,
+  Action1, and Microsoft Quick Assist, among others) built for IT helpdesks and managed
+  service providers to remotely control and administer endpoints. Quick Assist ships inside
+  Windows 10/11 (also distributed via the Microsoft Store) and needs no separate install, so
+  it is worth calling out specifically: it is one of the most common initial-access vectors
+  in tech-support-scam and ransomware phishing (e.g. the Black Basta and Storm-1811
+  campaigns), since a victim only has to accept a support request for an attacker to gain
+  full remote control. Because these binaries are legitimately code-signed and
+  rarely blocked by AV/EDR, ransomware affiliates and initial access brokers routinely abuse
+  the exact same tools per CISA #StopRansomware advisories to establish hands-on-keyboard
+  persistence after a phishing lure or an exploited internet-facing service, blending their
+  access in with normal IT traffic. The same category also covers "shadow IT": employees or
+  contractors installing an unsanctioned remote-access tool to bypass approved support
+  channels.
+references:
+  - https://lolrmm.io
+  - https://github.com/magicsword-io/LOLRMM
+  - https://www.cisa.gov/stopransomware
+author:
+  - rafa.bono@okta.com
+platform:
+  - macOS
+  - Windows
+  - Linux
+query: |
+  SELECT
+    CASE WHEN count(*) = 0 THEN '0'
+    ELSE '1'
+    END AS rmm_software_active_detected
+  FROM process_open_sockets s
+  JOIN processes p ON p.pid = s.pid
+  WHERE s.remote_address != ''
+    AND s.remote_address NOT IN ('0.0.0.0', '::', '127.0.0.1', '::1')
+    AND (
+         p.name LIKE '%TeamViewer%'
+      OR p.name LIKE '%AnyDesk%'
+      OR p.name LIKE '%ScreenConnect%'
+      OR p.name LIKE '%AteraAgent%'
+      OR p.name LIKE '%NinjaRMMAgent%'
+      OR p.name LIKE '%NinjaOne%'
+      OR p.name LIKE '%Splashtop%'
+      OR p.name LIKE '%strwinclt%'
+      OR p.name LIKE '%CagService%'
+      OR p.name LIKE '%AEMAgent%'
+      OR p.name LIKE '%Kaseya%'
+      OR p.name LIKE '%Syncro%'
+      OR p.name LIKE '%Kabuto%'
+      OR p.name LIKE '%ZohoAssist%'
+      OR p.name LIKE '%Zoho Assist%'
+      OR p.name LIKE '%RustDesk%'
+      OR p.name LIKE '%LogMeIn%'
+      OR p.name LIKE '%GoToResolve%'
+      OR p.name LIKE '%GoTo Resolve%'
+      OR p.name LIKE '%GoToAssist%'
+      OR p.name LIKE '%ISLLight%'
+      OR p.name LIKE '%ISL Light%'
+      OR p.name LIKE '%Pulseway%'
+      OR p.name LIKE '%SimpleHelp%'
+      OR p.name LIKE '%BeyondTrust%'
+      OR p.name LIKE '%Bomgar%'
+      OR p.name LIKE '%RemotePC%'
+      OR p.name LIKE '%Action1%'
+      OR p.name LIKE '%BASupSrvc%'
+      OR p.name LIKE '%BASupApp%'
+      OR p.name LIKE '%QuickAssist%'
+    );
