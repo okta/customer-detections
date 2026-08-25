@@ -20,12 +20,12 @@ query: |
     WITH file_copilot AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\.vscode\extensions\github.copilot-%'
-            OR path LIKE '%\Users\%%\.vscode\extensions\github.copilot-chat-%'
-            OR path LIKE '%\Users\%%\.config\github-copilot\hosts.json'
-            OR path LIKE '%\Users\%%\.config\github-copilot\apps.json'
-            OR path LIKE '%\Users\%%\AppData\Roaming\npm\node_modules\@github\copilot-language-server\package.json'
-            OR path LIKE '%\Users\%%\node_modules\@github\copilot-language-server\package.json'
+        WHERE path LIKE '%\Users\%\.vscode\extensions\github.copilot-%'
+            OR path LIKE '%\Users\%\.vscode\extensions\github.copilot-chat-%'
+            OR path LIKE '%\Users\%\.config\github-copilot\hosts.json'
+            OR path LIKE '%\Users\%\.config\github-copilot\apps.json'
+            OR path LIKE '%\Users\%\AppData\Roaming\npm\node_modules\@github\copilot-language-server\package.json'
+            OR path LIKE '%\Users\%\node_modules\@github\copilot-language-server\package.json'
     ),
     process_copilot AS (
         SELECT COALESCE(COUNT(*), 0) AS total

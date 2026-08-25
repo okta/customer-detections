@@ -23,9 +23,9 @@ query: |
     WITH file_anyllm AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\AppData\Local\Programs\AnythingLLM Desktop\AnythingLLM Desktop.exe'
-            OR path LIKE '%\Users\%%\AppData\Roaming\anythingllm-desktop\%'
-            OR path LIKE '%\Users\%%\AppData\Local\AnythingLLM\%'
+        WHERE path LIKE '%\Users\%\AppData\Local\Programs\AnythingLLM Desktop\AnythingLLM Desktop.exe'
+            OR path LIKE '%\Users\%\AppData\Roaming\anythingllm-desktop\%'
+            OR path LIKE '%\Users\%\AppData\Local\AnythingLLM\%'
     ),
     process_anyllm AS (
         SELECT COALESCE(COUNT(*), 0) AS total

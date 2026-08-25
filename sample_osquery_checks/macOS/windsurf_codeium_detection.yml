@@ -29,12 +29,12 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         WHERE path LIKE '/Applications/Windsurf.app'
-            OR path LIKE '/Users/%%/.codeium/config.json'
-            OR path LIKE '/Users/%%/.codeium/settings/%'
-            OR path LIKE '/Users/%%/.windsurf/%'
-            OR path LIKE '/Users/%%/Library/Application Support/Windsurf/User/settings.json'
+            OR path LIKE '/Users/%/.codeium/config.json'
+            OR path LIKE '/Users/%/.codeium/settings/%'
+            OR path LIKE '/Users/%/.windsurf/%'
+            OR path LIKE '/Users/%/Library/Application Support/Windsurf/User/settings.json'
             -- MCP configuration
-            OR path LIKE '/Users/%%/.codeium/windsurf/mcp_config.json'
+            OR path LIKE '/Users/%/.codeium/windsurf/mcp_config.json'
     ),
     process_windsurf AS (
         SELECT COALESCE(COUNT(*), 0) AS total

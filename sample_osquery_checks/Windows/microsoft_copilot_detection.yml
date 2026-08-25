@@ -25,8 +25,8 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         -- MSIX/UWP package store path
-        WHERE path LIKE '%\Users\%%\AppData\Local\Packages\Microsoft.Copilot_%'
-            OR path LIKE '%\Users\%%\AppData\Local\Microsoft\WindowsApps\Copilot.exe'
+        WHERE path LIKE '%\Users\%\AppData\Local\Packages\Microsoft.Copilot_%'
+            OR path LIKE '%\Users\%\AppData\Local\Microsoft\WindowsApps\Copilot.exe'
     ),
     startup_mscopilot AS (
         SELECT COALESCE(COUNT(*), 0) AS total

@@ -29,9 +29,9 @@ query: |
     file_ollama AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\AppData\Local\Programs\Ollama\ollama.exe'
-            OR path LIKE '%\Users\%%\AppData\Local\Ollama\%'
-            OR path LIKE '%\Users\%%\.ollama\models\%'
+        WHERE path LIKE '%\Users\%\AppData\Local\Programs\Ollama\ollama.exe'
+            OR path LIKE '%\Users\%\AppData\Local\Ollama\%'
+            OR path LIKE '%\Users\%\.ollama\models\%'
     ),
     process_ollama AS (
         SELECT COALESCE(COUNT(*), 0) AS total

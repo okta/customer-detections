@@ -23,10 +23,10 @@ query: |
     WITH file_gemini AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\AppData\Roaming\GeminiCli\settings.json'
-            OR path LIKE '%\Users\%%\AppData\Roaming\npm\node_modules\@google\gemini-cli\package.json'
-            OR path LIKE '%\Users\%%\node_modules\@google\gemini-cli\package.json'
-            OR path LIKE '%\Users\%%\AppData\Roaming\npm\gemini'
+        WHERE path LIKE '%\Users\%\AppData\Roaming\GeminiCli\settings.json'
+            OR path LIKE '%\Users\%\AppData\Roaming\npm\node_modules\@google\gemini-cli\package.json'
+            OR path LIKE '%\Users\%\node_modules\@google\gemini-cli\package.json'
+            OR path LIKE '%\Users\%\AppData\Roaming\npm\gemini'
     ),
     process_gemini AS (
         SELECT COALESCE(COUNT(*), 0) AS total

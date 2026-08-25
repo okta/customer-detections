@@ -24,12 +24,12 @@ query: |
     WITH file_tabnine AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '/Users/%%/.tabninecache/%'
-            OR path LIKE '/Users/%%/.tabnine/%'
+        WHERE path LIKE '/Users/%/.tabninecache/%'
+            OR path LIKE '/Users/%/.tabnine/%'
             -- VS Code extension
-            OR path LIKE '/Users/%%/.vscode/extensions/tabnine.tabnine-vscode-%'
+            OR path LIKE '/Users/%/.vscode/extensions/tabnine.tabnine-vscode-%'
             -- JetBrains plugin
-            OR path LIKE '/Users/%%/Library/Application Support/JetBrains/%%/plugins/tabnine-jetbrains/%'
+            OR path LIKE '/Users/%/Library/Application Support/JetBrains/%/plugins/tabnine-jetbrains/%'
     ),
     process_tabnine AS (
         SELECT COALESCE(COUNT(*), 0) AS total

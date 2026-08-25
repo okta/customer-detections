@@ -24,11 +24,11 @@ query: |
     WITH file_continue AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '/Users/%%/.continue/config.yaml'
-            OR path LIKE '/Users/%%/.continue/config.json'
-            OR path LIKE '/Users/%%/.continue/config.ts'
+        WHERE path LIKE '/Users/%/.continue/config.yaml'
+            OR path LIKE '/Users/%/.continue/config.json'
+            OR path LIKE '/Users/%/.continue/config.ts'
             -- VS Code extension directory
-            OR path LIKE '/Users/%%/.vscode/extensions/continue.continue-%'
+            OR path LIKE '/Users/%/.vscode/extensions/continue.continue-%'
     ),
     process_continue AS (
         SELECT COALESCE(COUNT(*), 0) AS total

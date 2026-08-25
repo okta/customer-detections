@@ -27,10 +27,10 @@ query: |
     file_cursor AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\AppData\Local\Programs\cursor\Cursor.exe'
-            OR path LIKE '%\Users\%%\AppData\Local\cursor\%'
-            OR path LIKE '%\Users\%%\.cursor\mcp.json'
-            OR path LIKE '%\Users\%%\AppData\Roaming\Cursor\User\settings.json'
+        WHERE path LIKE '%\Users\%\AppData\Local\Programs\cursor\Cursor.exe'
+            OR path LIKE '%\Users\%\AppData\Local\cursor\%'
+            OR path LIKE '%\Users\%\.cursor\mcp.json'
+            OR path LIKE '%\Users\%\AppData\Roaming\Cursor\User\settings.json'
     ),
     process_cursor AS (
         SELECT COALESCE(COUNT(*), 0) AS total

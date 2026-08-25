@@ -16,7 +16,7 @@ query: |
     file_claw AS (
         SELECT COALESCE(COUNT(*), 0) as total
         FROM file
-        WHERE path LIKE '%\Users\%%\.openclaw\'
+        WHERE path LIKE '%\Users\%\.openclaw\'
         ),
     claw_process AS (
         SELECT COALESCE(COUNT(*), 0) as total

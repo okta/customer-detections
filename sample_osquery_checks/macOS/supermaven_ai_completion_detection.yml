@@ -24,11 +24,11 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         -- VS Code and Cursor extension directories
-        WHERE path LIKE '/Users/%%/.vscode/extensions/supermaven.supermaven-%'
-            OR path LIKE '/Users/%%/.cursor/extensions/supermaven.supermaven-%'
+        WHERE path LIKE '/Users/%/.vscode/extensions/supermaven.supermaven-%'
+            OR path LIKE '/Users/%/.cursor/extensions/supermaven.supermaven-%'
             -- VS Code global storage and app support (requires Full Disk Access)
-            OR path LIKE '/Users/%%/Library/Application Support/Code/User/globalStorage/supermaven.supermaven/%'
-            OR path LIKE '/Users/%%/Library/Application Support/Supermaven/%'
+            OR path LIKE '/Users/%/Library/Application Support/Code/User/globalStorage/supermaven.supermaven/%'
+            OR path LIKE '/Users/%/Library/Application Support/Supermaven/%'
     ),
     process_supermaven AS (
         SELECT COALESCE(COUNT(*), 0) AS total

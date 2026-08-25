@@ -25,11 +25,11 @@ query: |
         FROM file
         -- Python Scripts directories (global and user installs)
         WHERE path LIKE '%\Scripts\aider.exe'
-            OR path LIKE '%\Users\%%\.aider\.aider.conf.yml'
-            OR path LIKE '%\Users\%%\.aider.conf.yml'
-            OR path LIKE '%\Users\%%\.aider\analytics.json'
+            OR path LIKE '%\Users\%\.aider\.aider.conf.yml'
+            OR path LIKE '%\Users\%\.aider.conf.yml'
+            OR path LIKE '%\Users\%\.aider\analytics.json'
             -- pipx installation
-            OR path LIKE '%\Users\%%\.local\pipx\venvs\aider-chat\%'
+            OR path LIKE '%\Users\%\.local\pipx\venvs\aider-chat\%'
     ),
     process_aider AS (
         SELECT COALESCE(COUNT(*), 0) AS total

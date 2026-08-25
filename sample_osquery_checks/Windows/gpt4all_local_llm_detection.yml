@@ -22,9 +22,9 @@ query: |
     WITH file_gpt4all AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\AppData\Local\Programs\GPT4All\GPT4All.exe'
-            OR path LIKE '%\Users\%%\AppData\Local\nomic.ai\GPT4All\%'
-            OR path LIKE '%\Users\%%\AppData\Local\GPT4All\%'
+        WHERE path LIKE '%\Users\%\AppData\Local\Programs\GPT4All\GPT4All.exe'
+            OR path LIKE '%\Users\%\AppData\Local\nomic.ai\GPT4All\%'
+            OR path LIKE '%\Users\%\AppData\Local\GPT4All\%'
     ),
     process_gpt4all AS (
         SELECT COALESCE(COUNT(*), 0) AS total

@@ -27,9 +27,9 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         WHERE path LIKE '/Applications/Cursor.app'
-            OR path LIKE '/Users/%%/.cursor/mcp.json'
-            OR path LIKE '/Users/%%/.cursor/extensions/%'
-            OR path LIKE '/Users/%%/Library/Application Support/Cursor/User/settings.json'
+            OR path LIKE '/Users/%/.cursor/mcp.json'
+            OR path LIKE '/Users/%/.cursor/extensions/%'
+            OR path LIKE '/Users/%/Library/Application Support/Cursor/User/settings.json'
     ),
     process_cursor AS (
         SELECT COALESCE(COUNT(*), 0) AS total

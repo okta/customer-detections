@@ -28,7 +28,7 @@ query: |
             OR path LIKE '/opt/homebrew/bin/llama-run'
             OR path LIKE '/usr/local/bin/llama-server'
             OR path LIKE '/usr/local/bin/llama-cli'
-            OR path LIKE '/Users/%%/.local/bin/llama-server'
+            OR path LIKE '/Users/%/.local/bin/llama-server'
     ),
     process_llamacpp AS (
         SELECT COALESCE(COUNT(*), 0) AS total

@@ -24,9 +24,9 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         WHERE path LIKE '/Applications/Jan.app'
-            OR path LIKE '/Users/%%/.jan/models/%'
-            OR path LIKE '/Users/%%/.jan/settings.json'
-            OR path LIKE '/Users/%%/.jan/extensions/%'
+            OR path LIKE '/Users/%/.jan/models/%'
+            OR path LIKE '/Users/%/.jan/settings.json'
+            OR path LIKE '/Users/%/.jan/extensions/%'
     ),
     process_jan AS (
         SELECT COALESCE(COUNT(*), 0) AS total

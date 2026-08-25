@@ -30,15 +30,15 @@ query: |
     file_kiro AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\AppData\Local\Programs\Kiro\Kiro.exe'
-            OR path LIKE '%\Users\%%\.kiro\settings\cli.json'
-            OR path LIKE '%\Users\%%\.kiro\settings\mcp.json'
+        WHERE path LIKE '%\Users\%\AppData\Local\Programs\Kiro\Kiro.exe'
+            OR path LIKE '%\Users\%\.kiro\settings\cli.json'
+            OR path LIKE '%\Users\%\.kiro\settings\mcp.json'
             -- Legacy Amazon Q Developer paths (pre-migration)
-            OR path LIKE '%\Users\%%\.amazonq\scopes\scope.json'
+            OR path LIKE '%\Users\%\.amazonq\scopes\scope.json'
             -- AWS Toolkit VS Code extension (ships Kiro/Q integration)
-            OR path LIKE '%\Users\%%\.vscode\extensions\amazonwebservices.aws-toolkit-vscode-%'
+            OR path LIKE '%\Users\%\.vscode\extensions\amazonwebservices.aws-toolkit-vscode-%'
             -- Legacy Amazon Q CLI binary (named q)
-            OR path LIKE '%\Users\%%\.local\bin\q.exe'
+            OR path LIKE '%\Users\%\.local\bin\q.exe'
     ),
     process_kiro AS (
         SELECT COALESCE(COUNT(*), 0) AS total
