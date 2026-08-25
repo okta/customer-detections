@@ -30,8 +30,8 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         WHERE path LIKE '/Applications/Ollama.app'
-            OR path LIKE '/Users/%%/.ollama/models/%'
-            OR path LIKE '/Users/%%/.ollama/config'
+            OR path LIKE '/Users/%/.ollama/models/%'
+            OR path LIKE '/Users/%/.ollama/config'
             OR path LIKE '/usr/local/bin/ollama'
             OR path LIKE '/opt/homebrew/bin/ollama'
     ),

@@ -25,12 +25,12 @@ query: |
     WITH file_goose AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '/Users/%%/.local/bin/goose'
+        WHERE path LIKE '/Users/%/.local/bin/goose'
             OR path LIKE '/opt/homebrew/bin/goose'
             OR path LIKE '/usr/local/bin/goose'
-            OR path LIKE '/Users/%%/.config/goose/profiles.yaml'
-            OR path LIKE '/Users/%%/.config/goose/config.yaml'
-            OR path LIKE '/Users/%%/.local/share/goose/sessions/%'
+            OR path LIKE '/Users/%/.config/goose/profiles.yaml'
+            OR path LIKE '/Users/%/.config/goose/config.yaml'
+            OR path LIKE '/Users/%/.local/share/goose/sessions/%'
     ),
     process_goose AS (
         SELECT COALESCE(COUNT(*), 0) AS total

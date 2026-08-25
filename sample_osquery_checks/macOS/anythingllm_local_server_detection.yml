@@ -25,8 +25,8 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         WHERE path LIKE '/Applications/AnythingLLM.app'
-            OR path LIKE '/Users/%%/Library/Application Support/anythingllm-desktop/%'
-            OR path LIKE '/Users/%%/Library/Application Support/AnythingLLM/%'
+            OR path LIKE '/Users/%/Library/Application Support/anythingllm-desktop/%'
+            OR path LIKE '/Users/%/Library/Application Support/AnythingLLM/%'
     ),
     process_anyllm AS (
         SELECT COALESCE(COUNT(*), 0) AS total

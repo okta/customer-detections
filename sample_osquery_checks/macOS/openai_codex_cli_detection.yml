@@ -20,12 +20,12 @@ query: |
     WITH file_codex AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '/Users/%%/.codex/config.json'
-            OR path LIKE '/Users/%%/.volta/bin/codex'
-            OR path LIKE '/Users/%%/.local/bin/codex'
+        WHERE path LIKE '/Users/%/.codex/config.json'
+            OR path LIKE '/Users/%/.volta/bin/codex'
+            OR path LIKE '/Users/%/.local/bin/codex'
             OR path LIKE '/usr/local/bin/codex'
             OR path LIKE '/opt/homebrew/bin/codex'
-            OR path LIKE '/Users/%%/node_modules/@openai/codex/package.json'
+            OR path LIKE '/Users/%/node_modules/@openai/codex/package.json'
     ),
     process_codex AS (
         SELECT COALESCE(COUNT(*), 0) AS total

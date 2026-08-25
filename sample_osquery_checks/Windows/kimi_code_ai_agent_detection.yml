@@ -22,12 +22,12 @@ query: |
     WITH file_kimi AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\.kimi-code\config.toml'
-            OR path LIKE '%\Users\%%\.kimi-code\tui.toml'
-            OR path LIKE '%\Users\%%\.kimi-code\mcp.json'
-            OR path LIKE '%\Users\%%\.kimi-code\bin\kimi.exe'
-            OR path LIKE '%\Users\%%\AppData\Roaming\npm\node_modules\@moonshot-ai\kimi-code\package.json'
-            OR path LIKE '%\Users\%%\node_modules\@moonshot-ai\kimi-code\package.json'
+        WHERE path LIKE '%\Users\%\.kimi-code\config.toml'
+            OR path LIKE '%\Users\%\.kimi-code\tui.toml'
+            OR path LIKE '%\Users\%\.kimi-code\mcp.json'
+            OR path LIKE '%\Users\%\.kimi-code\bin\kimi.exe'
+            OR path LIKE '%\Users\%\AppData\Roaming\npm\node_modules\@moonshot-ai\kimi-code\package.json'
+            OR path LIKE '%\Users\%\node_modules\@moonshot-ai\kimi-code\package.json'
     ),
     process_kimi AS (
         SELECT COALESCE(COUNT(*), 0) AS total

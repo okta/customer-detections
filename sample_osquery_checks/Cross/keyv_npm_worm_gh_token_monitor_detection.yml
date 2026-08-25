@@ -106,12 +106,12 @@ query: |
   persistence_signal AS (
       SELECT COALESCE(COUNT(*), 0) AS total
       FROM file
-      WHERE path LIKE '/Users/%%/.local/bin/gh-token-monitor.sh'
-         OR path LIKE '/home/%%/.local/bin/gh-token-monitor.sh'
-         OR path LIKE '/Users/%%/Library/LaunchAgents/com.user.gh-token-monitor.plist'
-         OR path LIKE '/Users/%%/.config/gh-token-monitor/token'
-         OR path LIKE '/home/%%/.config/gh-token-monitor/token'
-         OR path LIKE '/home/%%/.config/systemd/user/gh-token-monitor.service'
+      WHERE path LIKE '/Users/%/.local/bin/gh-token-monitor.sh'
+         OR path LIKE '/home/%/.local/bin/gh-token-monitor.sh'
+         OR path LIKE '/Users/%/Library/LaunchAgents/com.user.gh-token-monitor.plist'
+         OR path LIKE '/Users/%/.config/gh-token-monitor/token'
+         OR path LIKE '/home/%/.config/gh-token-monitor/token'
+         OR path LIKE '/home/%/.config/systemd/user/gh-token-monitor.service'
   ),
   final_score AS (
       SELECT

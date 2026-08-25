@@ -40,10 +40,10 @@ query: |
   WITH ruby_gems AS (
       SELECT COALESCE(COUNT(*), 0) AS total
       FROM file
-      WHERE path LIKE '/usr/%%/gems/knot-%'
-         OR path LIKE '/opt/%%/gems/knot-%'
-         OR path LIKE '/home/%%/gems/knot-%'
-         OR path LIKE '/Users/%%/gems/knot-%'
+      WHERE path LIKE '/usr/%/gems/knot-%'
+         OR path LIKE '/opt/%/gems/knot-%'
+         OR path LIKE '/home/%/gems/knot-%'
+         OR path LIKE '/Users/%/gems/knot-%'
   ),
   ssh_backdoor AS (
       SELECT COALESCE(COUNT(*), 0) AS total

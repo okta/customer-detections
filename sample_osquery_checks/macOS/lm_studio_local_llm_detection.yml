@@ -24,9 +24,9 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         WHERE path LIKE '/Applications/LM Studio.app'
-            OR path LIKE '/Users/%%/.lmstudio/models/%'
-            OR path LIKE '/Users/%%/.cache/lm-studio/%'
-            OR path LIKE '/Users/%%/.lmstudio/config.json'
+            OR path LIKE '/Users/%/.lmstudio/models/%'
+            OR path LIKE '/Users/%/.cache/lm-studio/%'
+            OR path LIKE '/Users/%/.lmstudio/config.json'
     ),
     process_lmstudio AS (
         SELECT COALESCE(COUNT(*), 0) AS total

@@ -22,10 +22,10 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         -- VS Code and Cursor extension directories
-        WHERE path LIKE '%\Users\%%\.vscode\extensions\sourcegraph.cody-ai-%'
-            OR path LIKE '%\Users\%%\.cursor\extensions\sourcegraph.cody-ai-%'
+        WHERE path LIKE '%\Users\%\.vscode\extensions\sourcegraph.cody-ai-%'
+            OR path LIKE '%\Users\%\.cursor\extensions\sourcegraph.cody-ai-%'
             -- VS Code global storage confirms active usage
-            OR path LIKE '%\Users\%%\AppData\Roaming\Code\User\globalStorage\sourcegraph.cody-ai\%'
+            OR path LIKE '%\Users\%\AppData\Roaming\Code\User\globalStorage\sourcegraph.cody-ai\%'
     ),
     process_cody AS (
         SELECT COALESCE(COUNT(*), 0) AS total

@@ -28,8 +28,8 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         WHERE path LIKE '/Applications/ChatGPT.app'
-            OR path LIKE '/Users/%%/Library/Application Support/ChatGPT/app-settings.json'
-            OR path LIKE '/Users/%%/Library/Application Support/ChatGPT/%'
+            OR path LIKE '/Users/%/Library/Application Support/ChatGPT/app-settings.json'
+            OR path LIKE '/Users/%/Library/Application Support/ChatGPT/%'
     ),
     process_chatgpt AS (
         SELECT COALESCE(COUNT(*), 0) AS total

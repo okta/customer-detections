@@ -23,12 +23,12 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         -- VS Code and Cursor extension directories
-        WHERE path LIKE '%\Users\%%\.vscode\extensions\supermaven.supermaven-%'
-            OR path LIKE '%\Users\%%\.cursor\extensions\supermaven.supermaven-%'
+        WHERE path LIKE '%\Users\%\.vscode\extensions\supermaven.supermaven-%'
+            OR path LIKE '%\Users\%\.cursor\extensions\supermaven.supermaven-%'
             -- VS Code global storage and app data
-            OR path LIKE '%\Users\%%\AppData\Roaming\Code\User\globalStorage\supermaven.supermaven\%'
-            OR path LIKE '%\Users\%%\AppData\Roaming\Supermaven\%'
-            OR path LIKE '%\Users\%%\AppData\Local\Supermaven\%'
+            OR path LIKE '%\Users\%\AppData\Roaming\Code\User\globalStorage\supermaven.supermaven\%'
+            OR path LIKE '%\Users\%\AppData\Roaming\Supermaven\%'
+            OR path LIKE '%\Users\%\AppData\Local\Supermaven\%'
     ),
     process_supermaven AS (
         SELECT COALESCE(COUNT(*), 0) AS total

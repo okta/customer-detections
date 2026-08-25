@@ -16,10 +16,10 @@ query: |
     file_claw AS (
         SELECT COALESCE(COUNT(*), 0) as total
         FROM file 
-        WHERE path LIKE '/Users/%%/.openclaw/openclaw.json' 
-            -- OR path LIKE '/%%/.openclaw/%'
-            OR path LIKE '/Users/%%/.volta/bin/openclaw'
-            OR path LIKE '/Users/%%/.nvm/current/bin/openclaw'
+        WHERE path LIKE '/Users/%/.openclaw/openclaw.json' 
+            -- OR path LIKE '/%/.openclaw/%'
+            OR path LIKE '/Users/%/.volta/bin/openclaw'
+            OR path LIKE '/Users/%/.nvm/current/bin/openclaw'
             OR path LIKE '/usr/bin/openclaw'
             OR path LIKE '/usr/local/bin/openclaw'
             OR path LIKE '/opt/homebrew/bin/openclaw'

@@ -22,12 +22,12 @@ query: |
     WITH file_opencode AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '/Users/%%/.local/bin/opencode'
+        WHERE path LIKE '/Users/%/.local/bin/opencode'
             OR path LIKE '/opt/homebrew/bin/opencode'
             OR path LIKE '/usr/local/bin/opencode'
-            OR path LIKE '/Users/%%/.config/opencode/config.json'
-            OR path LIKE '/Users/%%/.config/opencode/config.jsonc'
-            OR path LIKE '/Users/%%/node_modules/opencode-ai/package.json'
+            OR path LIKE '/Users/%/.config/opencode/config.json'
+            OR path LIKE '/Users/%/.config/opencode/config.jsonc'
+            OR path LIKE '/Users/%/node_modules/opencode-ai/package.json'
     ),
     process_opencode AS (
         SELECT COALESCE(COUNT(*), 0) AS total

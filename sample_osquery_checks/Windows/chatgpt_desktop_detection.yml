@@ -27,9 +27,9 @@ query: |
     file_chatgpt AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\AppData\Local\OpenAI\ChatGPT\%'
-            OR path LIKE '%\Users\%%\AppData\Roaming\OpenAI\ChatGPT\%'
-            OR path LIKE '%\Users\%%\AppData\Local\Programs\ChatGPT\ChatGPT.exe'
+        WHERE path LIKE '%\Users\%\AppData\Local\OpenAI\ChatGPT\%'
+            OR path LIKE '%\Users\%\AppData\Roaming\OpenAI\ChatGPT\%'
+            OR path LIKE '%\Users\%\AppData\Local\Programs\ChatGPT\ChatGPT.exe'
     ),
     process_chatgpt AS (
         SELECT COALESCE(COUNT(*), 0) AS total

@@ -25,14 +25,14 @@ query: |
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
         -- VS Code extension directories (Cline and Roo-Cline)
-        WHERE path LIKE '%\Users\%%\.vscode\extensions\saoudrizwan.claude-dev-%'
-            OR path LIKE '%\Users\%%\.vscode\extensions\rooveterinaryinc.roo-cline-%'
+        WHERE path LIKE '%\Users\%\.vscode\extensions\saoudrizwan.claude-dev-%'
+            OR path LIKE '%\Users\%\.vscode\extensions\rooveterinaryinc.roo-cline-%'
             -- Cursor extension directories
-            OR path LIKE '%\Users\%%\.cursor\extensions\saoudrizwan.claude-dev-%'
-            OR path LIKE '%\Users\%%\.cursor\extensions\rooveterinaryinc.roo-cline-%'
+            OR path LIKE '%\Users\%\.cursor\extensions\saoudrizwan.claude-dev-%'
+            OR path LIKE '%\Users\%\.cursor\extensions\rooveterinaryinc.roo-cline-%'
             -- VS Code global storage confirms active usage
-            OR path LIKE '%\Users\%%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\%'
-            OR path LIKE '%\Users\%%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\%'
+            OR path LIKE '%\Users\%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\%'
+            OR path LIKE '%\Users\%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\%'
     ),
     process_cline AS (
         SELECT COALESCE(COUNT(*), 0) AS total

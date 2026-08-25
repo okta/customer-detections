@@ -26,10 +26,10 @@ query: |
     WITH file_goose AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\.local\bin\goose.exe'
-            OR path LIKE '%\Users\%%\AppData\Roaming\goose\profiles.yaml'
-            OR path LIKE '%\Users\%%\AppData\Roaming\goose\config.yaml'
-            OR path LIKE '%\Users\%%\AppData\Local\goose\sessions\%'
+        WHERE path LIKE '%\Users\%\.local\bin\goose.exe'
+            OR path LIKE '%\Users\%\AppData\Roaming\goose\profiles.yaml'
+            OR path LIKE '%\Users\%\AppData\Roaming\goose\config.yaml'
+            OR path LIKE '%\Users\%\AppData\Local\goose\sessions\%'
     ),
     process_goose AS (
         SELECT COALESCE(COUNT(*), 0) AS total

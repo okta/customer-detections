@@ -30,10 +30,10 @@ query: |
     file_lmstudio AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '%\Users\%%\AppData\Local\Programs\LM Studio\LM Studio.exe'
-            OR path LIKE '%\Users\%%\.lmstudio\models\%'
-            OR path LIKE '%\Users\%%\.lmstudio\config.json'
-            OR path LIKE '%\Users\%%\AppData\Roaming\LM Studio\%'
+        WHERE path LIKE '%\Users\%\AppData\Local\Programs\LM Studio\LM Studio.exe'
+            OR path LIKE '%\Users\%\.lmstudio\models\%'
+            OR path LIKE '%\Users\%\.lmstudio\config.json'
+            OR path LIKE '%\Users\%\AppData\Roaming\LM Studio\%'
     ),
     process_lmstudio AS (
         SELECT COALESCE(COUNT(*), 0) AS total

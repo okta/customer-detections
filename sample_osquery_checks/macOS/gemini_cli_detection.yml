@@ -23,12 +23,12 @@ query: |
     WITH file_gemini AS (
         SELECT COALESCE(COUNT(*), 0) AS total
         FROM file
-        WHERE path LIKE '/Users/%%/.gemini/settings.json'
-            OR path LIKE '/Users/%%/.volta/bin/gemini'
-            OR path LIKE '/Users/%%/.local/bin/gemini'
+        WHERE path LIKE '/Users/%/.gemini/settings.json'
+            OR path LIKE '/Users/%/.volta/bin/gemini'
+            OR path LIKE '/Users/%/.local/bin/gemini'
             OR path LIKE '/usr/local/bin/gemini'
             OR path LIKE '/opt/homebrew/bin/gemini'
-            OR path LIKE '/Users/%%/node_modules/@google/gemini-cli/package.json'
+            OR path LIKE '/Users/%/node_modules/@google/gemini-cli/package.json'
     ),
     process_gemini AS (
         SELECT COALESCE(COUNT(*), 0) AS total
