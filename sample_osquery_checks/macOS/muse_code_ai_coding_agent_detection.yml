@@ -1,0 +1,54 @@
+title: Muse Code AI Coding Agent Detection
+id: d440a21f7a6a4771acf795703bbc1d1b
+description: |
+    Detects the presence of Muse Code, Meta's terminal-based agentic coding tool
+    (dev.meta.ai/lp/muse-code), on macOS devices. Muse Code is a multi-agent CLI coding assistant
+    capable of autonomously reading and writing files, executing shell commands, and running
+    multiple coordinated sub-agents on the user's behalf. It is installed via a self-updating
+    shell launcher (curl -fsSL https://dev.meta.ai/install.sh | bash) that places a launcher
+    binary named "muse" and versioned payload binaries named "muse-bin-<version>" in
+    ~/.local/bin by default, and stores an OAuth device-flow access token in
+    ~/.config/muse/auth.json. Code context, file contents, and conversation history are
+    transmitted to Meta's Muse Spark backend, and the stored auth.json token grants ongoing
+    access to the user's Muse account without re-authentication. This detection evaluates file
+    paths and running processes to identify Muse Code installations. A score greater than 1 (both
+    the installed binary and an active process) is required to confirm detection.
+references:
+    - https://dev.meta.ai/lp/muse-code
+    - https://dev.meta.ai/docs/muse-code/configuration
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH file_musecode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/Users/%/.local/bin/muse'
+            OR path LIKE '/Users/%/.local/bin/muse-bin-%'
+            OR path LIKE '/Users/%/.local/bin/.muse-version'
+            OR path LIKE '/Users/%/.local/bin/.muse-channel'
+            OR path LIKE '/Users/%/.local/bin/.muse-release-info.json'
+            OR path LIKE '/Users/%/.config/muse/auth.json'
+            OR path LIKE '/Users/%/.config/muse/settings.json'
+    ),
+    process_musecode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name = 'muse'
+            OR cmdline LIKE '%muse-bin-%'
+    ),
+    final_score AS (
+        SELECT
+            file_musecode.total
+            + process_musecode.total
+            AS score
+        FROM file_musecode, process_musecode
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS muse_code_detected
+    FROM final_score
+    ;

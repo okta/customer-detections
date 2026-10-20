@@ -1,0 +1,71 @@
+title: Muse AI Personal Assistant Detection
+id: 9d612593253b46c8b2306c1e6add130e
+description: |
+    Detects the presence of Meta's "Muse" personal AI agent (muse.ai) on macOS devices. Muse is
+    a desktop AI assistant, distinct from the Muse Code CLI coding agent, that requests macOS
+    Full Disk Access, Automation, and Notifications permissions in order to read and modify
+    files, send messages, and take actions inside other locally installed applications (such as
+    Mail, Notes, Calendar, and iMessage) on the user's behalf. Reporting has raised concerns about
+    the assistant building persistent profiles on users and reading private messages without
+    explicit per-action consent. Any content or metadata Muse accesses may be transmitted to
+    Meta's servers. Because the generic name "Muse" collides with several unrelated products
+    (note-taking apps, music notation software, EEG headband companion apps), this detection
+    anchors on Meta's application bundle identifier com.meta.endo and the Muse.app bundle rather
+    than the name alone to avoid false positives. Meta also publishes a separate "Meta AI" chatbot
+    app with the related but distinct bundle identifier com.meta.endo.vanilla; the launchd signal
+    below explicitly excludes that identifier so the two products are not conflated. This
+    detection evaluates launchd services, file paths, running processes, and installed
+    applications to identify Muse installations. A score greater than 1 (at least two positive
+    indicators) is required to confirm detection.
+references:
+    - https://muse.ai
+    - https://ai.meta.com/muse
+    - https://www.meta.com/help/artificial-intelligence/1126304576638594
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH launchd_muse AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM launchd
+        -- excludes com.meta.endo.vanilla (the separate "Meta AI" chatbot app)
+        WHERE (name = 'com.meta.endo' OR name LIKE 'com.meta.endo.%')
+            AND name NOT LIKE 'com.meta.endo.vanilla%'
+    ),
+    file_muse AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '/Applications/Muse.app'
+            OR path LIKE '/Users/%/Library/Application Support/com.meta.endo'
+            OR path LIKE '/Users/%/Library/Application Support/com.meta.endo/%'
+            OR path LIKE '/Users/%/Library/Caches/com.meta.endo'
+            OR path LIKE '/Users/%/Library/Preferences/com.meta.endo.plist'
+            OR path LIKE '/Users/%/Library/WebKit/com.meta.endo'
+    ),
+    process_muse AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE path LIKE '%/Muse.app/%'
+    ),
+    apps_muse AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM apps
+        WHERE bundle_identifier = 'com.meta.endo'
+    ),
+    final_score AS (
+        SELECT
+            launchd_muse.total
+            + file_muse.total
+            + process_muse.total
+            + apps_muse.total
+            AS score
+        FROM launchd_muse, file_muse, process_muse, apps_muse
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS muse_ai_detected
+    FROM final_score
+    ;
