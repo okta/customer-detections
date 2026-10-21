@@ -1,0 +1,83 @@
+title: Muse Code AI Coding Agent Detection
+id: 71519a0a06b84eb3bcaf884444522f5d
+description: |
+    Detects the presence of Muse Code, Meta's terminal-based agentic coding tool
+    (dev.meta.ai/lp/muse-code), on Windows devices. Muse Code is a multi-agent CLI coding
+    assistant capable of autonomously reading and writing files, executing shell commands, and
+    running multiple coordinated sub-agents on the user's behalf. On Windows it installs through
+    a two-layer gateway rather than a single binary: the self-updating installer (irm
+    https://dev.meta.ai/install.ps1 | iex) writes a thin shim named "muse.cmd" under
+    %LOCALAPPDATA%\Programs\muse by default, which invokes powershell.exe to run a hidden
+    self-updating gateway script named ".muse-launcher.ps1" in the same directory, which in turn
+    downloads and execs the versioned payload binary "muse-bin-<version>.exe". The gateway script
+    maintains its own state files (.muse-version, .muse-channel, .muse-release-info.json,
+    .muse-update-checked-at, .muse-update-notice, .muse-launcher.previous, and a
+    .muse-update-lock directory) and silently replaces itself in the background on a schedule.
+    An OAuth device-flow access token is stored in %USERPROFILE%\.config\muse\auth.json. Code
+    context, file contents, and conversation history are transmitted to Meta's Muse Spark
+    backend, and the stored auth.json token grants ongoing access to the user's Muse account
+    without re-authentication. This detection evaluates file paths (covering both the visible
+    shim/binary and the hidden gateway launcher/state files), running processes (including the
+    powershell.exe process that hosts the gateway script), prefetch entries, and active network
+    sockets to identify Muse Code installations. A score greater than 1 (at least two positive
+    indicators) is required to confirm detection.
+references:
+    - https://dev.meta.ai/lp/muse-code
+    - https://dev.meta.ai/docs/muse-code/configuration
+    - https://www.okta.com/blog/threat-intelligence/detecting-openclaw-advanced-posture-checks/
+author:
+    - rafa.bono@okta.com
+platform: Windows
+query: |
+    WITH file_musecode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM file
+        WHERE path LIKE '%\Users\%\AppData\Local\Programs\muse\muse.cmd'
+            OR path LIKE '%\Users\%\AppData\Local\Programs\muse\muse-bin-%.exe'
+            -- hidden self-updating gateway script invoked by muse.cmd via powershell.exe
+            OR path LIKE '%\Users\%\AppData\Local\Programs\muse\.muse-launcher.ps1'
+            OR path LIKE '%\Users\%\AppData\Local\Programs\muse\.muse-launcher.previous'
+            OR path LIKE '%\Users\%\AppData\Local\Programs\muse\.muse-version'
+            OR path LIKE '%\Users\%\AppData\Local\Programs\muse\.muse-channel'
+            OR path LIKE '%\Users\%\AppData\Local\Programs\muse\.muse-release-info.json'
+            OR path LIKE '%\Users\%\AppData\Local\Programs\muse\.muse-update-checked-at'
+            OR path LIKE '%\Users\%\AppData\Local\Programs\muse\.muse-update-notice'
+            OR path LIKE '%\Users\%\AppData\Local\Programs\muse\.muse-update-lock\%'
+            OR path LIKE '%\Users\%\.config\muse\auth.json'
+            OR path LIKE '%\Users\%\.config\muse\settings.json'
+    ),
+    process_musecode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE name LIKE '%muse-bin%'
+            OR name = 'muse.cmd'
+            -- gateway script is hosted inside a powershell.exe process, not its own binary
+            OR (name = 'powershell.exe' AND cmdline LIKE '%.muse-launcher.ps1%')
+    ),
+    prefetch_musecode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM prefetch
+        WHERE path LIKE '%muse-bin%'
+            OR path LIKE '%\Programs\muse\%'
+    ),
+    sockets_musecode AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM process_open_sockets
+        WHERE path LIKE '%muse-bin%'
+    ),
+    final_score AS (
+        SELECT
+            file_musecode.total
+            + process_musecode.total
+            + prefetch_musecode.total
+            + sockets_musecode.total
+            AS score
+        FROM file_musecode, process_musecode, prefetch_musecode, sockets_musecode
+    )
+    SELECT
+        CASE
+            WHEN score <= 1 THEN 0
+            WHEN score > 1 THEN 1
+        END AS muse_code_detected
+    FROM final_score
+    ;
