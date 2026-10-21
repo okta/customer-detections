@@ -1,0 +1,57 @@
+title: eMudhra CA Private Key Compromise Trust Store Detection
+id: b6a8033c44e44501bb9645c26e503078
+description: |
+  In October 2026, security researcher Dennis Jackson disclosed that eMudhra, a publicly
+  trusted Certificate Authority, generated the private keys for several intermediate TLS and
+  code-signing CA certificates using a flawed process that allows anyone to recover the private
+  key directly from the public certificate. This is not malware delivered to an endpoint; it is
+  a cryptographic failure in a CA that every device implicitly trusts via its OS or browser
+  trust store. An attacker in possession of a recovered intermediate key can mint certificates
+  for any domain or sign arbitrary code and have it accepted as validly issued, enabling
+  undetectable man-in-the-middle interception of TLS traffic or trusted execution of malicious
+  code. Sixteen affected intermediate certificates were identified across eight distinct
+  certificate/key pairs (each issued twice — once chaining to eMudhra's own root, once
+  cross-signed by Sectigo's "AAA Certificate Services" root — so both chains share the same
+  subject public key and therefore the same Subject Key Identifier). All sixteen were revoked by
+  their issuing roots as of 2026-10-19 for reason "ca_compromise". This detection checks whether
+  a device's local certificate store (macOS Keychain, Windows certificate store, or Linux/NSS CA
+  bundle) still contains any CA certificate matching one of the eight compromised Subject Key
+  Identifiers, which would indicate the revoked intermediate has not yet been removed or that
+  the device has not received an updated CA bundle / trust store update. A positive result does
+  not mean the device is compromised, but that it may still accept fraudulent certificates
+  chaining to one of these keys; remediate by updating the OS, browser, and/or CA certificate
+  bundle (ca-certificates, NSS, etc.) to the latest version, which should mark these intermediates
+  as revoked or remove them from the trusted set entirely.
+references:
+  - https://emudhra.we-have-a-problem.com/
+author:
+  - rafa.bono@okta.com
+platform:
+  - macOS
+  - Windows
+  - Linux
+query: |
+  SELECT
+    CASE WHEN count(*) = 0 THEN '0'
+    ELSE '1'
+    END AS emudhra_compromised_ca_trusted
+  FROM certificates
+  WHERE ca = 1
+    AND lower(subject_key_id) IN (
+      -- EM DV TLS CA - G3B
+      'e21e2fe71c19390e554b62c120245735248a2514',
+      -- EM OV TLS CA - G3B
+      '9bd86551afe7e72c37ad08ee6919d9bf3784ae0a',
+      -- EM EV TLS CA - G3B
+      '3edc20d9894698877b873fd88147b25c15d84706',
+      -- EM DV TLS CA - G3C
+      'ae7e105c3c2996c1a847270559f1e03dd4e50af3',
+      -- EM OV TLS CA - G3C
+      '34eaea0cebc90adaf9d0c5e2ed9b78c9879e1b6c',
+      -- EM EV TLS CA - G3C
+      'a6255e80a94db7f3967c1bc791df92bcee4beb5f',
+      -- EM OV CS CA - G3B (code-signing)
+      '79fae8eccfdb0d758da458d69fb6eddc7c49dee6',
+      -- EM OV CS CA - G3C (code-signing)
+      'ee6f73298d6fbfa7b31bc39534f61556447866b7'
+    );
