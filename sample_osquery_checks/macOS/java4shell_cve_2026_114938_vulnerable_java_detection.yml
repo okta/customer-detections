@@ -1,0 +1,76 @@
+title: Java4Shell CVE-2026-114938 Vulnerable Java Runtime Detection
+id: d6abcd0ae2b14fd0b78f9bf7d3568aad
+description: |
+    Detects Java runtimes in the version ranges reported as vulnerable to Java4Shell
+    (CVE-2026-114938), a heap overflow in the x86-64 AVX-512 VBMI Base64 intrinsic of OpenJDK
+    HotSpot, reported by Calif on 2026-11-17. Severity is rated CVSS 4.0 9.2 by Calif and CVSS 3.1
+    8.1 by Oracle. At the time of writing the CVE record was reserved with no public description,
+    and the technical details come from researcher write-ups rather than an official advisory.
+    Per those write-ups, malformed Base64 ending in an extra "=" makes the decoder write past the
+    end of the output array before rejecting the input, and it is reachable wherever a Java service
+    decodes attacker controlled Base64, for example HTTP Basic headers, SAML artifacts and CSRF
+    tokens. A Java client connecting over TLS to a malicious server may also be exposed. Calif
+    reports working remote code execution against several products, but has not published the
+    exploits, and other researchers (Upwind, Blackpoint) reproduced only JVM crashes and memory
+    leaks. No in-the-wild exploitation is known and the vulnerability is not in CISA KEV at the
+    time of writing. Only
+    x86-64 hosts with AVX-512 VBMI (avx512f, avx512bw, avx512vbmi, bmi2) are exposed; ARM64 is not.
+    The cpuid table is not available in every osquery build, so this check gates on an Intel CPU
+    (system_info.cpu_type) instead. This can flag an Intel Mac that lacks AVX-512 VBMI, so treat a
+    positive as "vulnerable runtime installed on potentially exposed hardware". The check reads the
+    version from installed JDK bundles (Info.plist under /Library/Java/JavaVirtualMachines and
+    ~/Library/Java/JavaVirtualMachines) and from Homebrew openjdk formulae, and matches the
+    vulnerable ranges 17.0.6 through 17.0.21.0.3, 21 through 21.0.13.0.3, 25 through 25.0.5.0.3
+    and 27 through 27.0.1.0.3. The fixed builds are 17.0.21.1, 21.0.13.1, 25.0.5.1 and 27.0.1.1
+    (Corretto 17.0.21.1.2, 21.0.13.1.2, 25.0.5.1.2, 27.0.1.1.4; SapMachine 17.0.21.1, 21.0.13.1,
+    25.0.5.1, 27.0.1.1). Java 8 and 11 are not matched; the Java SE 8 Performance Pack
+    (8u511b33-perf) and GraalVM builds do not expose a comparable version here and are not covered.
+    Upwind confirmed Eclipse Temurin 17.0.21, 21.0.13 and 25.0.5 as vulnerable in a lab, and these
+    three-part versions fall inside the matched ranges. Temurin, Microsoft OpenJDK, BellSoft
+    Liberica and Red Hat had no fixed builds listed when this was written, so a positive for those
+    vendors may not be remediable yet; restrict the JVM with -XX:-UseBASE64Intrinsics as an interim workaround. Vendors that report only a
+    three-part version (for example 17.0.21) cannot be told apart from a patched build and may be
+    flagged incorrectly. A positive means update the runtime to a fixed build and restart Java
+    services, or apply the workaround.
+references:
+    - https://calif.io/java4shell
+    - https://thehackernews.com/2026/11/java4shell-cve-2026-114938-enables-pre.html
+    - https://sec.okta.com/articles/2026/11/oracle-java-security-updates-openjdk-advisory-cve-2026-114938/
+    - https://www.cve.org/CVERecord?id=CVE-2026-114938
+    - https://www.upwind.io/blog/java4shell-what-we-know-now-and-what-comes-next
+    - https://thehackernews.com/2026/11/oracle-to-patch-11-java-flaws-today-as.html
+    - https://openjdk.org/groups/vulnerability/advisories/2026-11-17
+    - https://blogs.oracle.com/java/transitioning-java-to-more-frequent-security-updates
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH cpu_gate AS (
+        SELECT 1 AS ok
+        FROM system_info
+        WHERE cpu_type LIKE 'x86_64%'
+    ),
+    java_versions AS (
+        SELECT value AS v
+        FROM plist
+        WHERE key = 'CFBundleShortVersionString'
+            AND (path LIKE '/Library/Java/JavaVirtualMachines/%/Contents/Info.plist'
+                OR path LIKE '/Users/%/Library/Java/JavaVirtualMachines/%/Contents/Info.plist')
+
+        UNION ALL
+
+        SELECT version AS v
+        FROM homebrew_packages
+        WHERE name = 'openjdk'
+            OR name LIKE 'openjdk@%'
+    )
+    SELECT
+        CASE WHEN count(*) = 0 THEN '0'
+        ELSE '1'
+        END AS java4shell_detected
+    FROM java_versions, cpu_gate
+    WHERE (version_compare(v, '17.0.6') >= 0 AND version_compare(v, '17.0.21.0.3') <= 0)
+        OR (version_compare(v, '21.0.0') >= 0 AND version_compare(v, '21.0.13.0.3') <= 0)
+        OR (version_compare(v, '25.0.0') >= 0 AND version_compare(v, '25.0.5.0.3') <= 0)
+        OR (version_compare(v, '27.0.0') >= 0 AND version_compare(v, '27.0.1.0.3') <= 0)
+    ;
