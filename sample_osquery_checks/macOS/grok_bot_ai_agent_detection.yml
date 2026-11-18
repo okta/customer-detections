@@ -1,0 +1,60 @@
+title: Grok Bot AI Agent Detection
+id: b74706de86754968a70923d29887c367
+description: |
+    Detects the presence of Grok Bot, an AI teammate agent from x.ai (SpaceXAI), on macOS devices.
+    Grok Bot is built on Cursor infrastructure and signs in with a Cursor account. Each Bot is given
+    its own cloud computer, is signed into the user's business applications (Slack, Teams, email,
+    calendars, SaaS tools), and performs work autonomously and around the clock, including when the
+    user's laptop is closed. It can also join Google Meet, Zoom, and Teams calls, learn workflows
+    by demonstration, and act inside logged-in accounts. This creates data exposure and
+    delegated-access risk, since credentials, session access, and meeting content are handled by a
+    third-party agent. Organizations may wish to audit or restrict its use on corporate devices.
+    This detection matches the installed application by its exact bundle identifier
+    (com.anysphere.sand), confirmed from the Info.plist of the shipping Grok Bot.app (version
+    1.2.0 observed), the Homebrew cask named grok-bot, and any running process whose executable lives inside a
+    Grok Bot.app bundle. The process signal is location independent, so it also catches a copy of
+    the app extracted from the DMG and run from outside /Applications (for example ~/Downloads or
+    a mounted /Volumes image), which the apps table does not scan. All signals are exact and
+    unique, so a single match is high confidence. The user data directory is intentionally not
+    used because it survives uninstallation. A positive result
+    means Grok Bot is installed or running on the device; review whether its use is approved, and review which
+    corporate applications and accounts have been connected to it.
+references:
+    - https://x.ai/bot
+    - https://docs.x.ai/grok-bot/deployment
+    - https://docs.x.ai/grok-bot/get-started
+author:
+    - rafa.bono@okta.com
+platform: macOS
+query: |
+    WITH app_grok_bot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM apps
+        WHERE bundle_identifier = 'com.anysphere.sand'
+            OR name = 'Grok Bot.app'
+    ),
+    homebrew_grok_bot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM homebrew_packages
+        WHERE name = 'grok-bot'
+    ),
+    process_grok_bot AS (
+        SELECT COALESCE(COUNT(*), 0) AS total
+        FROM processes
+        WHERE path LIKE '%/Grok Bot.app/Contents/%'
+    ),
+    final_score AS (
+        SELECT
+            CASE WHEN app_grok_bot.total > 0 THEN 1 ELSE 0 END
+            + CASE WHEN homebrew_grok_bot.total > 0 THEN 1 ELSE 0 END
+            + CASE WHEN process_grok_bot.total > 0 THEN 1 ELSE 0 END
+            AS score
+        FROM app_grok_bot, homebrew_grok_bot, process_grok_bot
+    )
+    SELECT
+        CASE
+            WHEN score = 0 THEN 0
+            WHEN score > 0 THEN 1
+        END AS grok_bot_detected
+    FROM final_score
+    ;
